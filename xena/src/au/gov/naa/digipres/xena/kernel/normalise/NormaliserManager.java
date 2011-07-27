@@ -1205,7 +1205,7 @@ public class NormaliserManager {
 				// Add Some details about the copy
 				results.setInputSystemId(xis.getSystemId());
 				results.setInputType(xis.getType());
-				results.setOutputFileName(destinationDir + File.separator + origFile.getName());
+				results.setOutputFileName(origFile.getName());
 				// Set the normaliser name to tell the user what was done.
 				results.setNormaliserName("Copy Unchanged");
 

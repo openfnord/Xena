@@ -1271,7 +1271,7 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 	private void doCancel() {
 		// Confirm file deletion
 		String[] msgArr =
-		    {"Using the Cancel button will cause the current set " + "of normalised output files to be deleted.", "Are you sure you want to do this?"};
+		    {"Using the Cancel button will cause the current set of normalised output files to be deleted.", "Are you sure you want to do this?"};
 		int retVal = JOptionPane.showConfirmDialog(this, msgArr, "Confirm File Deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, IconFactory.getIconByName("images/icons/warning_32.png"));
 
 		if (retVal == JOptionPane.YES_OPTION) {
@@ -1280,16 +1280,25 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 			List<NormaliserResults> resultsList = tableModel.getAllNormaliserResults();
 
 			// For all results objects displayed in the table
+			String deleteFailureMsg = "";
 			for (NormaliserResults results : resultsList) {
 				// Delete output file
 				String destDir = results.getDestinationDirString();
 				String destFile = results.getOutputFileName();
 				if (destDir != null && !"".equals(destDir.trim()) && destFile != null && !"".equals(destFile.trim())) {
 					File file = new File(destDir + File.separator + destFile);
-					file.delete();
-
-					logger.finest("Deleted file " + file);
+					if (file.delete()) {
+						logger.finest("Deleted file " + file);
+					} else {
+						logger.warning("Failed to delete file " + file); // should this be a higher logging level?
+						deleteFailureMsg += "\n" + file.getAbsolutePath();
+					}
 				}
+			}
+			if (deleteFailureMsg != "") {
+				// display a message showing what files have not been deleted to the user
+				deleteFailureMsg = "The following files could not be deleted:" + deleteFailureMsg;
+				JOptionPane.showMessageDialog(this, deleteFailureMsg, "File Deletion Unsuccessful", JOptionPane.ERROR_MESSAGE);
 			}
 
 			// Clear results table
