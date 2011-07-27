@@ -116,10 +116,10 @@ public class OfficeToXenaOooNormaliser extends AbstractNormaliser {
 				try {
 					productId = OpenOfficeConverter.getProductId(normaliserManager.getPluginManager());
 				} catch (Exception ex) {
-					// Just write that an Unknown tool did the conversion and log error
-					//TODO change this and other possible serious errors to provide a warning result somewhere to the user
+					// Write that an Unknown tool did the conversion, log warning and add warning to results
 					productId = "an Unknown Conversion Tool"; 
-					logger.finest(ex.getMessage());
+					logger.warning(ex.getMessage());
+					results.addWarning("Could not retrieve Product ID of Conversion Tool; metadata written to say produced by an Unknown Conversion Tool");
 				}
 				// Base64 the file
 				att.addAttribute(OPEN_DOCUMENT_URI, PROCESS_DESCRIPTION_TAG_NAME, tagPrefix + ":" + PROCESS_DESCRIPTION_TAG_NAME, "CDATA", DESCRIPTION.concat(productId));
