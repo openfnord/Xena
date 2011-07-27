@@ -27,9 +27,11 @@ import java.awt.Frame;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
+import au.gov.naa.digipres.xena.kernel.IconFactory;
+
 /**
  */
-public class ExceptionDialog extends JDialog {
+public class XenaDialog extends JDialog {
 
 	private javax.swing.JPanel jContentPane = null;
 
@@ -48,7 +50,7 @@ public class ExceptionDialog extends JDialog {
 	 */
 	public static void showExceptionDialog(Component component, Throwable t, String title, String explanation) {
 		Frame frame = JOptionPane.getFrameForComponent(component);
-		ExceptionDialog dialog = new ExceptionDialog(frame, t, title, explanation);
+		XenaDialog dialog = new XenaDialog(frame, t, title, explanation);
 		dialog.setVisible(true);
 	}
 
@@ -63,6 +65,26 @@ public class ExceptionDialog extends JDialog {
 	}
 
 	/**
+	 * Show a dialog displaying an warning.
+	 * @param frame the component to show the dialog over
+	 * @param title the title of the dialog
+	 * @param explanation   the explanation of the warning
+	 */
+	public static void showWarningDialog(Component component, String warning, String title, String explanation) {
+		showExceptionDialog(component, warning, title, explanation, javax.swing.JOptionPane.WARNING_MESSAGE);
+	}
+	
+	/**
+	 * Show a dialog displaying information.
+	 * @param frame the component to show the dialog over
+	 * @param title the title of the dialog
+	 * @param explanation   the explanation of the warning
+	 */
+	public static void showInfoDialog(Component component, String warning, String title, String explanation) {
+		showExceptionDialog(component, warning, title, explanation, javax.swing.JOptionPane.INFORMATION_MESSAGE);
+	}
+	
+	/**
 	 * 
 	 * @param component parent component
 	 * @param error error detail
@@ -72,7 +94,7 @@ public class ExceptionDialog extends JDialog {
 	 */
 	public static void showExceptionDialog(Component component, String error, String title, String explanation, int type) {
 		Frame frame = JOptionPane.getFrameForComponent(component);
-		ExceptionDialog dialog = new ExceptionDialog(frame, error, title, explanation, type);
+		XenaDialog dialog = new XenaDialog(frame, error, title, explanation, type);
 		dialog.setLocationRelativeTo(component);
 		dialog.setVisible(true);
 	}
@@ -80,11 +102,11 @@ public class ExceptionDialog extends JDialog {
 	/**
 	 * This is the default constructor
 	 */
-	protected ExceptionDialog() {
+	protected XenaDialog() {
 		this(null, (Exception) null, "", "");
 	}
 
-	protected ExceptionDialog(Frame frame, Throwable t, String title, String explanation) {
+	protected XenaDialog(Frame frame, Throwable t, String title, String explanation) {
 		super(frame, true);
 		this.title = title;
 
@@ -92,7 +114,7 @@ public class ExceptionDialog extends JDialog {
 		initialize(javax.swing.JOptionPane.ERROR_MESSAGE);
 	}
 
-	protected ExceptionDialog(Frame frame, String error, String title, String explanation, int type) {
+	protected XenaDialog(Frame frame, String error, String title, String explanation, int type) {
 		super(frame, true);
 		this.title = title;
 		exceptionPanel = new ExceptionPanel(error, explanation);
@@ -134,6 +156,10 @@ public class ExceptionDialog extends JDialog {
 			jOptionPane = new JOptionPane();
 			jOptionPane.setMessage(exceptionPanel);
 			jOptionPane.setMessageType(type);
+			if (type == JOptionPane.WARNING_MESSAGE) {
+				// use our Crystal Projects warning icon rather than the default icon
+				jOptionPane.setIcon(IconFactory.getIconByName("images/icons/warning_32.png"));
+			}
 			jOptionPane.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
 				public void propertyChange(java.beans.PropertyChangeEvent e) {
 					if ((e.getPropertyName().equals("value"))) { //$NON-NLS-1$

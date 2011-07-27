@@ -33,6 +33,7 @@ import java.util.List;
 import au.gov.naa.digipres.xena.core.Xena;
 import au.gov.naa.digipres.xena.kernel.XenaException;
 import au.gov.naa.digipres.xena.kernel.XenaInputSource;
+import au.gov.naa.digipres.xena.kernel.XenaWarningException;
 import au.gov.naa.digipres.xena.kernel.filenamer.AbstractFileNamer;
 import au.gov.naa.digipres.xena.kernel.metadatawrapper.AbstractMetaDataWrapper;
 import au.gov.naa.digipres.xena.kernel.metadatawrapper.MetaDataWrapperManager;
@@ -125,6 +126,8 @@ public class NormaliserResults {
 	private List<String> errorList = new ArrayList<String>();
 
 	private List<Exception> exceptionList = new ArrayList<Exception>();
+	
+	private List<String> warningList = new ArrayList<String>();
 
 	private List<NormaliserResults> childAIPResults = new ArrayList<NormaliserResults>();
 
@@ -197,7 +200,7 @@ public class NormaliserResults {
 			       + "with normaliser: \"" + normaliserName + "\"" + System.getProperty("line.separator") + "to the folder: " + destinationDirString
 			       + System.getProperty("line.separator") + "and the Xena id is: " + id;
 		} else if (exceptionList.size() != 0) {
-			return "The following exceptions were registered: " + getErrorDetails();
+			return "The following exceptions were registered: " + getStatusDetails();
 		} else {
 			if (inputSystemId != null) {
 				return inputSystemId + " is NOT normalised, and no exceptions have been registered.";
@@ -311,11 +314,42 @@ public class NormaliserResults {
 		this.destinationDirString = destinationDirString;
 	}
 
+	/**
+	 * @param e
+	 *            The exception to add to these results (as an exception that has occurred when attempting to normalise).
+	 */
 	public void addException(Exception e) {
 		exceptionList.add(e);
 	}
+	
+	/**
+	 * @param message
+	 *            A warning message to add to these results.
+	 */
+	public void addWarning(String message) {
+		warningList.add(message);
+	}
+	
+	/**
+	 * @return Returns true if there are any exceptions or errors associated with these results else false
+	 */
+	public boolean hasError() {
+		return !(exceptionList.isEmpty() && errorList.isEmpty());
+	}
+	
+	/**
+	 * @return Returns true if there are any warnings associated with these results else false
+	 */
+	public boolean hasWarning() {
+		return !warningList.isEmpty();
+	}
 
-	public String getErrorDetails() {
+	/**
+	 * @return Returns a String containing exceptions, errors and warnings associated with these results.
+	 *         Each item occurs on a new line although individual items may be spread over more than one
+	 *         line.  Exceptions contain trace information (which is shown over multiple lines).
+	 */
+	public String getStatusDetails() {
 		// find all our exception messages
 		StringBuffer exceptions = new StringBuffer();
 		for (Exception e : exceptionList) {
@@ -333,29 +367,48 @@ public class NormaliserResults {
 		// find all our error messages
 		StringBuffer errors = new StringBuffer();
 		for (String errorMesg : errorList) {
-			errors.append(errorMesg);
+			errors.append(errorMesg + "\n");
 		}
+		
+		// find all our warning messages
+		StringBuffer warnings = new StringBuffer();
+		for (String warningMesg : warningList) {
+			warnings.append(warningMesg + "\n");
+		}
+		
 		StringBuffer returnStringBuffer = new StringBuffer();
 
 		if (exceptions.length() != 0) {
 			returnStringBuffer.append(exceptions + "\n");
 		}
 		if (errors.length() != 0) {
-			returnStringBuffer.append(errors);
+			returnStringBuffer.append(errors + "\n");
+		}
+		if (warnings.length() != 0) {
+			returnStringBuffer.append(warnings);
 		}
 		return new String(returnStringBuffer);
 	}
 
-	// Returns the message for the first exception or error, or an empty string
-	// if no errors have occurred.
-	public String getErrorMessage() {
-		String message = "";
+	/**
+	 * @return Returns the message for the first exception, error or warning, or an empty message 
+	 * 		   if none of these have occurred.
+	 */
+	public StatusMessage getStatusMessage() {
+		StatusMessage statusMessage = new StatusMessage();
 		if (!exceptionList.isEmpty()) {
-			message = "Exception: " + exceptionList.get(0).getMessage();
+			statusMessage.setType(StatusMessage.ERROR);
+			statusMessage.setMessage(exceptionList.get(0).getMessage());
 		} else if (!errorList.isEmpty()) {
-			message = "Error: " + errorList.get(0);
+			statusMessage.setType(StatusMessage.ERROR);
+			statusMessage.setMessage(errorList.get(0));
+		} else if (!warningList.isEmpty()) {
+			statusMessage.setType(StatusMessage.WARNING);
+			statusMessage.setMessage(warningList.get(0));
+		} else {
+			statusMessage.setMessage("");
 		}
-		return message;
+		return statusMessage;
 	}
 
 	/**
@@ -370,6 +423,13 @@ public class NormaliserResults {
 	 */
 	public List<Exception> getExceptionList() {
 		return exceptionList;
+	}
+	
+	/**
+	 * @return Returns the warningList.
+	 */
+	public List<String> getWarningList() {
+		return warningList;
 	}
 
 	/**

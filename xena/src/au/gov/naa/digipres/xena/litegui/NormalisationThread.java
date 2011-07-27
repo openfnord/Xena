@@ -43,6 +43,7 @@ import java.util.logging.Logger;
 import au.gov.naa.digipres.xena.core.Xena;
 import au.gov.naa.digipres.xena.kernel.XenaException;
 import au.gov.naa.digipres.xena.kernel.XenaInputSource;
+import au.gov.naa.digipres.xena.kernel.XenaWarningException;
 import au.gov.naa.digipres.xena.kernel.filenamer.AbstractFileNamer;
 import au.gov.naa.digipres.xena.kernel.metadatawrapper.AbstractMetaDataWrapper;
 import au.gov.naa.digipres.xena.kernel.normalise.AbstractNormaliser;
@@ -104,8 +105,9 @@ public class NormalisationThread extends Thread {
 	private Map<String, Set<NormaliserResults>> parentToChildrenMap = new HashMap<String, Set<NormaliserResults>>();
 	private int mode;
 	private boolean retainDirectoryStructure, performTextNormalisation;
-	private int index;
+	private int successCount;
 	private int errorCount;
+	private int warningCount;
 	private Frame parentFrame;
 
 	private ArrayList<NormalisationStateChangeListener> ntscListeners;
@@ -229,8 +231,9 @@ public class NormalisationThread extends Thread {
 	private void normaliseStandard(int modeParam) throws XenaException, IOException {
 		// Have to use global variables for the indices as they are
 		// updated in called methods.
-		index = 0;
+		successCount = 0;
 		errorCount = 0;
+		warningCount = 0;
 		threadState = RUNNING;
 
 		// Create the full file list, recursively adding all
@@ -247,7 +250,7 @@ public class NormalisationThread extends Thread {
 		}
 
 		for (XenaInputSource xis : xisSet) {
-			fireStateChangedEvent(RUNNING, xisSet.size(), index - errorCount, errorCount, xis.getFile().getName());
+			fireStateChangedEvent(RUNNING, xisSet.size(), successCount, errorCount, warningCount, xis.getFile().getName());
 
 			normaliseFile(xis, modeParam, -1, xisSet.size());
 
@@ -257,7 +260,7 @@ public class NormalisationThread extends Thread {
 				break;
 			}
 		}
-		fireStateChangedEvent(STOPPED, xisSet.size(), index - errorCount, errorCount, null);
+		fireStateChangedEvent(STOPPED, xisSet.size(), successCount, errorCount, warningCount, null);
 	}
 
 	/**
@@ -273,8 +276,9 @@ public class NormalisationThread extends Thread {
 	 * @throws IOException 
 	 */
 	private void normaliseErrors(int modeParam) {
-		index = 0;
+		successCount = 0;
 		errorCount = 0;
+		warningCount = 0;
 		threadState = RUNNING;
 
 		// Row indices of entries that were not normalised successfully
@@ -284,7 +288,7 @@ public class NormalisationThread extends Thread {
 			NormaliserResults results = tableModel.getNormaliserResults(errorResultIndex);
 			XenaInputSource xis = new XenaInputSource(results.getInputSystemId(), results.getInputType());
 
-			fireStateChangedEvent(RUNNING, errorIndices.size(), index - errorCount, errorCount, xis.getSystemId());
+			fireStateChangedEvent(RUNNING, errorIndices.size(), successCount, errorCount, warningCount, xis.getSystemId());
 
 			normaliseFile(xis, modeParam, errorResultIndex, errorIndices.size());
 
@@ -294,7 +298,7 @@ public class NormalisationThread extends Thread {
 				break;
 			}
 		}
-		fireStateChangedEvent(STOPPED, errorIndices.size(), index - errorCount, errorCount, null);
+		fireStateChangedEvent(STOPPED, errorIndices.size(), successCount, errorCount, warningCount, null);
 
 	}
 
@@ -315,9 +319,8 @@ public class NormalisationThread extends Thread {
 	 * @param totalFileCount
 	 */
 	private void normaliseFile(XenaInputSource xis, int modeParam, int modelIndex, int totalFileCount) {
+		NormaliserResults results = null;
 		try {
-			NormaliserResults results = null;
-
 			if (modeParam == BINARY_MODE || modeParam == BINARY_ERRORS_MODE) {
 				// Instantiate BinaryNormaliser
 				// AbstractNormaliser binaryNormaliser = NormaliserManager.singleton().lookup(BINARY_NORMALISER_NAME);
@@ -337,8 +340,6 @@ public class NormalisationThread extends Thread {
 			if (results == null) {
 				throw new XenaException("Normalisation failed, reason unknown");
 			} else if (!results.isNormalised()) {
-				errorCount++;
-
 				logger.finer("Normalisation failed:\n" + "Source: " + results.getInputSystemId());
 			}
 
@@ -399,43 +400,57 @@ public class NormalisationThread extends Thread {
 			             + results.getDestinationDirString() + File.separator + results.getOutputFileName());
 
 		} catch (Exception e) {
-			// Status label is now red to indicate an error
-			errorCount++;
-
 			// Create a new NormaliserResults object to display
 			// in the results table. Set all the data we can.
-			NormaliserResults errorResults = new NormaliserResults();
-			errorResults.setInputSystemId(xis.getSystemId());
-			errorResults.setInputType(xis.getType());
-			errorResults.addException(e);
-			errorResults.setOutputFileName("");
+			results = new NormaliserResults();
+			results.setInputSystemId(xis.getSystemId());
+			results.setInputType(xis.getType());
+			results.setOutputFileName("");
+			
+			// add exception or warning to results as appropriate
+			if (!(e instanceof XenaWarningException)) {
+				results.addException(e);
+			} else {
+				// this exception is just a warning so add the warning message to the results and discard
+				// the rest of the exception information
+				results.addWarning(e.getMessage());
+			}
 
 			// Add results to display table. If we are in
 			// BINARY_ERRORS_MODE, then the row is updated
 			// rather than added.
 			if (modeParam == BINARY_ERRORS_MODE) {
-				tableModel.setNormalisationResult(modelIndex, errorResults, new Date(), false);
+				tableModel.setNormalisationResult(modelIndex, results, new Date(), false);
 			} else {
-				tableModel.addNormalisationResult(errorResults, new Date(), false);
+				tableModel.addNormalisationResult(results, new Date(), false);
 			}
 
 			tableModel.fireTableDataChanged();
 
-			logger.finer("Normalisation failed for " + errorResults.getInputSystemId() + ": " + e);
+			logger.finer("Normalisation failed for " + results.getInputSystemId() + ": " + e);
 		} finally {
-			index++;
+			// add to counts
+			if (results.isNormalised()) {
+				successCount++;
+			}
+			if (results.hasError()) {
+				errorCount++;
+			}
+			if (results.hasWarning()) {
+				warningCount++;
+			}
 		}
 
 		// Check to see if thread has been paused
 		if (threadState == PAUSED) {
 			logger.finest("Normalisation thread paused");
-			fireStateChangedEvent(PAUSED, totalFileCount, index - errorCount, errorCount, xis.getSystemId());
+			fireStateChangedEvent(PAUSED, totalFileCount, successCount, errorCount, warningCount, xis.getSystemId());
 			doPause();
 
 			// Have returned from pause
 			if (threadState == RUNNING) {
 				logger.finest("Normalisation thread restarted");
-				fireStateChangedEvent(RUNNING, totalFileCount, index - errorCount, errorCount, xis.getSystemId());
+				fireStateChangedEvent(RUNNING, totalFileCount, successCount, errorCount, warningCount, xis.getSystemId());
 			}
 		}
 
@@ -529,9 +544,9 @@ public class NormalisationThread extends Thread {
 	 * Broadcast to all listeners that the thread state has changed
 	 * @param newState
 	 */
-	private void fireStateChangedEvent(int newState, int totalItems, int normalisedItems, int errorItems, String currentFile) {
+	private void fireStateChangedEvent(int newState, int totalItems, int normalisedItems, int errorItems, int warningItems, String currentFile) {
 		for (NormalisationStateChangeListener ntscl : ntscListeners) {
-			ntscl.normalisationStateChanged(newState, totalItems, normalisedItems, errorItems, currentFile);
+			ntscl.normalisationStateChanged(newState, totalItems, normalisedItems, errorItems, warningItems, currentFile);
 		}
 	}
 

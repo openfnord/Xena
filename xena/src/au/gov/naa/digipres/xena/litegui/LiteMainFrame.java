@@ -84,6 +84,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.SoftBevelBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumn;
 
 import au.gov.naa.digipres.xena.core.NormalisedObjectViewFactory;
 import au.gov.naa.digipres.xena.core.ReleaseInfo;
@@ -91,6 +93,7 @@ import au.gov.naa.digipres.xena.core.Xena;
 import au.gov.naa.digipres.xena.kernel.IconFactory;
 import au.gov.naa.digipres.xena.kernel.XenaException;
 import au.gov.naa.digipres.xena.kernel.normalise.NormaliserResults;
+import au.gov.naa.digipres.xena.kernel.normalise.StatusMessage;
 import au.gov.naa.digipres.xena.kernel.properties.PluginProperties;
 import au.gov.naa.digipres.xena.kernel.properties.PropertiesManager;
 import au.gov.naa.digipres.xena.kernel.properties.PropertiesMenuListener;
@@ -579,6 +582,38 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 				}
 			}
 		});
+		
+		// special renderer for displaying icons in message column
+		TableColumn messageCol = resultsTable.getColumn(NormalisationResultsTableModel.MESSAGE_TITLE);
+		messageCol.setCellRenderer(new DefaultTableCellRenderer() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column)
+			{
+				super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+				if (value instanceof StatusMessage) {
+					StatusMessage statusMessage = (StatusMessage) value;
+					setText(statusMessage.getMessage());
+					// set the icon based on the type of the status message
+					int type = statusMessage.getType();
+					if (type == StatusMessage.ERROR) {
+						setIcon(IconFactory.getIconByName("images/icons/red_cross_16.png"));
+					} else if (type == StatusMessage.WARNING) {
+						setIcon(IconFactory.getIconByName("images/icons/warning_16.png"));
+					} else {
+						setIcon(null);
+					}
+				} else {
+					// this code should not be reached but if it is put in whatever value the object given has
+					setText(value.toString());
+					setIcon(null);
+				}
+				return this;
+			}
+		});
+		
 
 		pauseButton.addActionListener(new ActionListener() {
 
@@ -1002,7 +1037,7 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 	 * The status bar components are also updated based on the
 	 * values of the total items, error count, current file etc.
 	 */
-	public void normalisationStateChanged(int newState, int totalItems, int normalisedItems, int errorItems, String currentFile) {
+	public void normalisationStateChanged(int newState, int totalItems, int normalisedItems, int errorItems, int warningItems, String currentFile) {
 		String statusText = normalisedItems + errorItems + " of " + totalItems + " completed (" + errorItems + " error(s))";
 		switch (newState) {
 		case NormalisationThread.RUNNING:
@@ -1068,7 +1103,7 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 			validate();
 			this.repaint();
 
-			displayConfirmationMessage("Normalisation Complete", totalItems, normalisedItems, errorItems);
+			displayConfirmationMessage("Normalisation Complete", totalItems, normalisedItems, errorItems, warningItems);
 			break;
 		}
 	}
@@ -1086,8 +1121,8 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 	 * @param normalisedItems
 	 * @param errorItems
 	 */
-	private void displayConfirmationMessage(String title, int totalItems, int normalisedItems, int errorItems) {
-		new NormalisationCompleteDialog(this, totalItems, normalisedItems, errorItems).setVisible(true);
+	private void displayConfirmationMessage(String title, int totalItems, int normalisedItems, int errorItems, int warningItems) {
+		new NormalisationCompleteDialog(this, totalItems, normalisedItems, errorItems, warningItems).setVisible(true);
 	}
 
 	/**
@@ -1116,17 +1151,27 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 		NormaliserResults results = tableModel.getNormaliserResults(selectedRow);
 		if (results.isMigrateOnly()) {
 			// Show the MigrateOnly error panel
-			ExceptionDialog
-			        .showExceptionDialog(this,
-			                             "This file was converted using the migrate only option and therefore there is no Xena file to open.  Please open the file using the standard application for this filetype.",
-			                             "Migration Only", "The file has been migrated, there is no Xena file to open.");
+			XenaDialog
+			        .showInfoDialog(this,
+			                        "This file was converted using the migrate only option and therefore there is no Xena file to open.  Please open the file using the standard application for this filetype.",
+			                        "Migration Only", "The file has been migrated, there is no Xena file to open.");
 		} else {
 			if (results.isNormalised()) {
 				viewNormalisedFile(results);
 			} else {
-				// An error has occurred, so display the error in full
-				ExceptionDialog
-				        .showExceptionDialog(this, results.getErrorDetails(), "Normalisation Error", "An error occurred during normalisation.");
+				if (results.hasError()) {
+					// An error has occurred, so display the error in full
+					XenaDialog
+				        .showExceptionDialog(this, results.getStatusDetails(), "Normalisation Error", "An error occurred during normalisation.");
+				} else if (results.hasWarning()) {
+					// A warning has occurred, so display the warning
+					XenaDialog
+				        .showWarningDialog(this, results.getStatusDetails(), "Normalisation Warning", "A warning occurred during normalisation");
+				} else {
+					// Not normalised but no error.  This should not happen.  Display a message to the user to say that this is an error
+					XenaDialog
+			        	.showExceptionDialog(this, "This input has not been normalised and no error has been recorded as to the reason why", "Normalisation Error", "An error occurred during normalisation.");
+				}
 			}
 		}
 	}
@@ -1227,7 +1272,7 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 		// Confirm file deletion
 		String[] msgArr =
 		    {"Using the Cancel button will cause the current set " + "of normalised output files to be deleted.", "Are you sure you want to do this?"};
-		int retVal = JOptionPane.showConfirmDialog(this, msgArr, "Confirm File Deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+		int retVal = JOptionPane.showConfirmDialog(this, msgArr, "Confirm File Deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, IconFactory.getIconByName("images/icons/warning_32.png"));
 
 		if (retVal == JOptionPane.YES_OPTION) {
 			// File deletion has been confirmed
@@ -1334,7 +1379,7 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 		}
 		if (!foundPlugin) {
 			JOptionPane.showMessageDialog(this, "No plugins found in plugin directory " + pluginsDir.getAbsolutePath(), "No Plugins Found",
-			                              JOptionPane.WARNING_MESSAGE);
+			                              JOptionPane.WARNING_MESSAGE, IconFactory.getIconByName("images/icons/warning_32.png"));
 			logger.finer("No plugins found, proceding without plugins");
 		}
 		return pluginsDir;
