@@ -1287,11 +1287,15 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 				String destFile = results.getOutputFileName();
 				if (destDir != null && !"".equals(destDir.trim()) && destFile != null && !"".equals(destFile.trim())) {
 					File file = new File(destDir + File.separator + destFile);
-					if (file.delete()) {
-						logger.finest("Deleted file " + file);
+					if (file.exists()) {
+						if (file.delete()) {
+							logger.finest("Deleted file " + file);
+						} else {
+							logger.warning("Failed to delete file " + file); // should this be a higher logging level?
+							deleteFailureMsg += "\n" + file.getAbsolutePath();
+						}
 					} else {
-						logger.warning("Failed to delete file " + file); // should this be a higher logging level?
-						deleteFailureMsg += "\n" + file.getAbsolutePath();
+						logger.finest("Output file " + file + " not present to be deleted (may have been deleted outside of program)");
 					}
 				}
 			}
