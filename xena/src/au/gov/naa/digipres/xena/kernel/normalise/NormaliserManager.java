@@ -1197,7 +1197,7 @@ public class NormaliserManager {
 			} else {
 				// Copy the original file to the destination location unchanged
 				File origFile = xis.getFile();
-				FileUtils.fileCopy(origFile, destinationDir + File.separator + origFile.getName(), false);
+				File copiedFile = FileUtils.fileCopy(origFile, destinationDir + File.separator + origFile.getName(), false);
 
 				// File type does not get converted, notify user
 				results.addWarning("File does not get converted, copied without modification.");
@@ -1205,7 +1205,7 @@ public class NormaliserManager {
 				// Add Some details about the copy
 				results.setInputSystemId(xis.getSystemId());
 				results.setInputType(xis.getType());
-				results.setOutputFileName(origFile.getName());
+				results.setOutputFileName(copiedFile.getName());
 				// Set the normaliser name to tell the user what was done.
 				results.setNormaliserName("Copy Unchanged");
 

@@ -122,16 +122,19 @@ public class FileUtils {
 	 * @param overwrite
 	 * 				- If true and a file already exists at the destination the file
 	 * 				  will be overwritten.
+	 * 
+	 * @return the copied file
 	 */
-	public static void fileCopy(File inputFile, String destPath, boolean overwrite) throws IOException {
+	public static File fileCopy(File inputFile, String destPath, boolean overwrite) throws IOException {
 		// Create the streams
 		InputStream in = new FileInputStream(inputFile);
 
-		fileCopy(in, destPath, overwrite);
+		File outputFile = fileCopy(in, destPath, overwrite);
 
 		if (in != null) {
 			in.close();
 		}
+		return outputFile; 
 	}
 
 	/**
@@ -199,8 +202,10 @@ public class FileUtils {
 	 * @param overwrite
 	 * 				- If true and a file already exists at the destination the file
 	 * 				  will be overwritten.
+	 * 
+	 * @return the copied file
 	 */
-	public static void fileCopy(InputStream inputStream, String destPath, boolean overwrite) throws IOException {
+	public static File fileCopy(InputStream inputStream, String destPath, boolean overwrite) throws IOException {
 
 		// Create/Open the output file
 		File outputFile = new File(destPath);
@@ -249,6 +254,7 @@ public class FileUtils {
 				throw new IOException(x);
 			}
 		}
+		return outputFile;
 	}
 
 }
