@@ -1186,9 +1186,6 @@ public class NormaliserManager {
 			// Check to see if this file gets converted or passed straight through
 			if (normaliser.isConvertible()) {
 				// File type does get converted, continue with migration routine
-				// Check if this is an archive format, if so they handle creating the output file themselves
-				String normType = normaliser.getName();
-				isArchiver = isArchiveFile(normType);
 				// Create the Open Format file
 				outputFile = fileNamer.makeNewOpenFile(xis, normaliser, destinationDir);
 			} else {
@@ -1709,22 +1706,4 @@ public class NormaliserManager {
 	public Map<String, AbstractNormaliser> getNormaliserMap() {
 		return normaliserMap;
 	}
-
-	/**
-	 * This method returns true if the input string is of a Archive file type
-	 * 
-	 * @param - fileType - String of the type of file being normalised
-	 * @return - boolean - True if the input string matches a known archive type as defined by Xena 
-	 */
-	public boolean isArchiveFile(String fileType) {
-		boolean result = false;
-		if (fileType.equalsIgnoreCase("gzip") || fileType.equalsIgnoreCase("zip") || fileType.equalsIgnoreCase("tar")
-		    || fileType.equalsIgnoreCase("Image Magick Normaliser") || fileType.equalsIgnoreCase("Image Tiff Normaliser")
-		    || fileType.equalsIgnoreCase("Website")) {
-			result = true;
-		}
-
-		return result;
-	}
-
 }

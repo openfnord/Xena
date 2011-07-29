@@ -184,7 +184,7 @@ public abstract class ArchiveNormaliser extends AbstractNormaliser {
 				entry = archiveHandler.getNextEntry();
 
 				// Check if this is an archive file within an archive
-				if (normaliserManager.isArchiveFile(fileType.toString()) && migrateOnly) {
+				if (isArchiveFile(fileType.toString()) && migrateOnly) {
 					// Delete the output file.
 					entryOutputFile.delete();
 				}
@@ -269,4 +269,22 @@ public abstract class ArchiveNormaliser extends AbstractNormaliser {
 	}
 
 	protected abstract ArchiveHandler getArchiveHandler(InputStream archiveStream);
+	
+	/* TODO neaten up this method and perhaps move into calling method or into Type, FileType or another subclass
+	 * 
+	 * This method returns true if the input string is of an Archive file type
+	 * 
+	 * @param - fileType - String of the type of file being normalised
+	 * @return - boolean - True if the input string matches a known archive type as defined by Xena 
+	 */
+	private boolean isArchiveFile(String fileType) {
+		boolean result = false;
+		if (fileType.equalsIgnoreCase("gzip") || fileType.equalsIgnoreCase("zip") || fileType.equalsIgnoreCase("tar")
+		    || fileType.equalsIgnoreCase("Image Magick Normaliser") || fileType.equalsIgnoreCase("Image Tiff Normaliser")
+		    || fileType.equalsIgnoreCase("Website")) {
+			result = true;
+		}
+
+		return result;
+	}
 }
