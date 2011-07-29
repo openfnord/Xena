@@ -87,7 +87,7 @@ public class SvgNormaliser extends AbstractNormaliser {
 
 			// Generate the export checksum. 
 			if (input instanceof XenaInputSource) {
-				// TODO This is a very dirty was of generating the Export Checksum, so this needs to be fixed up in the future. 
+				// TODO This is a very dirty way of generating the Export Checksum, so this needs to be fixed up in the future. 
 				String checksum = exportThenGenerateChecksum((XenaInputSource) input);
 
 				if (checksum != null) {

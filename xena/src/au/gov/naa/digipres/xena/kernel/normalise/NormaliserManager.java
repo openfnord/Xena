@@ -647,7 +647,7 @@ public class NormaliserManager {
 
 	/**
 	 * Get the outermost XML tag from a Xena document TODO: Should this be in
-	 * here? i mean, this isnt really anything to with normalising is it?
+	 * here? i mean, this isn't really anything to with normalising is it?
 	 * 
 	 * @param systemid
 	 *            URL of document
@@ -954,13 +954,11 @@ public class NormaliserManager {
 	// }
 
 	/**
-	 * normalise This code is part of the Xena API that should be used for all
+	 * This code is part of the Xena API that should be used for all
 	 * applications that require Xena functionality (including, arguably, the
-	 * Xena GUI!) It should be called thusly: NormaliserManager
-	 * normaliserManager = NormaliserManager.singelton();
-	 * normaliserManager.normalise(normaliser, xis, log);
+	 * Xena GUI!).
 	 * 
-	 * It is currently not called from the GUI, and changes wuill not effect the
+	 * It is currently not called from the GUI, and changes will not effect the
 	 * GUI in any way.
 	 * 
 	 * 
@@ -971,7 +969,7 @@ public class NormaliserManager {
 	 * @param destinationDir -
 	 *            destination dir for output files
 	 * @param fileNamer -
-	 *            fileNamer to use fo generate the output files
+	 *            fileNamer to use to generate the output files
 	 * @param wrapper -
 	 *            wrapper to use to create the tags around the normalised
 	 *            content.
@@ -1110,11 +1108,10 @@ public class NormaliserManager {
 	}
 
 	/** 
-	 * normalise This code is part of the Xena API that should be used for all
+	 * normalise
+	 * This code is part of the Xena API that should be used for all
 	 * applications that require Xena functionality (including, arguably, the
-	 * Xena GUI!) It should be called thusly: NormaliserManager
-	 * normaliserManager = NormaliserManager.singelton();
-	 * normaliserManager.normalise(normaliser, xis, log);
+	 * Xena GUI!).
 	 * 
 	 * @param xis -
 	 *            the input source to use
@@ -1538,7 +1535,7 @@ public class NormaliserManager {
 
 		// first up - lets find out what is at the top of this xml file.
 		// is there a package wrapper we know about or are we straight into a normaliser?
-		// or it something we simply dont know about?
+		// or it something we simply don't know about?
 
 		XMLFilter unwrapper = null;
 		String tag;

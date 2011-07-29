@@ -140,7 +140,7 @@ public class PlainTextToXenaPlainTextNormaliser extends AbstractNormaliser {
 					}
 				}
 			}
-			// if going by line dont forget to write our line!!!
+			// if going by line don't forget to write our line!!!
 			if (goingByLine) {
 				contentHandler.characters(arr, 0, arr.length);
 			}

@@ -96,7 +96,7 @@ abstract public class AbstractNormaliser implements XMLReader {
 	}
 
 	/**
-	 * Parse the input source and normalise it. This version of the method doesn't not migrate the method. 
+	 * Parse the input source and normalise it. This version of the method doesn't migrate the method. 
 	 * @param input The input source.
 	 * @param results 
 	 * @throws IOException
@@ -226,11 +226,11 @@ abstract public class AbstractNormaliser implements XMLReader {
 		setProperty("http://xena/exported_digest", currentValue + ", " + checksum);
 	}
 
+	/* (non-Javadoc)
+	 * Converts byte array to printable hexadecimal string.
+	 * e.g. convert created checksum to file form.
+	 */
 	protected static String convertToHex(byte[] byteArray) {
-		/*
-		 * ------------------------------------------------------ Converts byte array to printable hexadecimal string.
-		 * eg convert created checksum to file form. ------------------------------------------------------
-		 */
 		String s; // work string for single byte translation
 		String hexString = ""; // the output string being built
 
@@ -245,9 +245,10 @@ abstract public class AbstractNormaliser implements XMLReader {
 	}
 
 	/**
-	 * Set an exported checksum comment.This is required if a comment related to specifics as to how the exported checksum was generated, if some extra metadata/comments
-	 * are required. 
-	 * Such as if the export was generated using Linux line endings rather then Windows or Mac line endings. 
+	 * Set an exported checksum comment.
+	 * This should provide any specifics as to how the exported checksum was generated that are not already provided elsewhere in the metadata
+	 * (i.e. anything other than the algorithm type used to generate the checksum). 
+	 *  
 	 * @param comment
 	 */
 	protected void setExportedChecksumComment(String comment) {
@@ -262,7 +263,7 @@ abstract public class AbstractNormaliser implements XMLReader {
 	 * as we need to export a non-finished Xena file. 
 	 * This was created to fix the problem with files such as SVG's which are not binary normalised, so an export from there Xena-ified form is required to create a 
 	 * valid  export checksum.
-	 * @param stream The Xena file. 
+	 * @param stream The Xena file.
 	 * @return The exported checksum or null.
 	 */
 	protected String exportThenGenerateChecksum(XenaInputSource xis) {
@@ -275,10 +276,10 @@ abstract public class AbstractNormaliser implements XMLReader {
 			try {
 				normaliserManager.export(xis, tmpfolder, outFileName, true);
 			} catch (SAXException e) {
-				// This may fail as the Xena file proabably isn't a complete one yet, so we don't want to end to processing on this exception. 
+				// This may fail as the Xena file probably isn't a complete one yet, so we don't want to end to processing on this exception. 
 				e.printStackTrace();
 			} catch (XenaException e) {
-				// This may fail as the Xena file proabably isn't a complete one yet, so we don't want to end to processing on this exception. 
+				// This may fail as the Xena file probably isn't a complete one yet, so we don't want to end to processing on this exception. 
 				e.printStackTrace();
 			} catch (ParserConfigurationException e) {
 				e.printStackTrace();

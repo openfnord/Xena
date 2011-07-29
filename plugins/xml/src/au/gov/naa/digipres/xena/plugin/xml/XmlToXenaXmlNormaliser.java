@@ -63,7 +63,7 @@ public class XmlToXenaXmlNormaliser extends AbstractNormaliser {
 				// Set the lexical handler
 				reader.setProperty("http://xml.org/sax/properties/lexical-handler", getLexicalHandler());
 
-				// If we don't do this we get multiple startDocuments occuring
+				// If we don't do this we get multiple startDocuments occurring
 				XMLFilterImpl filter = new XMLFilterImpl() {
 					@Override
 					public void startDocument() {
@@ -82,7 +82,7 @@ public class XmlToXenaXmlNormaliser extends AbstractNormaliser {
 
 				// Generate the export checksum. 
 				if (input instanceof XenaInputSource) {
-					// TODO This is a very dirty was of generating the Export Checksum, so this needs to be fixed up in the future. 
+					// TODO This is a very dirty way of generating the Export Checksum, so this needs to be fixed up in the future. 
 					String checksum = exportThenGenerateChecksum((XenaInputSource) input);
 
 					if (checksum != null) {
