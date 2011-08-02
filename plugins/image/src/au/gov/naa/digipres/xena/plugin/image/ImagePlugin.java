@@ -79,7 +79,7 @@ public class ImagePlugin extends XenaPlugin {
 		guesserList.add(new TiffGuesser());
 		guesserList.add(new SvgGuesser());
 		guesserList.add(new PcxGuesser());
-		guesserList.add(new PNGGuesser());
+		guesserList.add(new PngGuesser());
 		guesserList.add(new JpegGuesser());
 		guesserList.add(new PnmGuesser());
 		guesserList.add(new IcoGuesser());
