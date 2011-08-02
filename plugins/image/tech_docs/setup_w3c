@@ -10,7 +10,7 @@ NOTE: Remember to download change the names of the zip files when you download t
 
 The SVG library comes with nothing but the source code directly inside the zip, so be careful when you unzip it.
 
-Becuase we need to build the source, we have to create our own build.xml script and our own folder structure:
+Because we need to build the source, we have to create our own build.xml script and our own folder structure:
 
 	w3c-scg/
 		build.xml

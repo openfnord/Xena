@@ -1,4 +1,4 @@
-The release of mpxj comes with a heap of useless stuff, we like to leave the 3rd party library source folder as we download it but unfortuantly an extracted source release of mpxj is 60MB which is far to big considering by removing everything but the source and libs (to compile) we can get it down to 12MB.
+The release of mpxj comes with a heap of useless stuff, we like to leave the 3rd party library source folder as we download it but unfortunately an extracted source release of mpxj is 60MB which is far to big considering by removing everything but the source and libs (to compile) we can get it down to 12MB.
 
 So to remove the extra crud when updating the mpxj library is:
 

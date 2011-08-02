@@ -1,16 +1,16 @@
-Tritonus is used for vorbis decoding, it also used the javalayer library for mp3 decoding, so it is an important library in our audio arsonal.
+Tritonus is used for vorbis decoding, it also used the javalayer library for mp3 decoding, so it is an important library in our audio arsenal.
 
 To only way to grab the source code is to grab it from CVS (See https://sourceforge.net/scm/?type=cvs&group_id=1390):
 	cvs -d:pserver:anonymous@tritonus.cvs.sourceforge.net:/cvsroot/tritonus login
 	cvs -z3 -d:pserver:anonymous@tritonus.cvs.sourceforge.net:/cvsroot/tritonus co -P tritonus
 
-Strangly the build script fails to build as it cannot find the javalayer library in the classpath, yet the library is inside the root tritonus folder, I also needed to change some of the compile target to build the tritonus jorbis plugin correctly, so rather then explaining what I changed, I just created a new build script for xena, which the compile target is similar to the original tritinus one.
+Strangely the build script fails to build as it cannot find the javalayer library in the classpath, yet the library is inside the root tritonus folder, I also needed to change some of the compile target to build the tritonus jorbis plugin correctly, so rather then explaining what I changed, I just created a new build script for Xena, which the compile target is similar to the original tritinus one.
 
-The build script requires a jorbis.jar file in the root of ext/src/tritonus, which is done during the compile_jorbis target inside etx/src/build.xml. This means jorbis _MUST_ be compiled first in order to build this source for xena.
+The build script requires a jorbis.jar file in the root of ext/src/tritonus, which is done during the compile_jorbis target inside etx/src/build.xml. This means jorbis _MUST_ be compiled first in order to build this source for Xena.
 
 CLEANUP =
 =========
-The tritonus source takes up over 7MB, alot of that is source, but we want to clean it up alittle as to not store to much useless stuff inside you repository.
+The tritonus source takes up over 7MB, a lot of that is source, but we want to clean it up a little as to not store too much useless stuff inside your repository.
 Remove the following:
 	test/
 	doc/

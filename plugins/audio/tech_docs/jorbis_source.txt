@@ -6,7 +6,7 @@ Annoyingly, jorbis doesn't use ant, or doesn't at least ship with an ant build s
 The build script is located inside the ext/src/jorbis<version> directory.
 If the source upgraded and the new source doesn't come with a build file then don't forget to move our build file from the old source into the new, or we won't have flac support.
 
-The jorbis tarball when downloaded isn't laid out nicely, the normal java source download once extracted has a src folder so all the readmes dont interfere with the source code.. As that seems to be the norm
+The jorbis tarball when downloaded isn't laid out nicely, the normal java source download once extracted has a src folder so all the readmes don't interfere with the source code.. As that seems to be the norm
 I move the 'com' and 'player' directories into a newly created 'src' folder for ease of use for the build script.
 
 As the custom script has been written to look for source code in this structure it was be replicated:

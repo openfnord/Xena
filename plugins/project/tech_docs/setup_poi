@@ -9,7 +9,7 @@ Once extracted we remove the following directories:
 	src/documentation/
 
 When we compile the source we use the compile-main target which will only compile the part we need for the plugin.
-Unfortuantly we're not done yet, because we removed the above folders, the build will fail becuase it is missing the testing and documentation folders so we need to modify the build script.
+Unfortunately we're not done yet, because we removed the above folders, the build will fail because it is missing the testing and documentation folders so we need to modify the build script.
 
 Goto the compile-main target and remove (or comment out) the javac section for testing:
 From
