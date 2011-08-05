@@ -20,10 +20,19 @@ When the process has finished successfully, you should see 'BUILD SUCCESSFUL' di
 
 
 4. Build the plugins:
-ant -f build_plugins.xml
+ant build_plugins
 
 - When the process has successfully finished, you should see 'BUILD SUCCESSFUL' displayed within the command window.
 The JAR files for each of the Xena plug-in are in the 'xena/xena/dist/plugins' directory.
 
 
 You can now start Xena... :-D
+
+5. Go to the dist directory
+cd xena/dist
+
+- The dist directory holds the distribution output (i.e. the end results of what was just built using ant)
+
+6. Run Xena or Xena Viewer
+use the xena.bat or xena.sh file to run Xena.
+use the viewer.bat or viewer.sh file to run Xena Viewer.
