@@ -56,7 +56,7 @@ public class DefaultMetaData extends AbstractMetaData {
 
 	private void useMetadataExtractionTool(InputSource input) throws SAXException {
 
-		// test the new Tikka util. 
+		// test the new Tika util.
 		XenaInputSource xis = (XenaInputSource) input;
 		Map<String, String> metadata = MetadataExtraction.extractMetadataWithTika(xis);
 
@@ -70,8 +70,13 @@ public class DefaultMetaData extends AbstractMetaData {
 		try {
 			handler.startElement(METADATA_URI, TIKA_TAG, METADATA_TIKA_TAG, atts);
 			for (String key : keys) {
-
-				if (key == null) {
+				// Do not process if key is null or one of the keys we are not interested in.
+				// Last-Printed, Edit-Time, Creation-Date, Last-Save-Date, Last-Modified and date have been removed because processing can easily change them.
+				// Page-Count has been removed because it is unreliable (should check if it is improved when the version of Tika used is changed).
+				// TODO List of keys that we do not want from Tika really should be a preference that a user can change				
+				if (key == null || key.equals("Last-Printed") || key.equals("Edit-Time") || key.equals("Creation-Date")
+					|| key.equals("Last-Save-Date") || key.equals("Last-Modified")|| key.equals("date") || key.equals("Page-Count"))
+				{
 					continue;
 				}
 
