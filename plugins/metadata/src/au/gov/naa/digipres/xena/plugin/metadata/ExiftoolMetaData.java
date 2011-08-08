@@ -97,6 +97,11 @@ public class ExiftoolMetaData extends AbstractMetaData {
 		// Now we have the file and the exiftool prog lets use it. 
 		List<String> commandList = new ArrayList<String>();
 		commandList.add(exifToolProg);
+		String[] excludedMetaDataList = {"FilePermissions", "Directory", "FileModifyDate", "LastPrinted", "AccessDate",
+				"CreateDate", "ModifyDate"}; // This probably should be changed to a preference option with this as the default
+		for (int i = 0; i < excludedMetaDataList.length; i++) {
+			commandList.add("--" + excludedMetaDataList[i]); // add parameter to tell exiftool to exclude this tag
+		}
 		commandList.add(fileToCheck.getAbsolutePath());
 		String[] commandArr = commandList.toArray(new String[0]);
 
