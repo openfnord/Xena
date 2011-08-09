@@ -98,7 +98,7 @@ public class LitePreferencesDialog extends JDialog {
 				fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				int retVal = fileChooser.showOpenDialog(LitePreferencesDialog.this, LitePreferencesDialog.class, "destination.directory");
 				if (retVal == JFileChooser.APPROVE_OPTION && fileChooser.getSelectedFile() != null) {
-					setXenaLogFileDir(fileChooser.getSelectedFile().getAbsolutePath());
+					setXenaDestDir(fileChooser.getSelectedFile().getAbsolutePath());
 				}
 			}
 		});
