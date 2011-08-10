@@ -23,6 +23,7 @@
 package au.gov.naa.digipres.xena.litegui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
@@ -42,6 +43,7 @@ import javax.swing.table.AbstractTableModel;
 import au.gov.naa.digipres.xena.core.Xena;
 import au.gov.naa.digipres.xena.kernel.plugin.PluginManager;
 import au.gov.naa.digipres.xena.kernel.plugin.XenaPlugin;
+import au.gov.naa.digipres.xena.plugin.email.EmailPlugin;
 import au.gov.naa.digipres.xena.util.TableSorter;
 
 public class AboutPluginsDialog extends JDialog {
@@ -65,9 +67,17 @@ public class AboutPluginsDialog extends JDialog {
 		for (XenaPlugin plugin : sortedSet) {
 			tableModel.addPlugin(plugin);
 		}
-
+		
 		TableSorter sorter = new TableSorter(tableModel);
 		JTable pluginTable = new JTable(sorter);
+		int tableViewportHeight = pluginTable.getPreferredSize().height;
+		if (tableViewportHeight < 75) {
+			tableViewportHeight = 75;
+		}
+		if (tableViewportHeight > 450) {
+			tableViewportHeight = 450;
+		}
+		pluginTable.setPreferredScrollableViewportSize(new Dimension(300, tableViewportHeight));		
 		sorter.setTableHeader(pluginTable.getTableHeader());
 
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -82,8 +92,9 @@ public class AboutPluginsDialog extends JDialog {
 		pluginsDialog = new JDialog(parent, title, true);
 		pluginsDialog.add(new JScrollPane(pluginTable), BorderLayout.CENTER);
 		pluginsDialog.add(buttonPanel, BorderLayout.SOUTH);
-		pluginsDialog.setSize(300, 300);
+		pluginsDialog.pack();
 		pluginsDialog.setLocationRelativeTo(parent);
+		okButton.requestFocusInWindow(); //TODO fix -  does not work!
 		pluginsDialog.setVisible(true);
 
 	}
