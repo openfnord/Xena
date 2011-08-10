@@ -55,7 +55,7 @@ public class NormalisationResultsTableModel extends AbstractTableModel {
 	public static final String SUCCESS_TITLE = "Success";
 	public static final String DESTINATION_TITLE = "Destination";
 	public static final String MESSAGE_TITLE = "Message";
-	public static final String DATE_TITLE = "Date Normalised";
+	public static final String DATE_TITLE = "Date";
 	public static final String TEXT_AIP_TITLE = "Text Version Produced";
 
 	// Sets the order of the columns

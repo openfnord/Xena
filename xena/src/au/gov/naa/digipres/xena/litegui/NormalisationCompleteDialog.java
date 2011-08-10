@@ -45,15 +45,15 @@ import javax.swing.border.EtchedBorder;
 import au.gov.naa.digipres.xena.kernel.IconFactory;
 
 public class NormalisationCompleteDialog extends JDialog {
-	private static final String DIALOG_TITLE = "Normalisation Complete";
+	private static final String DIALOG_TITLE = "Complete";
 
-	public NormalisationCompleteDialog(Frame owner, int totalItems, int normalisedItems, int errorItems, int warningItems) throws HeadlessException {
+	public NormalisationCompleteDialog(Frame owner, int totalItems, int normalisedItems, int errorItems, int warningItems, boolean isConvertOnly) throws HeadlessException {
 		super(owner, DIALOG_TITLE, true);
-		initGUI(totalItems, normalisedItems, errorItems, warningItems);
+		initGUI(totalItems, normalisedItems, errorItems, warningItems, isConvertOnly);
 		this.setLocationRelativeTo(owner);
 	}
 
-	private void initGUI(int totalItems, int normalisedItems, int errorItems, int warningItems) {
+	private void initGUI(int totalItems, int normalisedItems, int errorItems, int warningItems, boolean isConvertOnly) {
 		this.setResizable(false);
 		Font labelFont = new JLabel().getFont().deriveFont(Font.BOLD, 14);
 		JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -73,7 +73,12 @@ public class NormalisationCompleteDialog extends JDialog {
 
 		// Normalised Items
 		if (normalisedItems > 0) {
-			JLabel normText = new JLabel("Normalised:");
+			JLabel normText;
+			if (isConvertOnly) {
+				normText = new JLabel("Converted:");
+			} else {
+				normText = new JLabel("Normalised:");
+			}
 			normText.setFont(labelFont);
 			JLabel normVal = new JLabel("" + normalisedItems);
 			normVal.setFont(labelFont);

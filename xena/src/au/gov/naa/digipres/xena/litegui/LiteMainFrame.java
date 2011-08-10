@@ -84,6 +84,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.SoftBevelBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 
@@ -146,6 +148,7 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 
 	// GUI items
 	private FileAndDirectorySelectionPanel itemSelectionPanel;
+	private TitledBorder itemsBorder;
 	private JTable resultsTable;
 	private NormalisationResultsTableModel tableModel;
 	private TableSorter resultsSorter;
@@ -157,10 +160,11 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 	private JLabel currentFileLabel;
 	private JRadioButton guessTypeRadio;
 	private JRadioButton binaryOnlyRadio;
-	private JCheckBox migrateOnlyCheckbox;
+	private JRadioButton convertOnlyRadio;
 	private JCheckBox retainDirectoryStructureCheckbox;
 	private JCheckBox textNormalisationCheckbox;
 	private JProgressBar progressBar;
+	private JButton normaliseButton;
 	private JButton pauseButton;
 	private JButton stopButton;
 	private JButton cancelButton;
@@ -372,31 +376,41 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 	private void initNormaliseItemsPanel() {
 		// Setup normalise items panel
 		itemSelectionPanel = new FileAndDirectorySelectionPanel();
-		TitledBorder itemsBorder = new TitledBorder(new EtchedBorder(), "Items to Normalise");
+		itemsBorder = new TitledBorder(new EtchedBorder(), "Items to Normalise");
 		itemsBorder.setTitleFont(itemsBorder.getTitleFont().deriveFont(13.0f));
 		itemSelectionPanel.setBorder(itemsBorder);
 
 		// Setup normalise options panel
 
-		// Guess type radio
-		JPanel binaryRadioPanel = new JPanel();
-		binaryRadioPanel.setLayout(new BoxLayout(binaryRadioPanel, BoxLayout.Y_AXIS));
-		guessTypeRadio = new JRadioButton("Guess type for all files");
+		// Action type radio
+		JPanel actionTypeRadioPanel = new JPanel();
+		actionTypeRadioPanel.setLayout(new BoxLayout(actionTypeRadioPanel, BoxLayout.Y_AXIS));
+		guessTypeRadio = new JRadioButton("Normalise");
 		guessTypeRadio.setFont(guessTypeRadio.getFont().deriveFont(12.0f));
-		binaryOnlyRadio = new JRadioButton("Binary normalisation only");
+		binaryOnlyRadio = new JRadioButton("Binary Normalise");
 		binaryOnlyRadio.setFont(binaryOnlyRadio.getFont().deriveFont(12.0f));
-		binaryRadioPanel.add(guessTypeRadio);
-		binaryRadioPanel.add(binaryOnlyRadio);
-		ButtonGroup binaryRadioGroup = new ButtonGroup();
-		binaryRadioGroup.add(guessTypeRadio);
-		binaryRadioGroup.add(binaryOnlyRadio);
+		convertOnlyRadio = new JRadioButton("Convert");
+		convertOnlyRadio.setFont(convertOnlyRadio.getFont().deriveFont(12.0f));
+		convertOnlyRadio.addChangeListener(new ChangeListener(){
+		    public void stateChanged(ChangeEvent e) {
+		    	if (normaliseButton.getText().equals("Normalise")) {
+		    		normaliseButton.setText("Convert");
+		    		itemsBorder.setTitle("Items to Convert");
+		    	} else {
+		    		normaliseButton.setText("Normalise");
+		    		itemsBorder.setTitle("Items to Normalise");
+		    	}
+		    	itemSelectionPanel.repaint();
+		    }
+		});
+		actionTypeRadioPanel.add(guessTypeRadio);
+		actionTypeRadioPanel.add(binaryOnlyRadio);
+		actionTypeRadioPanel.add(convertOnlyRadio);
+		ButtonGroup actionTypeRadioGroup = new ButtonGroup();
+		actionTypeRadioGroup.add(guessTypeRadio);
+		actionTypeRadioGroup.add(binaryOnlyRadio);
+		actionTypeRadioGroup.add(convertOnlyRadio);
 		guessTypeRadio.setSelected(true);
-
-		// Migrate Only checkbox
-		migrateOnlyCheckbox = new JCheckBox("Migrate to Open Format Only");
-		migrateOnlyCheckbox.setFont(guessTypeRadio.getFont().deriveFont(12.0f));
-		migrateOnlyCheckbox.setSelected(false);
-		binaryRadioPanel.add(migrateOnlyCheckbox);
 
 		// Retain directory structure checkbox
 		retainDirectoryStructureCheckbox = new JCheckBox("Retain Directory Structure");
@@ -409,16 +423,16 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 		textNormalisationCheckbox.setSelected(false);
 
 		JPanel normaliseOptionsPanel = new JPanel(new BorderLayout());
-		normaliseOptionsPanel.add(binaryRadioPanel, BorderLayout.NORTH);
+		normaliseOptionsPanel.add(actionTypeRadioPanel, BorderLayout.NORTH);
 		normaliseOptionsPanel.add(retainDirectoryStructureCheckbox, BorderLayout.CENTER);
 		normaliseOptionsPanel.add(textNormalisationCheckbox, BorderLayout.SOUTH);
-		TitledBorder optionsBorder = new TitledBorder(new EtchedBorder(), "Normalisation Options");
+		TitledBorder optionsBorder = new TitledBorder(new EtchedBorder(), "Options");
 		optionsBorder.setTitleFont(optionsBorder.getTitleFont().deriveFont(13.0f));
 		normaliseOptionsPanel.setBorder(optionsBorder);
 
 		// Setup main button panel
 		JPanel bottomButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		JButton normaliseButton = new JButton("Normalise");
+		normaliseButton = new JButton("Normalise");
 		normaliseButton.setIcon(IconFactory.getIconByName("images/icons/green_r_arrow.png"));
 		normaliseButton.setFont(normaliseButton.getFont().deriveFont(18.0f));
 		bottomButtonPanel.add(normaliseButton);
@@ -443,30 +457,17 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 				int mode;
 				if (binaryOnlyRadio.isSelected()) {
 					mode = NormalisationThread.BINARY_MODE;
-				} else if (migrateOnlyCheckbox.isSelected()) {
-					mode = NormalisationThread.MIGRATE_ONLY_MODE;
+				} else if (convertOnlyRadio.isSelected()) {
+					mode = NormalisationThread.CONVERT_ONLY_MODE;
 				} else {
 					mode = NormalisationThread.STANDARD_MODE;
 				}
+				// update buttons
+				normErrorsButton.setVisible(!convertOnlyRadio.isSelected());
+				// do the normalisation
 				doNormalisation(mode, retainDirectoryStructureCheckbox.isSelected(), textNormalisationCheckbox.isSelected());
 			}
 
-		});
-
-		migrateOnlyCheckbox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				// If Migrate Only is selected disable and de-select Binary Normalisation option
-				if (migrateOnlyCheckbox.isSelected()) {
-					// Disable Binary Option
-					guessTypeRadio.setSelected(true);
-					guessTypeRadio.setEnabled(false);
-					binaryOnlyRadio.setEnabled(false);
-				} else {
-					// Ensure Binary option is available
-					guessTypeRadio.setEnabled(true);
-					binaryOnlyRadio.setEnabled(true);
-				}
-			}
 		});
 
 		logger.finest("Normalise Items panel initialised");
@@ -543,7 +544,7 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 		tablePanel.add(resultsTableSP, BorderLayout.CENTER);
 
 		mainResultsPanel = new JPanel(new BorderLayout());
-		TitledBorder titledBorder = new TitledBorder(new EmptyBorder(0, 3, 3, 3), "Normalisation Results");
+		TitledBorder titledBorder = new TitledBorder(new EmptyBorder(0, 3, 3, 3), "Results");
 		titledBorder.setTitleFont(titledBorder.getTitleFont().deriveFont(13.0f));
 		mainResultsPanel.setBorder(titledBorder);
 		mainResultsPanel.add(tablePanel, BorderLayout.CENTER);
@@ -1085,11 +1086,7 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 			cancelButton.setEnabled(true);
 			doneButton.setEnabled(true);
 			newSessionButton.setEnabled(true);
-			if ((errorItems > 0) && !migrateOnlyCheckbox.isSelected()) {
-				normErrorsButton.setEnabled(true);
-			} else {
-				normErrorsButton.setEnabled(false);
-			}
+			normErrorsButton.setEnabled(errorItems > 0);
 
 			// Update status label
 			statusLabel.setText(statusText);
@@ -1103,7 +1100,7 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 			validate();
 			this.repaint();
 
-			displayConfirmationMessage("Normalisation Complete", totalItems, normalisedItems, errorItems, warningItems);
+			displayConfirmationMessage("Complete", totalItems, normalisedItems, errorItems, warningItems, convertOnlyRadio.isSelected());
 			break;
 		}
 	}
@@ -1121,8 +1118,8 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 	 * @param normalisedItems
 	 * @param errorItems
 	 */
-	private void displayConfirmationMessage(String title, int totalItems, int normalisedItems, int errorItems, int warningItems) {
-		new NormalisationCompleteDialog(this, totalItems, normalisedItems, errorItems, warningItems).setVisible(true);
+	private void displayConfirmationMessage(String title, int totalItems, int normalisedItems, int errorItems, int warningItems, boolean isConvertOnly) {
+		new NormalisationCompleteDialog(this, totalItems, normalisedItems, errorItems, warningItems, isConvertOnly).setVisible(true);
 	}
 
 	/**
@@ -1153,8 +1150,8 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 			// Show the MigrateOnly error panel
 			XenaDialog
 			        .showInfoDialog(this,
-			                        "This file was converted using the migrate only option and therefore there is no Xena file to open.  Please open the file using the standard application for this filetype.",
-			                        "Migration Only", "The file has been migrated, there is no Xena file to open.");
+			                        "This file was converted but not normalised and therefore there is no Xena file to open.  Please open the file using the standard application for this filetype.",
+			                        "Conversion Only", "The file has been converted; there is no Xena file to open.");
 		} else {
 			if (results.isNormalised()) {
 				viewNormalisedFile(results);
@@ -1271,7 +1268,7 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 	private void doCancel() {
 		// Confirm file deletion
 		String[] msgArr =
-		    {"Using the Cancel button will cause the current set of normalised output files to be deleted.", "Are you sure you want to do this?"};
+		    {"Using the Cancel button will cause the current set of output files to be deleted.", "Are you sure you want to do this?"};
 		int retVal = JOptionPane.showConfirmDialog(this, msgArr, "Confirm File Deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, IconFactory.getIconByName("images/icons/warning_32.png"));
 
 		if (retVal == JOptionPane.YES_OPTION) {

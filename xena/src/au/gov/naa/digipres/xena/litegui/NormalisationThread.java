@@ -96,7 +96,7 @@ public class NormalisationThread extends Thread {
 	public static final int STANDARD_MODE = 0;
 	public static final int BINARY_MODE = 1;
 	public static final int BINARY_ERRORS_MODE = 2;
-	public static final int MIGRATE_ONLY_MODE = 3;
+	public static final int CONVERT_ONLY_MODE = 3;
 
 	private Xena xenaInterface;
 	private NormalisationResultsTableModel tableModel;
@@ -244,7 +244,7 @@ public class NormalisationThread extends Thread {
 		Set<XenaInputSource> xisSet = getXisSet(fileSet);
 
 		// Guess the files, and filter out children
-		if (modeParam == STANDARD_MODE || modeParam == MIGRATE_ONLY_MODE) {
+		if (modeParam == STANDARD_MODE || modeParam == CONVERT_ONLY_MODE) {
 			setTypes(xisSet);
 			doFiltering(xisSet);
 		}
@@ -328,7 +328,7 @@ public class NormalisationThread extends Thread {
 				AbstractNormaliser binaryNormaliser = xenaInterface.getPluginManager().getNormaliserManager().lookup(BINARY_NORMALISER_NAME);
 
 				results = xenaInterface.normalise(xis, binaryNormaliser, destinationDir);
-			} else if (modeParam == MIGRATE_ONLY_MODE) {
+			} else if (modeParam == CONVERT_ONLY_MODE) {
 				// Instantiate MigrateOnly Normaliser
 				AbstractMetaDataWrapper emptyWrapper = xenaInterface.getPluginManager().getMetaDataWrapperManager().getEmptyWrapper().getWrapper();
 				results = xenaInterface.normalise(xis, destinationDir, emptyWrapper, true);
@@ -345,7 +345,7 @@ public class NormalisationThread extends Thread {
 
 			// Perform text normalisation if required
 			boolean textAIPProduced = false;
-			if ((modeParam == STANDARD_MODE || modeParam == MIGRATE_ONLY_MODE) && performTextNormalisation) {
+			if ((modeParam == STANDARD_MODE || modeParam == CONVERT_ONLY_MODE) && performTextNormalisation) {
 				// Text AIP dir is in the same directory as the normalised AIP dir
 				File textAIPDestinationDir = new File(destinationDir, TEXT_AIP_DIR_NAME);
 
