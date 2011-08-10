@@ -63,16 +63,16 @@ public class ImageToXenaPngNormaliser extends AbstractNormaliser {
 	}
 
 	@Override
-	public void parse(InputSource input, NormaliserResults results, boolean migrateOnly) throws IOException, SAXException {
+	public void parse(InputSource input, NormaliserResults results, boolean convertOnly) throws IOException, SAXException {
 		try {
 			BufferedImage src = Sanselan.getBufferedImage(input.getByteStream());
-			outputImage(src, results, migrateOnly);
+			outputImage(src, results, convertOnly);
 		} catch (ImageReadException x) {
 			throw new SAXException(x);
 		}
 	}
 
-	void outputImage(BufferedImage src, NormaliserResults results, boolean migrateOnly) throws SAXException, IOException {
+	void outputImage(BufferedImage src, NormaliserResults results, boolean convertOnly) throws SAXException, IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try {
 			// Encode the file as a PNG image.
@@ -88,7 +88,7 @@ public class ImageToXenaPngNormaliser extends AbstractNormaliser {
 		ContentHandler ch = getContentHandler();
 		InputStream is = new ByteArrayInputStream(baos.toByteArray());
 
-		if (migrateOnly) {
+		if (convertOnly) {
 			// Just copy the file into the final output file
 			FileUtils.fileCopy(is, results.getDestinationDirString() + File.separator + results.getOutputFileName(), true);
 

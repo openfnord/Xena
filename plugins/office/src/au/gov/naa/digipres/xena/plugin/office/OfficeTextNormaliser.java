@@ -55,7 +55,7 @@ public class OfficeTextNormaliser extends AbstractTextNormaliser {
 	}
 
 	@Override
-	public void parse(InputSource input, NormaliserResults results, boolean migrateOnly) throws IOException, SAXException {
+	public void parse(InputSource input, NormaliserResults results, boolean convertOnly) throws IOException, SAXException {
 		XenaInputSource xis = (XenaInputSource) input;
 		Type type = xis.getType();
 

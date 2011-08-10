@@ -61,8 +61,8 @@ public class PcxToXenaPngNormaliser extends AbstractNormaliser {
 	}
 
 	@Override
-	public void parse(InputSource input, NormaliserResults results, boolean migrateOnly) throws IOException, SAXException {
-		// TODO: Note that the migrateOnly flag has only been added to allow Xena/Plugins to compile cleanly, it is NOT implemented in this module.
+	public void parse(InputSource input, NormaliserResults results, boolean convertOnly) throws IOException, SAXException {
+		// TODO: Note that the convertOnly flag has only been added to allow Xena/Plugins to compile cleanly, it is NOT implemented in this module.
 
 		Image pcxImage = PcxReader.decodeImage(input.getByteStream());
 

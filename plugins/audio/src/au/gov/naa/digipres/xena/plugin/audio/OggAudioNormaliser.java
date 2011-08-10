@@ -76,7 +76,7 @@ public class OggAudioNormaliser extends AbstractNormaliser {
 	}
 
 	@Override
-	public void parse(InputSource input, NormaliserResults results, boolean migrateOnly) throws IOException, SAXException {
+	public void parse(InputSource input, NormaliserResults results, boolean convertOnly) throws IOException, SAXException {
 		try {
 			// TODO: The parse method should ONLY accept xena input sources. The Abstract normaliser should handle this
 			// appropriately.
@@ -114,7 +114,7 @@ public class OggAudioNormaliser extends AbstractNormaliser {
 			}
 			normaliser.setNormaliserManager(normaliserManager);
 			normaliser.setContentHandler(getContentHandler());
-			normaliser.parse(input, results, migrateOnly);
+			normaliser.parse(input, results, convertOnly);
 		} catch (XenaException x) {
 			throw new SAXException(x);
 		}

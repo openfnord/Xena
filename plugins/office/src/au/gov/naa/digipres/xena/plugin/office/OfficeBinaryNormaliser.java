@@ -49,7 +49,7 @@ public class OfficeBinaryNormaliser extends AbstractNormaliser {
 	}
 
 	@Override
-	public void parse(InputSource input, NormaliserResults results, boolean migrateOnly) throws IOException, SAXException {
+	public void parse(InputSource input, NormaliserResults results, boolean convertOnly) throws IOException, SAXException {
 		ContentHandler ch = getContentHandler();
 		AttributesImpl att = new AttributesImpl();
 		InputStream is = input.getByteStream();

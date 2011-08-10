@@ -46,9 +46,9 @@ public class XmlToXenaXmlNormaliser extends AbstractNormaliser {
 	}
 
 	@Override
-	public void parse(InputSource input, NormaliserResults results, boolean migrateOnly) throws java.io.IOException, org.xml.sax.SAXException {
+	public void parse(InputSource input, NormaliserResults results, boolean convertOnly) throws java.io.IOException, org.xml.sax.SAXException {
 		try {
-			if (migrateOnly) {
+			if (convertOnly) {
 				// Just copy the input file to the output.
 				XenaInputSource xis = (XenaInputSource) input;
 				File inputFile = xis.getFile();

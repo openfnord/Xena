@@ -49,7 +49,7 @@ public class SvgNormaliser extends AbstractNormaliser {
 	}
 
 	@Override
-	public void parse(InputSource input, NormaliserResults results, boolean migrateOnly) throws java.io.IOException, org.xml.sax.SAXException {
+	public void parse(InputSource input, NormaliserResults results, boolean convertOnly) throws java.io.IOException, org.xml.sax.SAXException {
 		try {
 			// Check SVG validity by creating a SVGDocument from the SVG file. An exception will be thrown if it is not
 			// valid.

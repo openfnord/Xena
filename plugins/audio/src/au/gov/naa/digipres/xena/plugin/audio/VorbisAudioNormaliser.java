@@ -80,7 +80,7 @@ public class VorbisAudioNormaliser extends AbstractNormaliser {
 	}
 
 	@Override
-	public void parse(InputSource input, NormaliserResults results, boolean migrateOnly) throws IOException, SAXException {
+	public void parse(InputSource input, NormaliserResults results, boolean convertOnly) throws IOException, SAXException {
 		try {
 			// TODO: The parse method should ONLY accept xena input sources. The Abstract normaliser should handle this
 			// appropriately.
@@ -229,7 +229,7 @@ public class VorbisAudioNormaliser extends AbstractNormaliser {
 				flacStream = new FileInputStream(tmpFlacFile);
 			}
 
-			if (migrateOnly) {
+			if (convertOnly) {
 				// Copy the flacStream to the final file
 				FileUtils.fileCopy(flacStream, results.getDestinationDirString() + File.separator + results.getOutputFileName(), true);
 			} else {

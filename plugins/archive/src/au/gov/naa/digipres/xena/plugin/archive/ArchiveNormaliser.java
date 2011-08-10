@@ -72,7 +72,7 @@ public abstract class ArchiveNormaliser extends AbstractNormaliser {
 	public final static String DATE_FORMAT_STRING = "yyyyMMdd'T'HHmmssZ";
 
 	@Override
-	public void parse(InputSource input, NormaliserResults results, boolean migrateOnly) throws SAXException, java.io.IOException {
+	public void parse(InputSource input, NormaliserResults results, boolean convertOnly) throws SAXException, java.io.IOException {
 		FileNamerManager fileNamerManager = normaliserManager.getPluginManager().getFileNamerManager();
 		AbstractFileNamer fileNamer = fileNamerManager.getActiveFileNamer();
 
@@ -103,11 +103,11 @@ public abstract class ArchiveNormaliser extends AbstractNormaliser {
 
 				File entryOutputFile;
 
-				if (migrateOnly) {
+				if (convertOnly) {
 
 					// Check to see if this file gets converted or passed straight through
 					if (entryNormaliser.isConvertible()) {
-						// File type does get converted, continue with migration routine
+						// File type does get converted, continue with conversion routine
 						entryNormaliser.setProperty("http://xena/input", childXis);
 						// Create the Open Format file
 						entryOutputFile = fileNamer.makeNewOpenFile(childXis, entryNormaliser);
@@ -134,7 +134,7 @@ public abstract class ArchiveNormaliser extends AbstractNormaliser {
 				try {
 					entryOutputStream = new FileOutputStream(entryOutputFile);
 					childResults =
-					    normaliseArchiveEntry(childXis, entryNormaliser, entryOutputFile, entryOutputStream, fileNamerManager, fileType, migrateOnly);
+					    normaliseArchiveEntry(childXis, entryNormaliser, entryOutputFile, entryOutputStream, fileNamerManager, fileType, convertOnly);
 				} catch (Exception ex) {
 					System.out.println("Normalisation of archive entry failed, switching to binary.\n" + ex);
 
@@ -151,7 +151,7 @@ public abstract class ArchiveNormaliser extends AbstractNormaliser {
 					childXis.setOutputFileName(entryOutputFile.getName());
 					entryOutputStream = new FileOutputStream(entryOutputFile);
 					childResults =
-					    normaliseArchiveEntry(childXis, entryNormaliser, entryOutputFile, entryOutputStream, fileNamerManager, fileType, migrateOnly);
+					    normaliseArchiveEntry(childXis, entryNormaliser, entryOutputFile, entryOutputStream, fileNamerManager, fileType, convertOnly);
 				} finally {
 					// Always ensure we have closed the stream
 					if (entryOutputStream != null) {
@@ -184,7 +184,7 @@ public abstract class ArchiveNormaliser extends AbstractNormaliser {
 				entry = archiveHandler.getNextEntry();
 
 				// Check if this is an archive file within an archive
-				if (isArchiveFile(fileType.toString()) && migrateOnly) {
+				if (isArchiveFile(fileType.toString()) && convertOnly) {
 					// Delete the output file.
 					entryOutputFile.delete();
 				}
@@ -210,7 +210,7 @@ public abstract class ArchiveNormaliser extends AbstractNormaliser {
 
 	private NormaliserResults normaliseArchiveEntry(XenaInputSource childXis, AbstractNormaliser entryNormaliser, File entryOutputFile,
 	                                                OutputStream entryOutputStream, FileNamerManager fileNamerManager, Type fileType,
-	                                                boolean migrateOnly) throws TransformerConfigurationException, XenaException, SAXException,
+	                                                boolean convertOnly) throws TransformerConfigurationException, XenaException, SAXException,
 	        IOException {
 		// Set up the normaliser and wrapper for this entry
 		SAXTransformerFactory transformFactory = (SAXTransformerFactory) TransformerFactory.newInstance();
@@ -222,7 +222,7 @@ public abstract class ArchiveNormaliser extends AbstractNormaliser {
 		// Set up the wrappers defaults by the Normaliser Manager. 
 		//wrapper = getNormaliserManager().wrapTheNormaliser(entryNormaliser, childXis, wrapper);
 
-		if (migrateOnly) {
+		if (convertOnly) {
 			// Create an emptyWrapper
 			wrapper = normaliserManager.getPluginManager().getMetaDataWrapperManager().getEmptyWrapper().getWrapper();
 			transformerHandler.getTransformer().setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
@@ -254,7 +254,7 @@ public abstract class ArchiveNormaliser extends AbstractNormaliser {
 		childResults.setOutputFileName(entryOutputFile.getName());
 
 		// Normalise the message
-		normaliserManager.parse(entryNormaliser, childXis, wrapper, childResults, migrateOnly);
+		normaliserManager.parse(entryNormaliser, childXis, wrapper, childResults, convertOnly);
 
 		// Populate the entry results, and link to the main results object
 		childResults.setNormalised(true);

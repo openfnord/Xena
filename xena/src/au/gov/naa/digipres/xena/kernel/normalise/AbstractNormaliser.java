@@ -96,7 +96,7 @@ abstract public class AbstractNormaliser implements XMLReader {
 	}
 
 	/**
-	 * Parse the input source and normalise it. This version of the method doesn't migrate the method. 
+	 * Parse the input source and normalise it.
 	 * @param input The input source.
 	 * @param results 
 	 * @throws IOException
@@ -106,14 +106,14 @@ abstract public class AbstractNormaliser implements XMLReader {
 		parse(input, results, false);
 	}
 
-	public abstract void parse(InputSource input, NormaliserResults results, boolean migrateOnly) throws IOException, SAXException;
+	public abstract void parse(InputSource input, NormaliserResults results, boolean convertOnly) throws IOException, SAXException;
 
 	public void parse(InputSource input) throws IOException, SAXException {
 		parse(input, new NormaliserResults(), false);
 	}
 
-	public void parse(InputSource input, boolean migrateOnly) throws IOException, SAXException {
-		parse(input, new NormaliserResults(), migrateOnly);
+	public void parse(InputSource input, boolean convertOnly) throws IOException, SAXException {
+		parse(input, new NormaliserResults(), convertOnly);
 	}
 
 	public void parse(String systemId) throws java.io.IOException, org.xml.sax.SAXException {

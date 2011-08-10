@@ -579,7 +579,7 @@ public class Xena {
 	/**
 	 * Normalise the xena input source to the destination directory, by 
 	 *  getting the active fileNamer and wrapper, and then calling:
-	 * <code>normalise(XenaInputSource, File, FileNamer, XMLFilter, MigrateOnly)</code>
+	 * <code>normalise(XenaInputSource, File, FileNamer, XMLFilter, ConvertOnly)</code>
 	 * <p> 
 	 * Return the NormaliserDataStore that is generated as a result of the
 	 * normalisation.
@@ -592,22 +592,22 @@ public class Xena {
 	 * 
 	 * @param xis - the XenaInputSource to normalise
 	 * @param destinationDir - destination directory for the normalised files
-	 * @param migrateOnly - if true only migrate the input to an Open Format file
+	 * @param convertOnly - if true only convert the input to an Open Format file
 	 * @return A NormaliserDataStore object with the results of the normalisation.
 	 * @throws XenaException in the case of an error occurring during the normalisation process.
 	 */
-	public NormaliserResults normalise(XenaInputSource xis, File destinationDir, boolean migrateOnly) throws XenaException {
+	public NormaliserResults normalise(XenaInputSource xis, File destinationDir, boolean convertONly) throws XenaException {
 		AbstractMetaDataWrapper wrapper;
 
-		if (migrateOnly) {
+		if (convertONly) {
 			// Set the emptyWrapper
 			wrapper = getPluginManager().getMetaDataWrapperManager().getEmptyWrapper().getWrapper();
 		} else {
-			// This is not a migrate, perform a normal normalise
+			// This is not a conversion only, perform a normal normalise
 			wrapper = pluginManager.getMetaDataWrapperManager().getActiveWrapperPlugin().getWrapper();
 		}
 
-		NormaliserResults results = normalise(xis, destinationDir, wrapper, migrateOnly);
+		NormaliserResults results = normalise(xis, destinationDir, wrapper, convertONly);
 
 		if (results != null) {
 			return results;
@@ -675,14 +675,14 @@ public class Xena {
 
 	/** 
 	 * Normalise the xena input source to the destination directory, by 
-	 * getting the active fileNamer and using the emptywrapper if a migrateOnly is specified.
+	 * getting the active fileNamer and using the emptywrapper if a convertOnly is specified.
 	 * Normalise the xena input source to the destination directory using the fileNamer
 	 * and wrapper. If the XenaInputSource has not got a type set, then guess
 	 * the type of the xis, and update the XenaInputSource type field. Then get 
 	 * the appropriate normaliser based on the type of the XenaInputSource. 
 	 * Then use the specified fileNamer and destination directory to normalise the files. 
 	 * Return a list of NormaliserDataStore objects for each xena input source.
-	 * This only performs the MigrateOnly normalisation.
+	 * This only performs the convertOnly normalisation.
 	 * 
 	 * <p> 
 	 * Return the NormaliserDataStore that is generated as a result of the
@@ -705,7 +705,7 @@ public class Xena {
 	 * @return A NormaliserDataStore object with the results of the normalisation.
 	 * @throws XenaException in the case of an error occurring during the normalisation process.
 	 */
-	public NormaliserResults normalise(XenaInputSource xis, File destinationDir, AbstractMetaDataWrapper wrapper, boolean migrateOnly)
+	public NormaliserResults normalise(XenaInputSource xis, File destinationDir, AbstractMetaDataWrapper wrapper, boolean convertOnly)
 	        throws XenaException {
 		pluginManager.getFileNamerManager().setDestinationDir(destinationDir);
 		AbstractFileNamer fileNamer = pluginManager.getFileNamerManager().getActiveFileNamer();
@@ -714,8 +714,8 @@ public class Xena {
 
 		NormaliserResults results = new NormaliserResults(xis);
 
-		// Set the isMigrateOnly flag
-		results.setMigrateOnly(migrateOnly);
+		// Set the isConvertOnly flag
+		results.setConvertOnly(convertOnly);
 
 		if (xis.getType() == null) {
 			// find the most likely type for this XIS...
@@ -738,8 +738,8 @@ public class Xena {
 			throw new XenaException("No normaliser for this input.");
 		}
 		try {
-			// Run the normalisation as Migrate only
-			results = pluginManager.getNormaliserManager().normalise(xis, normaliser, destinationDir, fileNamer, wrapper, migrateOnly);
+			// Run the normalisation as Convert only
+			results = pluginManager.getNormaliserManager().normalise(xis, normaliser, destinationDir, fileNamer, wrapper, convertOnly);
 
 		} catch (IOException e) {
 			throw new XenaException(e);

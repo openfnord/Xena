@@ -55,7 +55,7 @@ public class CsvToXenaCsvNormaliser extends AbstractNormaliser {
 	}
 
 	@Override
-	public void parse(InputSource input, NormaliserResults results, boolean migrateOnly) throws IOException, SAXException {
+	public void parse(InputSource input, NormaliserResults results, boolean convertOnly) throws IOException, SAXException {
 		InputStream is = input.getByteStream();
 		is.mark(Integer.MAX_VALUE);
 		if (input.getEncoding() == null) {

@@ -368,9 +368,8 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 	 * <LI> The JList to display the items to be
 	 * normalised, and buttons to add and remove files and directories
 	 * from this list.
-	 * <LI> A panel to display normalisation options (currently "Binary
-	 * Normalisation Only" and "Migrate to Open Format Only" are the options).
-	 * <LI> A button to do the Normalisation.
+	 * <LI> A panel to display options.
+	 * <LI> A button to do the Normalisation/Conversion.
 	 *
 	 */
 	private void initNormaliseItemsPanel() {
@@ -1146,8 +1145,8 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 	 */
 	private void displayResults(int selectedRow) throws XenaException, IOException {
 		NormaliserResults results = tableModel.getNormaliserResults(selectedRow);
-		if (results.isMigrateOnly()) {
-			// Show the MigrateOnly error panel
+		if (results.isConvertOnly()) {
+			// Show the ConvertOnly error panel
 			XenaDialog
 			        .showInfoDialog(this,
 			                        "This file was converted but not normalised and therefore there is no Xena file to open.  Please open the file using the standard application for this filetype.",

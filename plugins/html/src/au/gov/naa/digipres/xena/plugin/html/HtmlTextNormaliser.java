@@ -49,7 +49,7 @@ public class HtmlTextNormaliser extends AbstractTextNormaliser {
 	 * @see au.gov.naa.digipres.xena.kernel.normalise.AbstractNormaliser#parse(org.xml.sax.InputSource, au.gov.naa.digipres.xena.kernel.normalise.NormaliserResults)
 	 */
 	@Override
-	public void parse(InputSource input, NormaliserResults results, boolean migrateOnly) throws SAXException, IOException {
+	public void parse(InputSource input, NormaliserResults results, boolean convertOnly) throws SAXException, IOException {
 
 		ContentHandler contentHandler = getContentHandler();
 
