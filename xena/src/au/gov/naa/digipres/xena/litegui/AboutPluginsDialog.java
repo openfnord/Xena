@@ -43,7 +43,6 @@ import javax.swing.table.AbstractTableModel;
 import au.gov.naa.digipres.xena.core.Xena;
 import au.gov.naa.digipres.xena.kernel.plugin.PluginManager;
 import au.gov.naa.digipres.xena.kernel.plugin.XenaPlugin;
-import au.gov.naa.digipres.xena.plugin.email.EmailPlugin;
 import au.gov.naa.digipres.xena.util.TableSorter;
 
 public class AboutPluginsDialog extends JDialog {
