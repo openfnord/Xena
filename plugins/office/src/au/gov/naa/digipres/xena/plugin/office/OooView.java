@@ -19,6 +19,7 @@
 package au.gov.naa.digipres.xena.plugin.office;
 
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -208,7 +209,27 @@ public class OooView extends XenaView {
 		try {
 			OpenOfficeConverter.loadDocument(openDocumentFile, true, viewManager.getPluginManager());
 		} catch (Exception ex) {
-			JOptionPane.showMessageDialog(this, ex);
+			// give user the option to try to open in the system's default application if available else just display error
+			if (Desktop.isDesktopSupported()) {
+				Desktop desktop = Desktop.getDesktop();
+				if (desktop.isSupported(Desktop.Action.OPEN)) {
+					if (JOptionPane.showConfirmDialog(this,
+							ex.getMessage() + "\n\nWould you like to attempt to open this file in the system's default application?",
+							"Failed to open in OpenOffice", JOptionPane.YES_NO_OPTION)
+						== JOptionPane.YES_OPTION)
+					{
+						try {
+							desktop.open(openDocumentFile);
+						} catch (IOException ioe) {
+							JOptionPane.showMessageDialog(this, ioe, "Failed to open in System Application", JOptionPane.ERROR_MESSAGE);
+						}
+					}
+				} else {
+					JOptionPane.showMessageDialog(this, ex, "Failed to open in OpenOffice", JOptionPane.ERROR_MESSAGE);
+				}
+			} else {
+				JOptionPane.showMessageDialog(this, ex, "Failed to open in OpenOffice", JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 

@@ -25,6 +25,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Desktop;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -1146,11 +1147,15 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 	private void displayResults(int selectedRow) throws XenaException, IOException {
 		NormaliserResults results = tableModel.getNormaliserResults(selectedRow);
 		if (results.isConvertOnly()) {
-			// Show the ConvertOnly error panel
-			XenaDialog
-			        .showInfoDialog(this,
-			                        "This file was converted but not normalised and therefore there is no Xena file to open.  Please open the file using the standard application for this filetype.",
-			                        "Conversion Only", "The file has been converted; there is no Xena file to open.");
+			// As this is a conversion open the converted file in the system's default application if able
+			if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {	
+				Desktop.getDesktop().open(new File(results.getDestinationDirString(), results.getOutputFileName()));
+			} else {
+				// Provide the user with an information box to show that this file cannot be opened
+				XenaDialog.showInfoDialog(this,
+						"Xena is unable to open the file using the system's default application for this file type.  Please open this file outside of Xena.",
+				        "Cannot Open", "Cannot open converted file.");
+			}
 		} else {
 			if (results.isNormalised()) {
 				viewNormalisedFile(results);
