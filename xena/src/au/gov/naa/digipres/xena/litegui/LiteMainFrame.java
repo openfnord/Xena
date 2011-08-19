@@ -383,7 +383,6 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 
 		// Action type radio
 		JPanel actionTypeRadioPanel = new JPanel();
-		actionTypeRadioPanel.setLayout(new BoxLayout(actionTypeRadioPanel, BoxLayout.Y_AXIS));
 		guessTypeRadio = new JRadioButton("Normalise");
 		guessTypeRadio.setFont(guessTypeRadio.getFont().deriveFont(12.0f));
 		binaryOnlyRadio = new JRadioButton("Binary Normalise");
@@ -405,6 +404,7 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 		actionTypeRadioPanel.add(guessTypeRadio);
 		actionTypeRadioPanel.add(binaryOnlyRadio);
 		actionTypeRadioPanel.add(convertOnlyRadio);
+		actionTypeRadioPanel.setLayout(new BoxLayout(actionTypeRadioPanel, BoxLayout.Y_AXIS));
 		ButtonGroup actionTypeRadioGroup = new ButtonGroup();
 		actionTypeRadioGroup.add(guessTypeRadio);
 		actionTypeRadioGroup.add(binaryOnlyRadio);
@@ -462,7 +462,7 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 					mode = NormalisationThread.STANDARD_MODE;
 				}
 				// update buttons
-				normErrorsButton.setVisible(!convertOnlyRadio.isSelected());
+				normErrorsButton.setVisible(guessTypeRadio.isSelected());
 				// do the normalisation
 				doNormalisation(mode, retainDirectoryStructureCheckbox.isSelected(), textNormalisationCheckbox.isSelected());
 			}
