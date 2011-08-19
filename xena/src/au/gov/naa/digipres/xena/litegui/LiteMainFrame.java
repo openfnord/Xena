@@ -1155,18 +1155,24 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 			if (results.isNormalised()) {
 				viewNormalisedFile(results);
 			} else {
+				String actionName;
+				if (convertOnlyRadio.isSelected()) {
+					actionName = "Conversion";
+				} else {
+					actionName = "Normalisation";
+				}
 				if (results.hasError()) {
 					// An error has occurred, so display the error in full
 					XenaDialog
-				        .showExceptionDialog(this, results.getStatusDetails(), "Normalisation Error", "An error occurred during normalisation.");
+				        .showExceptionDialog(this, results.getStatusDetails(), actionName + " Error", "An error occurred during " + actionName.toLowerCase() + ".");
 				} else if (results.hasWarning()) {
 					// A warning has occurred, so display the warning
 					XenaDialog
-				        .showWarningDialog(this, results.getStatusDetails(), "Normalisation Warning", "A warning occurred during normalisation");
+				        .showWarningDialog(this, results.getStatusDetails(), actionName + " Warning", "A warning occurred during " + actionName.toLowerCase() + ".");
 				} else {
 					// Not normalised but no error.  This should not happen.  Display a message to the user to say that this is an error
 					XenaDialog
-			        	.showExceptionDialog(this, "This input has not been normalised and no error has been recorded as to the reason why", "Normalisation Error", "An error occurred during normalisation.");
+			        	.showExceptionDialog(this, "This input has not been processed and no error has been recorded as to the reason why", actionName + " Error", "An error occurred during " + actionName.toLowerCase() + ".");
 				}
 			}
 		}
