@@ -22,6 +22,10 @@ PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 2.0//EN"
 		<tocitem image="img.page" text="Normalising a directory" target="normdirectory"/>
 		<tocitem image="img.page" text="Binary normalising" target="normbinary"/>
 	</tocitem>
+	<tocitem image="img.category" text="Converting files" target="convert">
+		<tocitem image="img.page" text="Convert options" target="convertopt"/>
+		<tocitem image="img.page" text="Converting one or more files" target="convertfile"/>
+	</tocitem>
 	<tocitem image="img.category" text="Viewing Xena files" target="viewing">
 		<tocitem image="img.page" text="Viewing the results" target="viewresults"/>
 		<tocitem image="img.page" text="Viewing options" target="viewopt"/>
