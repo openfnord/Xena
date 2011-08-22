@@ -1,5 +1,5 @@
 /* Created by JReleaseInfo AntTask from Open Source Competence Group */
-/* Creation date Mon Aug 22 14:49:45 EST 2011 */
+/* Creation date Mon Aug 22 15:11:32 EST 2011 */
 package au.gov.naa.digipres.xena.plugin.multipage;
 
 import java.util.Date;
@@ -207,21 +207,21 @@ class JReleaseInfoViewer extends JFrame {
 public class ReleaseInfo {
 
 
-   /** buildDate (set during build process to 1313988585923L). */
-   private static Date buildDate = new Date(1313988585923L);
+   /** buildDate (set during build process to 1313989892683L). */
+   private static Date buildDate = new Date(1313989892683L);
 
    /**
-    * Get buildDate (set during build process to Mon Aug 22 14:49:45 EST 2011).
+    * Get buildDate (set during build process to Mon Aug 22 15:11:32 EST 2011).
     * @return Date buildDate
     */
    public static final Date getBuildDate() { return buildDate; }
 
 
    /**
-    * Get buildNumber (set during build process to 22).
+    * Get buildNumber (set during build process to 23).
     * @return int buildNumber
     */
-   public static final int getBuildNumber() { return 22; }
+   public static final int getBuildNumber() { return 23; }
 
 
    /** project (set during build process to "multipage"). */
