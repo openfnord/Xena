@@ -26,6 +26,8 @@ package au.gov.naa.digipres.xena.kernel.normalise;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -33,7 +35,6 @@ import java.util.List;
 import au.gov.naa.digipres.xena.core.Xena;
 import au.gov.naa.digipres.xena.kernel.XenaException;
 import au.gov.naa.digipres.xena.kernel.XenaInputSource;
-import au.gov.naa.digipres.xena.kernel.XenaWarningException;
 import au.gov.naa.digipres.xena.kernel.filenamer.AbstractFileNamer;
 import au.gov.naa.digipres.xena.kernel.metadatawrapper.AbstractMetaDataWrapper;
 import au.gov.naa.digipres.xena.kernel.metadatawrapper.MetaDataWrapperManager;
@@ -344,50 +345,54 @@ public class NormaliserResults {
 		return !warningList.isEmpty();
 	}
 
+	private String getStackTrace(Throwable throwable) {
+		StringWriter result = new StringWriter();
+		PrintWriter printWriter = new PrintWriter(result);
+		throwable.printStackTrace(printWriter);
+		return result.toString();
+	}
+	
 	/**
 	 * @return Returns a String containing exceptions, errors and warnings associated with these results.
 	 *         Each item occurs on a new line although individual items may be spread over more than one
 	 *         line.  Exceptions contain trace information (which is shown over multiple lines).
 	 */
 	public String getStatusDetails() {
-		// find all our exception messages
-		StringBuffer exceptions = new StringBuffer();
-		for (Exception e : exceptionList) {
-			exceptions.append(e.getMessage() + "\n");
-
-			StackTraceElement[] steArr = e.getStackTrace();
-			if (steArr.length > 0) {
-				exceptions.append("Trace:\n");
-				for (StackTraceElement element : steArr) {
-					exceptions.append(element.toString() + "\n");
-				}
-			}
+		StringBuffer details = new StringBuffer(getErrorDetails());
+		// add all our warning messages
+		if (!warningList.isEmpty() && details.length() > 0) {
+			details.append('\n');
 		}
-
-		// find all our error messages
-		StringBuffer errors = new StringBuffer();
-		for (String errorMesg : errorList) {
-			errors.append(errorMesg + "\n");
-		}
-		
-		// find all our warning messages
-		StringBuffer warnings = new StringBuffer();
 		for (String warningMesg : warningList) {
-			warnings.append(warningMesg + "\n");
+			details.append(warningMesg);
+			details.append('\n');
 		}
-		
-		StringBuffer returnStringBuffer = new StringBuffer();
-
-		if (exceptions.length() != 0) {
-			returnStringBuffer.append(exceptions + "\n");
+		return new String(details);
+	}
+	
+	/**
+	 * @return Returns a String containing exceptions and errors (no warnings) associated with these results.
+	 *         Each item occurs on a new line although individual items may be spread over more than one
+	 *         line.  Exceptions contain trace information (which is shown over multiple lines).
+	 */
+	public String getErrorDetails() {
+		StringBuffer details = new StringBuffer();
+		// add all our exception messages
+		for (Exception e : exceptionList) {
+			details.append(e.getMessage());
+			details.append('\n');
+			details.append(getStackTrace(e));
+			details.append('\n');
 		}
-		if (errors.length() != 0) {
-			returnStringBuffer.append(errors + "\n");
+		// add all our error messages
+		if (!errorList.isEmpty() && !exceptionList.isEmpty()) {
+			details.append('\n');
 		}
-		if (warnings.length() != 0) {
-			returnStringBuffer.append(warnings);
+		for (String errorMesg : errorList) {
+			details.append(errorMesg);
+			details.append('\n');
 		}
-		return new String(returnStringBuffer);
+		return new String(details);
 	}
 
 	/**
@@ -396,12 +401,9 @@ public class NormaliserResults {
 	 */
 	public StatusMessage getStatusMessage() {
 		StatusMessage statusMessage = new StatusMessage();
-		if (!exceptionList.isEmpty()) {
+		if (!exceptionList.isEmpty() || !errorList.isEmpty()) {
 			statusMessage.setType(StatusMessage.ERROR);
-			statusMessage.setMessage(exceptionList.get(0).getMessage());
-		} else if (!errorList.isEmpty()) {
-			statusMessage.setType(StatusMessage.ERROR);
-			statusMessage.setMessage(errorList.get(0));
+			statusMessage.setMessage(getErrorMessage());
 		} else if (!warningList.isEmpty()) {
 			statusMessage.setType(StatusMessage.WARNING);
 			statusMessage.setMessage(warningList.get(0));
@@ -409,6 +411,20 @@ public class NormaliserResults {
 			statusMessage.setMessage("");
 		}
 		return statusMessage;
+	}
+	
+	/**
+	 * @return Returns the message of the first exception or error that has occurred or an empty
+	 *         string if no exception or error has occurred.
+	 */
+	public String getErrorMessage() {
+		if (!exceptionList.isEmpty()) {
+			return exceptionList.get(0).getMessage();
+		} else if (!errorList.isEmpty()) {
+			return errorList.get(0);
+		} else {
+			return "";
+		}
 	}
 
 	/**
