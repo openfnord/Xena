@@ -151,22 +151,9 @@ public class ImageMagicTextNormaliser extends AbstractTextNormaliser {
 
 			final String outputFileName = "out.tif";
 			File outfile = new File(tmpImageDir, outputFileName);
-			IMOperation op = new IMOperation();
-
-			op.addImage(tiffFile.getAbsolutePath());
-			op.alpha("off");
-			op.addImage(outfile.getAbsolutePath());
-
-			ConvertCmd convert = new ConvertCmd();
-
-			// If we have a binaryPath then modify the command used, otherwise use default (PATH).
-			if ((binaryPath != null) && (!binaryPath.equals(""))) {
-				// Change the command.
-				convert.clearCommand();
-				convert.setCommand(binaryPath);
-			}
-
-			convert.run(op);
+			
+			ImageMagicConverter.setImageMagicConvertLocation(binaryPath); // TODO this functionality should be moved to the changing of preferences
+			ImageMagicConverter.convertAlphaOff(tiffFile, outfile);
 
 			// Get the files generated
 			if (outfile.exists()) {
