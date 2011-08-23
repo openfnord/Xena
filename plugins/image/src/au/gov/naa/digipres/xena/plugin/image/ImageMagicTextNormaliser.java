@@ -26,8 +26,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.im4java.core.ConvertCmd;
-import org.im4java.core.IMOperation;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
