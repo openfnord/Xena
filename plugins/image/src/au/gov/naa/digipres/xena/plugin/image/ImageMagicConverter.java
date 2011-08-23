@@ -74,13 +74,13 @@ public class ImageMagicConverter {
 			try {
 				checkForImageMagickConvert(newConvertCommand);
 			} catch (IOException e) {
-				throw new IllegalArgumentException("\"" + path + NO_IMAGE_MAGICK_MSG_SUFFIX);
+				throw new IllegalArgumentException("\"" + path + NO_IMAGE_MAGICK_MSG_SUFFIX, e);
 			} catch (InterruptedException e) {
-				throw new IllegalArgumentException("\"" + path + NO_IMAGE_MAGICK_MSG_SUFFIX);
+				throw new IllegalArgumentException("\"" + path + NO_IMAGE_MAGICK_MSG_SUFFIX, e);
 			} catch (IM4JavaException e) {
-				throw new IllegalArgumentException("\"" + path + NO_IMAGE_MAGICK_MSG_SUFFIX);
+				throw new IllegalArgumentException("\"" + path + NO_IMAGE_MAGICK_MSG_SUFFIX, e);
 			} catch (XenaException e) {
-				throw new IllegalArgumentException("\"" + path + NO_IMAGE_MAGICK_MSG_SUFFIX);
+				throw new IllegalArgumentException("\"" + path + NO_IMAGE_MAGICK_MSG_SUFFIX, e);
 			}
 			convertCommand = newConvertCommand;
 			convertPath = path;
