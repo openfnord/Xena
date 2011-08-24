@@ -405,11 +405,22 @@ public class NormalisationThread extends Thread {
 			results = new NormaliserResults();
 			results.setInputSystemId(xis.getSystemId());
 			results.setInputType(xis.getType());
-			results.setOutputFileName("");
+			results.setMigrateOnly(modeParam == MIGRATE_ONLY_MODE);
+			if (destinationDir != null) {
+				results.setDestinationDirString(destinationDir.getAbsolutePath());
+			}
+			results.setOutputFileName(xis.getOutputFileName());
 			
 			// add exception or warning to results as appropriate
 			if (!(e instanceof XenaWarningException)) {
 				results.addException(e);
+				// delete the output file if it exists as we can assume the exception would mean it is not valid
+				if (destinationDir != null && destinationDir.exists()) {
+					File outputFile = new File(destinationDir, xis.getOutputFileName());
+					if (outputFile.exists()) {
+						outputFile.delete();
+					}
+				}
 			} else {
 				// this exception is just a warning so add the warning message to the results and discard
 				// the rest of the exception information
