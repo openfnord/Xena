@@ -48,7 +48,7 @@ public class ImageMagicConverter {
 	// with stack trace whereas it should really be shown as a nice clean error text.
 	private static final String NO_IMAGE_MAGICK_MSG_SUFFIX = "\" is not a valid location for the Image Magick Convert Executable.  " +
 			"Please ensure that the Image Magick convert executable is specified in your system path or Xena Plugin Preferences " +
-			"(Tools - Plugin Preferences - Image)";
+			"(Tools - Plugin Preferences - Image).  Please view the log to find any error output from the specified convert command.";
 	
 	static {
 		// set up the normal convert operation parameters, which just takes an input image and an output image to convert
@@ -71,6 +71,7 @@ public class ImageMagicConverter {
 				newConvertCommand = new ImageCommand();
 				newConvertCommand.setCommand(path);
 			}
+			setConsumers(newConvertCommand);
 			try {
 				checkForImageMagickConvert(newConvertCommand);
 			} catch (IOException e) {
@@ -107,26 +108,27 @@ public class ImageMagicConverter {
 			// Provide a nice error message to the user
 			System.out.println("not a valid location for the Image Magick Convert Executable: " + e.getMessage());
 			throw new XenaException("Image Magick Convert cannot be found or is invalid.  Please ensure that the Image Magick Convert executable is " +
-					"specified in your system path or in Xena Plugin Preferences (in Tools - Plugin Preferences - Image)", e);
+					"specified in your system path or in Xena Plugin Preferences (in Tools - Plugin Preferences - Image).  " +
+					"Please view the log for and error output.", e);
 		}
 	}
 	
 	private static ImageCommand getConvertCommand() {
 		if (convertCommand == null) {
 			convertCommand = new ConvertCmd(); // this sets the command to just use convert which will only work if this is on the system path
+			setConsumers(convertCommand);
 		}
 		return convertCommand;
 	}
 	
-	private static void setConsumers() {
-		ImageCommand cnvtCmd = getConvertCommand();
+	private static void setConsumers(ImageCommand imageCommand) {
 		// Create consumers of Error and Output for the conversion process
 		// Note that these are essential as without consuming output from the process it is possible for the process to hang
 		// (as its buffers for output can fill up)
 		// TODO The output from these consumers particularly the error consumer should really be displayed to the user more obviously.
 		//      Currently the error consumer output goes to the log, but would be better to have both go to the log and the error consumer
 		//      go to an actual error or warning message in the table showing the conversion results).
-		cnvtCmd.setErrorConsumer(new ErrorConsumer() {
+		imageCommand.setErrorConsumer(new ErrorConsumer() {
 			private final Logger logger = Logger.getLogger(ImageMagicConverter.class.getCanonicalName());
 			
 			public void consumeError(InputStream pInputStream) throws IOException {
@@ -140,27 +142,30 @@ public class ImageMagicConverter {
 				}
 				msg = msg.trim();
 				if (msg.length() > 0) {
-//					msg = "Image Magick error/warning output for conversion (" + inputImage.getAbsolutePath() + " -> " + outputImage.getAbsolutePath() + "):\n" + msg;
+					msg = "Image Magick error/warning output for conversion:\n" + msg;
 					logger.warning(msg); // TODO should really check if this is a warning or an error and use the appropriate call
 				}
 			}
 		});
-		cnvtCmd.setOutputConsumer(new OutputConsumer() {
+		imageCommand.setOutputConsumer(new OutputConsumer() {
 			private final Logger logger = Logger.getLogger(ImageMagicConverter.class.getCanonicalName());
+			private final boolean isWindowsOs = System.getProperty("os.name").startsWith("Windows");
 			
 			public void consumeOutput(InputStream pInputStream) throws IOException {
 				if (pInputStream.available() == 0) {
-					// Return if there is no available data.  This is a dirty hack to get around a problem where when running
-					// under windows the -1 for end of stream when using the read command never occurs.  This looks like it may be
-					// some problem in the im4java library but difficult to tell.  The problem with this is that it makes it possible
-					// to not get our output if the inputstream has not yet output it.  Based on the im4java code that calls this this
-					// seems unlikely in the extreme.
+					// Return if there is no available data when running under Windows.  This is a dirty hack to get around a problem
+					// where when running under windows the -1 for end of stream when using the read command never occurs.  This looks
+					// like it may be some problem in the im4java library but difficult to tell.  The problem with this is that it
+					// makes it possible to not get our output if the inputstream has not yet output it.  Based on the im4java code
+					// that calls this this seems unlikely in the extreme.
 					// Note that this has only been put on the output consumer.  Have not had any occurrence of this being necessary
 					// for the error consumer thus far although it would seem reasonable to think that it is possible.
 					// Note also that it is probably not a big deal if we miss some of this output; the error output is far more
 					// important to us.
 					// TODO Try and find some way around using this hack
-					return;
+					if (isWindowsOs) {
+						return;
+					}
 				}
 				// Log output
 				// TODO should use buffer rather than doing one character at a time
@@ -172,7 +177,7 @@ public class ImageMagicConverter {
 				}
 				msg = msg.trim();
 				if (msg.length() > 0) {
-//					msg = "Image Magick standard output for conversion (" + inputImage.getAbsolutePath() + " -> " + outputImage.getAbsolutePath() + "):\n" + msg;
+					msg = "Image Magick standard output for conversion:\n" + msg;
 					logger.finer(msg);
 				}		
 			}
@@ -186,17 +191,13 @@ public class ImageMagicConverter {
 	
 	public static void convert(final File inputImage, final File outputImage) throws IOException, InterruptedException, IM4JavaException, XenaException {
 		checkForImageMagickConvert();
-		setConsumers();
 		// run the command
 		getConvertCommand().run(convertOp, inputImage.getAbsolutePath(), outputImage.getAbsolutePath());
-		clearConsumers();
 	}
 	
 	public static void convertAlphaOff(File inputImage, File outputImage) throws IOException, InterruptedException, IM4JavaException, XenaException {
 		checkForImageMagickConvert();
-		setConsumers();
 		// run the command
 		getConvertCommand().run(convertOpAlphaOff, inputImage.getAbsolutePath(), outputImage.getAbsolutePath());
-		clearConsumers();
 	}
 }
