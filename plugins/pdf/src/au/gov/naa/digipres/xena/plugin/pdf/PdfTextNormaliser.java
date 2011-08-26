@@ -59,7 +59,7 @@ public class PdfTextNormaliser extends AbstractTextNormaliser {
 	 * @see au.gov.naa.digipres.xena.kernel.normalise.AbstractNormaliser#parse(org.xml.sax.InputSource, au.gov.naa.digipres.xena.kernel.normalise.NormaliserResults)
 	 */
 	@Override
-	public void parse(InputSource input, NormaliserResults results, boolean migrateOnly) throws IOException {
+	public void parse(InputSource input, NormaliserResults results, boolean convertOnly) throws IOException {
 		XenaInputSource xis = (XenaInputSource) input;
 		// JPedal only accepts an input file, so is the input source is a stream we will need to write it out.
 		File originalFile;

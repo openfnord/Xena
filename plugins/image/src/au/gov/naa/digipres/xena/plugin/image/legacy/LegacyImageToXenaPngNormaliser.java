@@ -66,9 +66,9 @@ public class LegacyImageToXenaPngNormaliser extends AbstractNormaliser {
 	}
 
 	@Override
-	public void parse(InputSource input, NormaliserResults results, boolean migrateOnly) throws IOException, SAXException {
+	public void parse(InputSource input, NormaliserResults results, boolean convertOnly) throws IOException, SAXException {
 		// Removing the jimi library.
-		// TODO: Note that the migrateOnly flag has only been added to allow Xena/Plugins to compile cleanly, it is NOT implemented in this module.
+		// TODO: Note that the convertOnly flag has only been added to allow Xena/Plugins to compile cleanly, it is NOT implemented in this module.
 
 		//JimiReader reader;
 		//		try {

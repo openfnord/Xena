@@ -54,7 +54,7 @@ public class GZipNormaliser extends AbstractNormaliser {
 	}
 
 	@Override
-	public void parse(InputSource input, NormaliserResults results, boolean migrateOnly) throws IOException, SAXException {
+	public void parse(InputSource input, NormaliserResults results, boolean convertOnly) throws IOException, SAXException {
 		ContentHandler contentHandler = getContentHandler();
 
 		// Just decompress the gzip file to a temporary file, and normalise the decompressed file as normal
@@ -112,9 +112,9 @@ public class GZipNormaliser extends AbstractNormaliser {
 			entryNormaliser.setProperty("http://xena/normaliser", entryNormaliser);
 			entryNormaliser.setProperty("http://xena/input", extractedXis);
 
-			// IF this is a migrateOnly, we need to set the Output File correctly in xis
+			// IF this is a convertOnly, we need to set the Output File correctly in xis
 			// and results now we know what the GZip contained
-			if (migrateOnly) {
+			if (convertOnly) {
 				// Change the file extension
 				String extension = "";
 
@@ -132,7 +132,7 @@ public class GZipNormaliser extends AbstractNormaliser {
 			}
 
 			// Normalise the entry
-			entryNormaliser.parse(extractedXis, results, migrateOnly);
+			entryNormaliser.parse(extractedXis, results, convertOnly);
 		} catch (XenaException ex) {
 			throw new SAXException("Problem normalising the compressed file contained within a GZIP archive", ex);
 		}

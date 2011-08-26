@@ -849,7 +849,7 @@ public class NormaliserManager {
 
 	/** 
 	 * Normalise an actual document given a source of data. 
-	 * New Normaliser to handle the Migrate Only conversion feature.
+	 * New Normaliser to handle the Convert feature.
 	 * 
 	 * <p>
 	 * This method takes as a parameter a normaliser, an XIS and a wrapper and then
@@ -863,18 +863,18 @@ public class NormaliserManager {
 	 *            normaliser to use
 	 * @param xis
 	 *            source of data
-	 * @param migrateOnly
+	 * @param convertOnly
 	 *            true if this is a convert to Open Format only
 	 * @throws XenaException
 	 */
-	public void parse(AbstractNormaliser normaliser, InputSource xis, AbstractMetaDataWrapper wrapper, NormaliserResults results, boolean migrateOnly)
+	public void parse(AbstractNormaliser normaliser, InputSource xis, AbstractMetaDataWrapper wrapper, NormaliserResults results, boolean convertOnly)
 	        throws XenaException {
 		try {
 
 			// Actually create the normalised document
 			// Wrap and parse the file
 			wrapper.startDocument();
-			normaliser.parse(xis, results, migrateOnly);
+			normaliser.parse(xis, results, convertOnly);
 			wrapper.endDocument();
 
 			// Don't bother the user with reporting success on every embedded
@@ -1124,8 +1124,8 @@ public class NormaliserManager {
 	 * @param wrapper -
 	 *            wrapper to use to create the tags around the normalised
 	 *            content.
-	 * @param migrateOnly -
-	 *            true if this is only a migrate to Open Format normalise
+	 * @param convertOnly -
+	 *            true if this is only a conversion to Open Format rather than a normalisation
 	 * 
 	 * @return NormaliseDataStore - an object containing all the information
 	 *         generated during the normalise process.
@@ -1134,7 +1134,7 @@ public class NormaliserManager {
 	 * @throws SAXException
 	 */
 	public NormaliserResults normalise(final XenaInputSource xis, final AbstractNormaliser normaliser, File destinationDir,
-	                                   AbstractFileNamer fileNamer, final AbstractMetaDataWrapper wrapper, final boolean migrateOnly)
+	                                   AbstractFileNamer fileNamer, final AbstractMetaDataWrapper wrapper, final boolean convertOnly)
 	        throws XenaException, IOException {
 		// check our arguments....
 		if (xis == null) {
@@ -1166,7 +1166,7 @@ public class NormaliserManager {
 		// create our output file...
 		File outputFile;
 		boolean isArchiver = false;
-		boolean isEmail = normaliser.getName().equalsIgnoreCase("Email"); // Emails are migrated differently
+		boolean isEmail = normaliser.getName().equalsIgnoreCase("Email"); // Emails are converted differently
 		AbstractMetaDataWrapper newWrapper = wrapper;
 
 		if (isEmail) {
@@ -1181,11 +1181,11 @@ public class NormaliserManager {
 		normaliser.setProperty("http://xena/input", xis);
 
 		// TODO: should look at doing something with the file extension...
-		if (migrateOnly && !isEmail) {
+		if (convertOnly && !isEmail) {
 
 			// Check to see if this file gets converted or passed straight through
 			if (normaliser.isConvertible()) {
-				// File type does get converted, continue with migration routine
+				// File type does get converted, continue with conversion routine
 				// Create the Open Format file
 				outputFile = fileNamer.makeNewOpenFile(xis, normaliser, destinationDir);
 			} else {
@@ -1230,8 +1230,8 @@ public class NormaliserManager {
 			StreamResult streamResult = new StreamResult(osw);
 			transformerHandler.setResult(streamResult);
 
-			// If this is a text normaliser or MigrateOnly, we don't want to include the XML header
-			if ((normaliser instanceof AbstractTextNormaliser) || (migrateOnly && !isEmail)) {
+			// If this is a text normaliser or ConvertOnly, we don't want to include the XML header
+			if ((normaliser instanceof AbstractTextNormaliser) || (convertOnly && !isEmail)) {
 				transformerHandler.getTransformer().setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 			}
 
@@ -1252,9 +1252,9 @@ public class NormaliserManager {
 			wrapTheNormaliser(normaliser, xis, newWrapper);
 
 			// do the normalisation!
-			parse(normaliser, xis, newWrapper, results, migrateOnly);
+			parse(normaliser, xis, newWrapper, results, convertOnly);
 			results.setNormalised(true);
-			results.setMigrateOnly(migrateOnly);
+			results.setConvertOnly(convertOnly);
 
 			String id = wrapper.getSourceId(new XenaInputSource(outputFile));
 
@@ -1265,7 +1265,7 @@ public class NormaliserManager {
 
 			results.setId(id);
 
-			if (isEmail && migrateOnly) {
+			if (isEmail && convertOnly) {
 				// Run the export for the emails
 				File dirDestination = new File(results.getDestinationDirString());
 				File normXenaFile = new File(dirDestination, results.getOutputFileName());
@@ -1275,7 +1275,7 @@ public class NormaliserManager {
 				} catch (ParserConfigurationException e) {
 					throw new XenaException("Error in Parser: " + e.getMessage());
 				} finally {
-					// Remove the Xena file as this is a migrateOnly
+					// Remove the Xena file as this is a convertOnly
 					outputFile.delete();
 					if (results.getChildAIPResults().size() > 0) {
 						// Delete the Children Xena files as well
@@ -1312,7 +1312,7 @@ public class NormaliserManager {
 			outputStream.flush();
 			outputStream.close();
 			//Check if it was an archiver, if so, delete the outputFile, as this is a temp Xena file
-			if (isArchiver && migrateOnly) {
+			if (isArchiver && convertOnly) {
 				outputFile.delete();
 			}
 			outputFile = null;

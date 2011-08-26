@@ -77,7 +77,7 @@ public class WebsiteNormaliser extends AbstractNormaliser {
 	public final static String DATE_FORMAT_STRING = "yyyyMMdd'T'HHmmssZ";
 
 	@Override
-	public void parse(InputSource input, NormaliserResults results, boolean migrateOnly) throws SAXException, java.io.IOException {
+	public void parse(InputSource input, NormaliserResults results, boolean convertOnly) throws SAXException, java.io.IOException {
 		FileNamerManager fileNamerManager = normaliserManager.getPluginManager().getFileNamerManager();
 		AbstractFileNamer fileNamer = fileNamerManager.getActiveFileNamer();
 		MetaDataWrapperManager wrapperManager = normaliserManager.getPluginManager().getMetaDataWrapperManager();
@@ -127,11 +127,11 @@ public class WebsiteNormaliser extends AbstractNormaliser {
 				//File entryOutputFile = fileNamer.makeNewXenaFile(childXis, entryNormaliser);
 				File entryOutputFile;
 
-				if (migrateOnly) {
+				if (convertOnly) {
 
 					// Check to see if this file gets converted or passed straight through
 					if (entryNormaliser.isConvertible()) {
-						// File type does get converted, continue with migration routine
+						// File type does get converted, continue with conversion routine
 						// Create the Open Format file
 						entryOutputFile = fileNamer.makeNewOpenFile(childXis, entryNormaliser);
 					} else {
@@ -160,7 +160,7 @@ public class WebsiteNormaliser extends AbstractNormaliser {
 				try {
 					entryOutputStream = new FileOutputStream(entryOutputFile);
 					childResults =
-					    normaliseWebsiteEntry(childXis, entryNormaliser, entryOutputFile, entryOutputStream, fileNamerManager, fileType, migrateOnly);
+					    normaliseWebsiteEntry(childXis, entryNormaliser, entryOutputFile, entryOutputStream, fileNamerManager, fileType, convertOnly);
 				} catch (Exception ex) {
 					System.out.println("Normalisation of website file failed, switching to binary.\n" + ex);
 
@@ -177,7 +177,7 @@ public class WebsiteNormaliser extends AbstractNormaliser {
 					childXis.setOutputFileName(entryOutputFile.getName());
 					entryOutputStream = new FileOutputStream(entryOutputFile);
 					childResults =
-					    normaliseWebsiteEntry(childXis, entryNormaliser, entryOutputFile, entryOutputStream, fileNamerManager, fileType, migrateOnly);
+					    normaliseWebsiteEntry(childXis, entryNormaliser, entryOutputFile, entryOutputStream, fileNamerManager, fileType, convertOnly);
 				} finally {
 					// Always ensure we have closed the stream
 					if (entryOutputStream != null) {
@@ -233,7 +233,7 @@ public class WebsiteNormaliser extends AbstractNormaliser {
 
 	private NormaliserResults normaliseWebsiteEntry(XenaInputSource childXis, AbstractNormaliser entryNormaliser, File entryOutputFile,
 	                                                OutputStream entryOutputStream, FileNamerManager fileNamerManager, Type fileType,
-	                                                boolean migrateOnly) throws TransformerConfigurationException, XenaException, SAXException,
+	                                                boolean convertOnly) throws TransformerConfigurationException, XenaException, SAXException,
 	        IOException {
 		// Set up the normaliser and wrapper for this entry
 		SAXTransformerFactory transformFactory = (SAXTransformerFactory) TransformerFactory.newInstance();
@@ -242,7 +242,7 @@ public class WebsiteNormaliser extends AbstractNormaliser {
 		//AbstractMetaDataWrapper wrapper = normaliserManager.getPluginManager().getMetaDataWrapperManager().getWrapNormaliser();
 		AbstractMetaDataWrapper wrapper = null;
 
-		if (migrateOnly) {
+		if (convertOnly) {
 			// Create an emptyWrapper
 			wrapper = normaliserManager.getPluginManager().getMetaDataWrapperManager().getEmptyWrapper().getWrapper();
 			transformerHandler.getTransformer().setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
@@ -275,7 +275,7 @@ public class WebsiteNormaliser extends AbstractNormaliser {
 		childResults.setOutputFileName(entryOutputFile.getName());
 
 		// Normalise the message
-		normaliserManager.parse(entryNormaliser, childXis, wrapper, childResults, migrateOnly);
+		normaliserManager.parse(entryNormaliser, childXis, wrapper, childResults, convertOnly);
 
 		// Populate the entry results, and link to the main results object
 		childResults.setNormalised(true);

@@ -54,7 +54,7 @@ public class MacBinaryNormaliser extends AbstractNormaliser {
 	}
 
 	@Override
-	public void parse(InputSource input, NormaliserResults results, boolean migrateOnly) throws IOException, SAXException {
+	public void parse(InputSource input, NormaliserResults results, boolean convertOnly) throws IOException, SAXException {
 		ContentHandler contentHandler = getContentHandler();
 
 		// We want to normalise the file inside this archive, using its original file name. However the name of the
@@ -110,7 +110,7 @@ public class MacBinaryNormaliser extends AbstractNormaliser {
 			entryNormaliser.setProperty("http://xena/normaliser", entryNormaliser);
 
 			// Normalise the entry
-			entryNormaliser.parse(extractedXis, results, migrateOnly);
+			entryNormaliser.parse(extractedXis, results, convertOnly);
 		} catch (XenaException ex) {
 			throw new SAXException("Problem normalising the compressed file contained within a GZIP archive", ex);
 		}

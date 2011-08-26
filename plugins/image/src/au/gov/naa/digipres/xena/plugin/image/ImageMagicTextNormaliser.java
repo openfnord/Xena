@@ -74,10 +74,10 @@ public class ImageMagicTextNormaliser extends AbstractTextNormaliser {
 	 * @see au.gov.naa.digipres.xena.kernel.normalise.AbstractNormaliser#parse(org.xml.sax.InputSource, au.gov.naa.digipres.xena.kernel.normalise.NormaliserResults)
 	 */
 	@Override
-	public void parse(InputSource input, NormaliserResults results, boolean migrateOnly) throws IOException, SAXException {
+	public void parse(InputSource input, NormaliserResults results, boolean convertOnly) throws IOException, SAXException {
 		try {
 
-			// NOTE: As this is a text normaliser we don't bother about the migrate only functionality. 
+			// NOTE: As this is a text normaliser we don't bother about the convert only functionality. 
 
 			if (!(input instanceof XenaInputSource)) {
 				throw new XenaException("Can only normalise XenaInputSource objects.");

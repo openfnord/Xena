@@ -61,7 +61,7 @@ public class ImageMagicNormaliser extends AbstractNormaliser {
 	}
 
 	@Override
-	public void parse(InputSource input, NormaliserResults results, boolean migrateOnly) throws IOException, SAXException {
+	public void parse(InputSource input, NormaliserResults results, boolean convertOnly) throws IOException, SAXException {
 		try {
 
 			if (!(input instanceof XenaInputSource)) {
@@ -76,8 +76,8 @@ public class ImageMagicNormaliser extends AbstractNormaliser {
 			String imageMagickPath = propManager.getPropertyValue(ImageProperties.IMAGE_PLUGIN_NAME, ImageProperties.IMAGEMAGIC_LOCATION_PROP_NAME);
 
 			// Use image magick to convert to PNG. 
-			List<File> images = imageMagickConvert(xis.getFile(), imageMagickPath, results.getDestinationDirString(), migrateOnly);
-			if (!migrateOnly) {
+			List<File> images = imageMagickConvert(xis.getFile(), imageMagickPath, results.getDestinationDirString(), convertOnly);
+			if (!convertOnly) {
 
 				// Continue normalisation
 
@@ -113,7 +113,7 @@ public class ImageMagicNormaliser extends AbstractNormaliser {
 		}
 	}
 
-	private List<File> imageMagickConvert(File tiffFile, String binaryPath, String destinationDir, boolean migrateOnly) throws SAXException {
+	private List<File> imageMagickConvert(File tiffFile, String binaryPath, String destinationDir, boolean convertOnly) throws SAXException {
 		try {
 			List<File> result = new ArrayList<File>();
 
@@ -146,14 +146,14 @@ public class ImageMagicNormaliser extends AbstractNormaliser {
 			if (outfile.exists()) {
 				// Only one file generated.
 				result.add(outfile);
-				if (migrateOnly) {
+				if (convertOnly) {
 					FileUtils.fileCopy(outfile, destinationDir + File.separator + tiffFile.getName() + "-" + outfile.getName(), false);
 				}
 			} else {
 				// More then one file generated.
 				for (File file : tmpImageDir.listFiles()) {
 					result.add(file);
-					if (migrateOnly) {
+					if (convertOnly) {
 						FileUtils.fileCopy(file, destinationDir + File.separator + tiffFile.getName() + "-" + file.getName(), false);
 					}
 				}

@@ -47,7 +47,7 @@ public class PlaintextTextNormaliser extends AbstractTextNormaliser {
 	 * @see au.gov.naa.digipres.xena.kernel.normalise.AbstractNormaliser#parse(org.xml.sax.InputSource, au.gov.naa.digipres.xena.kernel.normalise.NormaliserResults)
 	 */
 	@Override
-	public void parse(InputSource input, NormaliserResults results, boolean migrateOnly) throws IOException, SAXException {
+	public void parse(InputSource input, NormaliserResults results, boolean convertOnly) throws IOException, SAXException {
 		InputStream inputStream = input.getByteStream();
 		inputStream.mark(Integer.MAX_VALUE);
 		if (input.getEncoding() == null) {

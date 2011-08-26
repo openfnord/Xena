@@ -96,7 +96,7 @@ public class MessageNormaliser extends AbstractNormaliser {
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public void parse(InputSource input, NormaliserResults results, boolean migrateOnly) throws org.xml.sax.SAXException {
+	public void parse(InputSource input, NormaliserResults results, boolean convertOnly) throws org.xml.sax.SAXException {
 		try {
 			URLName msgurl = new URLName(input.getSystemId());
 			AttributesImpl empty = new AttributesImpl();

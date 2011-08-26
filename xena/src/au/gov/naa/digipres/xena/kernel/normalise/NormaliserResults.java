@@ -134,7 +134,7 @@ public class NormaliserResults {
 
 	private List<NormaliserResults> dataObjectComponentResults = new ArrayList<NormaliserResults>();
 
-	private boolean isMigrateOnly = false;
+	private boolean isConvertOnly = false;
 
 	/**
 	 * Default Constructor - initialise values to null, unknown, or false.
@@ -626,18 +626,18 @@ public class NormaliserResults {
 	}
 
 	/**
-	 * @return Returns the isMigrateOnly.
+	 * @return Returns true if these result are only a conversion rather than a normalisation
 	 */
-	public boolean isMigrateOnly() {
-		return isMigrateOnly;
+	public boolean isConvertOnly() {
+		return isConvertOnly;
 	}
 
 	/**
-	 * @param isMigrateOnly
-	 *            The new value to set isMigrateOnly to.
+	 * @param isConvertOnly
+	 *            The new value to set isConvertOnly to.
 	 */
-	public void setMigrateOnly(boolean isMigrateOnly) {
-		this.isMigrateOnly = isMigrateOnly;
+	public void setConvertOnly(boolean isConvertOnly) {
+		this.isConvertOnly = isConvertOnly;
 	}
 
 }

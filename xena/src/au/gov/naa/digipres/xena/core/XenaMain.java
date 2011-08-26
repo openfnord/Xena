@@ -77,10 +77,10 @@ public class XenaMain {
 		File destinationDirectory = xenaMain.getDestinationDirectory(destinationPath);
 		File pluginsDirectory = xenaMain.getPluginsDirectory(pluginsPath);
 
-		// Check if this is a migrateOnly run
-		boolean migrateOnly = commandLine.hasOption('m');
+		// Check if this is a convertOnly run
+		boolean convertOnly = commandLine.hasOption('c');
 
-		xenaMain.processNormalisation(files, destinationDirectory, pluginsDirectory, migrateOnly);
+		xenaMain.processNormalisation(files, destinationDirectory, pluginsDirectory, convertOnly);
 	}
 
 	/**
@@ -133,9 +133,9 @@ public class XenaMain {
 	 * @param files list of files to perform normalisation on
 	 * @param destinationDirectory destination directory for normalised files
 	 * @param pluginsDirectory directory of Xena plugins
-	 * @param migrateOnly true if converting source to open format files only
+	 * @param convertOnly true if converting source to open format files only
 	 */
-	private void processNormalisation(String[] files, File destinationDirectory, File pluginsDirectory, boolean migrateOnly) throws XenaException,
+	private void processNormalisation(String[] files, File destinationDirectory, File pluginsDirectory, boolean convertOnly) throws XenaException,
 	        FileNotFoundException, IOException {
 		Xena xena = new Xena();
 		System.out.println(pluginsDirectory);
@@ -147,7 +147,7 @@ public class XenaMain {
 			XenaInputSource xenaInputSource = new XenaInputSource(new File(file));
 
 			// Normalise file using best guess
-			NormaliserResults results = xena.normalise(xenaInputSource, destinationDirectory, migrateOnly);
+			NormaliserResults results = xena.normalise(xenaInputSource, destinationDirectory, convertOnly);
 			if (!results.isNormalised()) {
 				failureCount++;
 				System.out.println(" FAIL");
@@ -180,7 +180,7 @@ public class XenaMain {
 		options.addOption("o", "outputDirectory", true, "Output directory");
 		options.addOption("h", "help", false, "Print usage information");
 
-		options.addOption("m", "migrateOnly", false, "Migrate source to open format");
+		options.addOption("c", "convertOnly", false, "Convert source to open format only (do not normalise into xena file)");
 
 		return options;
 	}

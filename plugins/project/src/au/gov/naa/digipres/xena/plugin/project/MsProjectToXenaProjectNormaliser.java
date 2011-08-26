@@ -56,7 +56,7 @@ public class MsProjectToXenaProjectNormaliser extends AbstractNormaliser {
 	}
 
 	@Override
-	public void parse(InputSource input, NormaliserResults results, boolean migrateOnly) throws IOException, SAXException {
+	public void parse(InputSource input, NormaliserResults results, boolean convertOnly) throws IOException, SAXException {
 		ProjectFile projFile = null;
 		try {
 			MPPReader mppReader = new MPPReader();
@@ -67,7 +67,7 @@ public class MsProjectToXenaProjectNormaliser extends AbstractNormaliser {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		MSPDIWriter mspdiWriter = new MSPDIWriter();
 		mspdiWriter.write(projFile, baos);
-		if (migrateOnly) {
+		if (convertOnly) {
 			// Copy the ByteArray to the output file
 			FileUtils.fileCopy(baos.toByteArray(), results.getDestinationDirString() + File.separator + results.getOutputFileName(), true);
 		} else {

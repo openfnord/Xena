@@ -102,7 +102,7 @@ public class ImageMagicTiffToXenaPngNormaliser extends AbstractNormaliser {
 	}
 
 	@Override
-	public void parse(InputSource input, NormaliserResults results, boolean migrateOnly) throws IOException, SAXException {
+	public void parse(InputSource input, NormaliserResults results, boolean convertOnly) throws IOException, SAXException {
 		try {
 
 			if (!(input instanceof XenaInputSource)) {
@@ -175,14 +175,14 @@ public class ImageMagicTiffToXenaPngNormaliser extends AbstractNormaliser {
 						dir = null;
 					}
 
-					if (migrateOnly) {
+					if (convertOnly) {
 						// Just convert the image
-						outputImage(dir, images.get(i), input, results, migrateOnly);
+						outputImage(dir, images.get(i), input, results, convertOnly);
 					} else {
 						//XML Wrap and Convert
 
 						ch.startElement(MULTIPAGE_URI, PAGE_TAG, MULTIPAGE_PREFIX + ":page", att);
-						outputImage(dir, images.get(i), input, results, migrateOnly);
+						outputImage(dir, images.get(i), input, results, convertOnly);
 						ch.endElement(MULTIPAGE_URI, PAGE_TAG, MULTIPAGE_PREFIX + ":page");
 
 						// Add the input file checksum as a normaliser property so it can be picked up when we write the metadata. 
@@ -193,7 +193,7 @@ public class ImageMagicTiffToXenaPngNormaliser extends AbstractNormaliser {
 			} else {
 
 				// Just a single image in the TIFF file
-				outputImage((validSanselanTiff) ? tiffDirectories.get(0) : null, images.get(0), input, results, migrateOnly);
+				outputImage((validSanselanTiff) ? tiffDirectories.get(0) : null, images.get(0), input, results, convertOnly);
 
 				// Add the input file checksum as a normaliser property so it can be picked up when we write the metadata. 
 				setExportedChecksum(generateChecksum(images.get(0)));
@@ -306,7 +306,7 @@ public class ImageMagicTiffToXenaPngNormaliser extends AbstractNormaliser {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	void outputImage(TiffDirectory dir, File image, InputSource tiffSource, NormaliserResults results, boolean migrateOnly) throws SAXException,
+	void outputImage(TiffDirectory dir, File image, InputSource tiffSource, NormaliserResults results, boolean convertOnly) throws SAXException,
 	        IOException {
 
 		// Create our Xena normalised file
@@ -316,7 +316,7 @@ public class ImageMagicTiffToXenaPngNormaliser extends AbstractNormaliser {
 		ContentHandler ch = getContentHandler();
 		InputStream is = new FileInputStream(image);
 
-		if (migrateOnly) {
+		if (convertOnly) {
 			// Copy the file to the destination
 			String tempBaseFilename = results.getOutputFileName();
 			// Remove the .PNG we added to the parent filename

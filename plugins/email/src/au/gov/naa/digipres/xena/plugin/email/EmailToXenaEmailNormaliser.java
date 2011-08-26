@@ -208,7 +208,7 @@ public class EmailToXenaEmailNormaliser extends AbstractNormaliser {
 	 * @throws org.xml.sax.SAXException
 	 */
 	@Override
-	public void parse(InputSource input, NormaliserResults results, boolean migrateOnly) throws java.io.IOException, org.xml.sax.SAXException {
+	public void parse(InputSource input, NormaliserResults results, boolean convertOnly) throws java.io.IOException, org.xml.sax.SAXException {
 		Store store = null;
 		try {
 			ContentHandler ch = getContentHandler();

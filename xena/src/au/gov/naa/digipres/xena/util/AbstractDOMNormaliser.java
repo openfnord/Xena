@@ -38,7 +38,7 @@ import au.gov.naa.digipres.xena.kernel.normalise.NormaliserResults;
  */
 abstract public class AbstractDOMNormaliser extends AbstractNormaliser {
 	@Override
-	public void parse(InputSource input, NormaliserResults results, boolean migrateOnly) throws java.io.IOException, org.xml.sax.SAXException {
+	public void parse(InputSource input, NormaliserResults results, boolean convertOnly) throws java.io.IOException, org.xml.sax.SAXException {
 		// Call the JDOM normalisation procedure
 		Element el = normalise(input);
 		// Now write the tree as if it was SAX events.

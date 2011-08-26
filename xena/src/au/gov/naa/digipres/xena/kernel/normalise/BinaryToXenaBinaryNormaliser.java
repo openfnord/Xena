@@ -51,7 +51,7 @@ public class BinaryToXenaBinaryNormaliser extends AbstractNormaliser {
 	}
 
 	@Override
-	public void parse(InputSource input, NormaliserResults nr, boolean migrateOnly) throws IOException, SAXException {
+	public void parse(InputSource input, NormaliserResults nr, boolean convertOnly) throws IOException, SAXException {
 		AttributesImpl attributes = new AttributesImpl();
 		attributes.addAttribute(URI, PROCESS_DESCRIPTION_TAG_NAME, PREFIX + ":" + PROCESS_DESCRIPTION_TAG_NAME, "CDATA", DESCRIPTION);
 		ContentHandler ch = getContentHandler();
@@ -69,9 +69,8 @@ public class BinaryToXenaBinaryNormaliser extends AbstractNormaliser {
 
 	@Override
 	public String getOutputFileExtension() {
-		// This method is only for the migration.  A Binary Migration is not possible.
-		throw new IllegalStateException("Migrating a Binary Conversion is not possible. Please raise this as a program bug.");
-
+		// This method is only for the conversion only functionality.  This code should not be called.
+		throw new IllegalStateException("Attempt to get the Output File Extension for the Binary Normaliser.  This function is not supported");
 	}
 
 	@Override

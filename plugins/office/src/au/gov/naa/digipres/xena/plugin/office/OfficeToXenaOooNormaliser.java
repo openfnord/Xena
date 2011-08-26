@@ -67,7 +67,7 @@ public class OfficeToXenaOooNormaliser extends AbstractNormaliser {
 	}
 
 	@Override
-	public void parse(InputSource input, NormaliserResults results, boolean migrateOnly) throws SAXException, IOException {
+	public void parse(InputSource input, NormaliserResults results, boolean convertOnly) throws SAXException, IOException {
 
 		XenaInputSource xis = (XenaInputSource) input;
 		Type type = xis.getType();
@@ -106,8 +106,8 @@ public class OfficeToXenaOooNormaliser extends AbstractNormaliser {
 				throw new IOException("An empty document was created by OpenOffice.org");
 			}
 
-			// Check if this is a migrate only
-			if (migrateOnly) {
+			// Check if this is a conversion only
+			if (convertOnly) {
 				// Just copy the output file to the final destination
 				// Need to use xis.getOutputFileName as results.getOutFileName is null when part of an archive (zip)
 				FileUtils.fileCopy(output, results.getDestinationDirString() + File.separator + xis.getOutputFileName(), true);
