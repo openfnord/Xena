@@ -405,7 +405,7 @@ public class NormalisationThread extends Thread {
 			results = new NormaliserResults();
 			results.setInputSystemId(xis.getSystemId());
 			results.setInputType(xis.getType());
-			results.setMigrateOnly(modeParam == MIGRATE_ONLY_MODE);
+			results.setConvertOnly(modeParam == CONVERT_ONLY_MODE);
 			if (destinationDir != null) {
 				results.setDestinationDirString(destinationDir.getAbsolutePath());
 			}
