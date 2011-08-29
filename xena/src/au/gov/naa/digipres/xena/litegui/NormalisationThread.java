@@ -440,15 +440,37 @@ public class NormalisationThread extends Thread {
 
 			logger.finer("Normalisation failed for " + results.getInputSystemId() + ": " + e);
 		} finally {
-			// add to counts
-			if (results.isNormalised()) {
-				successCount++;
-			}
-			if (results.hasError()) {
-				errorCount++;
-			}
-			if (results.hasWarning()) {
-				warningCount++;
+			if (results != null) {
+				// add to counts
+				if (results.isNormalised()) {
+					successCount++;
+				}
+				if (results.hasError()) {
+					errorCount++;
+				}
+				if (results.hasWarning()) {
+					warningCount++;
+				}
+			} else {
+				// this really should not happen but it does.  Log it.
+				// TODO work out how the code gets to this point.
+				String msg = "Result of null given for Xena Input Source of: ";
+				if (xis != null) {
+					File xisFile = xis.getFile();
+					if (xisFile != null) {
+						msg += xisFile.getAbsolutePath();
+					} else {
+						msg += "input file of null";
+					}
+					msg += " -> ";
+					if (destinationDir != null) {
+						msg += destinationDir.getAbsolutePath() + File.pathSeparatorChar;
+					}
+					msg += xis.getOutputFileName();
+				} else {
+					msg += "null.";
+				}
+				logger.warning(msg);
 			}
 		}
 
