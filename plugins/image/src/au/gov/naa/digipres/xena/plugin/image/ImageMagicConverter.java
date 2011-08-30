@@ -39,6 +39,8 @@ import org.im4java.process.OutputConsumer;
 import au.gov.naa.digipres.xena.kernel.XenaException;
 
 public class ImageMagicConverter {
+	private static final Logger logger = Logger.getLogger(ImageMagicConverter.class.getCanonicalName());
+	
 	private static String convertPath = null;
 	private static ImageCommand convertCommand = null;
 	private static final IMOperation convertOp;
@@ -49,6 +51,9 @@ public class ImageMagicConverter {
 	private static final String NO_IMAGE_MAGICK_MSG_SUFFIX = "\" is not a valid location for the Image Magick Convert Executable.  " +
 			"Please ensure that the Image Magick convert executable is specified in your system path or Xena Plugin Preferences " +
 			"(Tools - Plugin Preferences - Image).  Please view the log to find any error output from the specified convert command.";
+	// variables for capturing error output to display on gui (all error output is logged regardless of these variables)
+	private static boolean captureNextErrOutput = false;
+	private static String capturedErrOutput;
 	
 	static {
 		// set up the normal convert operation parameters, which just takes an input image and an output image to convert
@@ -61,9 +66,8 @@ public class ImageMagicConverter {
 	}
 	
 	public static void setImageMagicConvertLocation(String path) throws IllegalArgumentException {
-		// TODO check input and perhaps throw exception if not valid path
-		// check if the path is valid by running the convert command with the version option only
 		if (convertPath == null || !convertPath.equals(path)) {
+			// check if the path is valid by running the convert command with the version option only
 			ImageCommand newConvertCommand;
 			if (path.isEmpty()) {
 				newConvertCommand = new ConvertCmd();
@@ -81,7 +85,8 @@ public class ImageMagicConverter {
 			} catch (IM4JavaException e) {
 				throw new IllegalArgumentException("\"" + path + NO_IMAGE_MAGICK_MSG_SUFFIX, e);
 			} catch (XenaException e) {
-				throw new IllegalArgumentException("\"" + path + NO_IMAGE_MAGICK_MSG_SUFFIX, e);
+				// throw just passing the XenaException as this already has a descriptive message
+				throw new IllegalArgumentException(e);
 			}
 			convertCommand = newConvertCommand;
 			convertPath = path;
@@ -90,6 +95,12 @@ public class ImageMagicConverter {
 	
 	private static void checkForImageMagickConvert() throws IOException, InterruptedException, IM4JavaException, XenaException {
 		checkForImageMagickConvert(getConvertCommand());
+	}
+	
+	private static void setCapturedErrMsg(String message) {
+		// record the error message and disable capturing of error output (it is still logged)
+		capturedErrOutput = message;
+		captureNextErrOutput = false;
 	}
 	
 	// check for the existence of a valid executable for Convert (of Image Magick)
@@ -101,22 +112,33 @@ public class ImageMagicConverter {
 		// TODO really should look at the output to check that this actually is ImageMagick
 		IMOperation getVersion = new IMOperation();
 		getVersion.version();
+		captureNextErrOutput = true;
 		try {
 			convertCmd.run(getVersion);
 		} catch (CommandException e) {
 			// Command Exception should only be caused by the convert executable not being present in this case
 			// Provide a nice error message to the user
-			System.out.println("not a valid location for the Image Magick Convert Executable: " + e.getMessage());
-			throw new XenaException("Image Magick Convert cannot be found or is invalid.  Please ensure that the Image Magick Convert executable is " +
-					"specified in your system path or in Xena Plugin Preferences (in Tools - Plugin Preferences - Image).  " +
-					"Please view the log for and error output.", e);
+			logger.warning("not a valid location for the Image Magick Convert Executable: " + e.getMessage());
+			String msg = "Image Magick Convert cannot be found or is invalid.  Please ensure that the Image Magick Convert executable is " +
+					"specified in your system path or in Xena Plugin Preferences (in Tools - Plugin Preferences - Image).";
+			if (capturedErrOutput != null && !capturedErrOutput.isEmpty()) {
+				msg += "\n" + capturedErrOutput;
+				capturedErrOutput = null;
+			}
+			throw new XenaException(msg, e);
+		} finally {
+			// disable the capture for the case in which nothing was captured
+			captureNextErrOutput = false;
 		}
 	}
 	
-	private static ImageCommand getConvertCommand() {
+	private static ImageCommand getConvertCommand() throws IOException, InterruptedException, IM4JavaException, XenaException {
 		if (convertCommand == null) {
+			// no convert command exists create one
 			convertCommand = new ConvertCmd(); // this sets the command to just use convert which will only work if this is on the system path
 			setConsumers(convertCommand);
+			// check to see if it is valid
+			checkForImageMagickConvert();
 		}
 		return convertCommand;
 	}
@@ -129,8 +151,6 @@ public class ImageMagicConverter {
 		//      Currently the error consumer output goes to the log, but would be better to have both go to the log and the error consumer
 		//      go to an actual error or warning message in the table showing the conversion results).
 		imageCommand.setErrorConsumer(new ErrorConsumer() {
-			private final Logger logger = Logger.getLogger(ImageMagicConverter.class.getCanonicalName());
-			
 			public void consumeError(InputStream pInputStream) throws IOException {
 				// Log error output
 				// TODO should use buffer rather than doing one character at a time
@@ -145,10 +165,13 @@ public class ImageMagicConverter {
 					msg = "Image Magick error/warning output for conversion:\n" + msg;
 					logger.warning(msg); // TODO should really check if this is a warning or an error and use the appropriate call
 				}
+				// set captured output if necessary (for use in GUI Messages)
+				if (captureNextErrOutput) {
+					setCapturedErrMsg(msg);
+				}
 			}
 		});
 		imageCommand.setOutputConsumer(new OutputConsumer() {
-			private final Logger logger = Logger.getLogger(ImageMagicConverter.class.getCanonicalName());
 			private final boolean isWindowsOs = System.getProperty("os.name").startsWith("Windows");
 			
 			public void consumeOutput(InputStream pInputStream) throws IOException {
@@ -190,13 +213,11 @@ public class ImageMagicConverter {
 	}
 	
 	public static void convert(final File inputImage, final File outputImage) throws IOException, InterruptedException, IM4JavaException, XenaException {
-		checkForImageMagickConvert();
 		// run the command
 		getConvertCommand().run(convertOp, inputImage.getAbsolutePath(), outputImage.getAbsolutePath());
 	}
 	
 	public static void convertAlphaOff(File inputImage, File outputImage) throws IOException, InterruptedException, IM4JavaException, XenaException {
-		checkForImageMagickConvert();
 		// run the command
 		getConvertCommand().run(convertOpAlphaOff, inputImage.getAbsolutePath(), outputImage.getAbsolutePath());
 	}
