@@ -43,8 +43,6 @@ import org.apache.sanselan.formats.tiff.TiffDirectory;
 import org.apache.sanselan.formats.tiff.TiffField;
 import org.apache.sanselan.formats.tiff.TiffImageParser;
 import org.apache.sanselan.formats.tiff.TiffReader;
-import org.im4java.core.ConvertCmd;
-import org.im4java.core.Operation;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -59,6 +57,7 @@ import au.gov.naa.digipres.xena.kernel.normalise.NormaliserResults;
 import au.gov.naa.digipres.xena.kernel.plugin.PluginManager;
 import au.gov.naa.digipres.xena.kernel.properties.PropertiesManager;
 import au.gov.naa.digipres.xena.plugin.image.BasicImageNormaliser;
+import au.gov.naa.digipres.xena.plugin.image.ImageMagicConverter;
 import au.gov.naa.digipres.xena.plugin.image.ImageProperties;
 import au.gov.naa.digipres.xena.plugin.image.ReleaseInfo;
 import au.gov.naa.digipres.xena.util.FileUtils;
@@ -121,9 +120,9 @@ public class ImageMagicTiffToXenaPngNormaliser extends AbstractNormaliser {
 			// Make a sanselan ByteSourceInputStream
 			ByteSourceInputStream src = new ByteSourceInputStream(xis.getByteStream(), xis.getFile().getAbsolutePath());
 
-			// If the tiff file is has broken metadata, then the reading of contents will throw an exception stopping the normailisation of this
-			// tiff file.. we don't want this, if the metadata is broken we want to still attempt to normalise the file, just without the extraction of metadata
-			// using the sanselan library. 
+			// If the tiff file has broken metadata, then the reading of contents will throw an exception stopping the normalisation of this
+			// tiff file.. we don't want this, if the metadata is broken we want to still attempt to normalise the file, just without the extraction
+			// of metadata using the sanselan library. 
 			TiffContents contents = null;
 			boolean validSanselanTiff = true;
 			try {
@@ -135,9 +134,9 @@ public class ImageMagicTiffToXenaPngNormaliser extends AbstractNormaliser {
 			List<TiffDirectory> tiffDirectories = new ArrayList<TiffDirectory>();
 
 			// Sanselan doesn't support all compression types for tiff images, but does a great job of grabbing the metadata.
-			// so we use sanselan for metadata and im2java (ImageMagick for Java) to actually do all the tiff conversions.
+			// so we use sanselan for metadata and im4java (ImageMagick for Java) to actually do all the tiff conversions.
 			// YES this is yucky as we need to have the imagemagick binary and library installed on the machine, but we cannot
-			// use JAI as it is a GPL violation.. so we are stuck using this technique until either Sanselan is either up for the job
+			// use JAI as it is a GPL violation.. so we are stuck using this technique until either Sanselan is up for the job
 			// or there is another pure java tiff alternative which is GPL compatible.
 
 			// Use image magick to convert to PNG. 
@@ -219,23 +218,12 @@ public class ImageMagicTiffToXenaPngNormaliser extends AbstractNormaliser {
 			tmpTiffDir = File.createTempFile("tiffdir", "dir");
 			tmpTiffDir.delete();
 			tmpTiffDir.mkdir();
-
+			
 			final String outputFileName = "out.png";
 			File outfile = new File(tmpTiffDir, outputFileName);
-			Operation op = new Operation();
-			op.addImage(tiffFile.getAbsolutePath());
-			op.addImage(outfile.getAbsolutePath());
 
-			ConvertCmd convert = new ConvertCmd();
-
-			// If we have a binaryPath then modify the command used, otherwise use default (PATH).
-			if ((binaryPath != null) && (!binaryPath.equals(""))) {
-				// Change the command.
-				convert.clearCommand();
-				convert.setCommand(binaryPath);
-			}
-
-			convert.run(op);
+			ImageMagicConverter.setImageMagicConvertLocation(binaryPath); // TODO this functionality should be moved to the changing of preferences
+			ImageMagicConverter.convert(tiffFile, outfile);
 
 			// Get the files generated
 			if (outfile.exists()) {
