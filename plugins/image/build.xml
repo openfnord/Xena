@@ -53,6 +53,7 @@
     		buildNumFile="${basedir}/etc/buildnum.properties"
     		buildNumProperty="buildnum"
     		version="4.5.5">
+		<parameter name="Release" type="Boolean" value="false" />
     	</jreleaseinfo>
 	</target>	
 

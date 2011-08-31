@@ -37,6 +37,7 @@ import au.gov.naa.digipres.xena.plugin.archive.tar.TarNormaliser;
 import au.gov.naa.digipres.xena.plugin.archive.zip.ZipFileType;
 import au.gov.naa.digipres.xena.plugin.archive.zip.ZipGuesser;
 import au.gov.naa.digipres.xena.plugin.archive.zip.ZipNormaliser;
+import au.gov.naa.digipres.xena.plugin.archive.ReleaseInfo;
 
 /**
  * @author Justin Waddell
@@ -59,7 +60,12 @@ public class ArchivePlugin extends XenaPlugin {
 	 */
 	@Override
 	public String getVersion() {
-		return ReleaseInfo.getVersion() + "b" + ReleaseInfo.getBuildNumber();
+		// return the version as a string, include the build number (prefixed with the letter b) if this is not a release build
+		String verString = ReleaseInfo.getVersion();
+		if (!ReleaseInfo.isRelease()) {
+			verString += "b" + ReleaseInfo.getBuildNumber();
+		}
+		return verString;
 	}
 
 	@Override

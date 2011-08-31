@@ -26,6 +26,7 @@ import au.gov.naa.digipres.xena.kernel.plugin.XenaPlugin;
 import au.gov.naa.digipres.xena.kernel.properties.PluginProperties;
 import au.gov.naa.digipres.xena.kernel.type.Type;
 import au.gov.naa.digipres.xena.kernel.view.XenaView;
+import au.gov.naa.digipres.xena.plugin.audio.ReleaseInfo;
 
 /**
  * @author Justin Waddell
@@ -49,7 +50,12 @@ public class AudioPlugin extends XenaPlugin {
 	 */
 	@Override
 	public String getVersion() {
-		return ReleaseInfo.getVersion() + "b" + ReleaseInfo.getBuildNumber();
+		// return the version as a string, include the build number (prefixed with the letter b) if this is not a release build
+		String verString = ReleaseInfo.getVersion();
+		if (!ReleaseInfo.isRelease()) {
+			verString += "b" + ReleaseInfo.getBuildNumber();
+		}
+		return verString;
 	}
 
 	@Override
