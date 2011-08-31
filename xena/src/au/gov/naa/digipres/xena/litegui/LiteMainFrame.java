@@ -227,9 +227,12 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 
 	private String getVersionString() {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
-
-		return "build " + ReleaseInfo.getVersionNum() + "." + ReleaseInfo.getRevisionNum() + "." + ReleaseInfo.getFixNum() + "-"
-		       + ReleaseInfo.getBuildNumber() + "/" + formatter.format(ReleaseInfo.getBuildDate());
+		String verStr = "build " + ReleaseInfo.getVersion() + "-"
+				+ ReleaseInfo.getBuildNumber() + "/" + formatter.format(ReleaseInfo.getBuildDate());
+		if (!ReleaseInfo.isRelease()) {
+			verStr += " (Development Build)";
+		}
+		return verStr;
 	}
 
 	/**
