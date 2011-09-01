@@ -1,5 +1,5 @@
 /* Created by JReleaseInfo AntTask from Open Source Competence Group */
-/* Creation date Thu Sep 01 12:00:43 EST 2011 */
+/* Creation date Thu Sep 01 14:30:47 EST 2011 */
 package au.gov.naa.digipres.xena.plugin.email;
 
 import java.util.Date;
@@ -207,11 +207,11 @@ class JReleaseInfoViewer extends JFrame {
 public class ReleaseInfo {
 
 
-   /** buildDate (set during build process to 1314842443182L). */
-   private static Date buildDate = new Date(1314842443182L);
+   /** buildDate (set during build process to 1314851447161L). */
+   private static Date buildDate = new Date(1314851447161L);
 
    /**
-    * Get buildDate (set during build process to Thu Sep 01 12:00:43 EST 2011).
+    * Get buildDate (set during build process to Thu Sep 01 14:30:47 EST 2011).
     * @return Date buildDate
     */
    public static final Date getBuildDate() { return buildDate; }
@@ -225,10 +225,10 @@ public class ReleaseInfo {
 
 
    /**
-    * Get buildNumber (set during build process to 29).
+    * Get buildNumber (set during build process to 30).
     * @return int buildNumber
     */
-   public static final int getBuildNumber() { return 29; }
+   public static final int getBuildNumber() { return 30; }
 
 
    /** project (set during build process to "email"). */
