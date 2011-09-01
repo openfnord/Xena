@@ -1,5 +1,5 @@
 /* Created by JReleaseInfo AntTask from Open Source Competence Group */
-/* Creation date Mon Aug 22 16:02:31 EST 2011 */
+/* Creation date Thu Sep 01 11:37:06 EST 2011 */
 package au.gov.naa.digipres.xena.core;
 
 import java.util.Date;
@@ -207,38 +207,28 @@ class JReleaseInfoViewer extends JFrame {
 public class ReleaseInfo {
 
 
-   /** buildDate (set during build process to 1313992951644L). */
-   private static Date buildDate = new Date(1313992951644L);
+   /** buildDate (set during build process to 1314841026134L). */
+   private static Date buildDate = new Date(1314841026134L);
 
    /**
-    * Get buildDate (set during build process to Mon Aug 22 16:02:31 EST 2011).
+    * Get buildDate (set during build process to Thu Sep 01 11:37:06 EST 2011).
     * @return Date buildDate
     */
    public static final Date getBuildDate() { return buildDate; }
 
 
    /**
-    * Get buildNumber (set during build process to 24).
+    * Get release (set during build process to Boolean.FALSE).
+    * @return Boolean release
+    */
+   public static final Boolean isRelease() { return Boolean.FALSE; }
+
+
+   /**
+    * Get buildNumber (set during build process to 25).
     * @return int buildNumber
     */
-   public static final int getBuildNumber() { return 24; }
-
-
-   /**
-    * Get versionNum (set during build process to 5).
-    * @return int versionNum
-    */
-   public static final int getVersionNum() { return 5; }
-
-
-   /** fixNum (set during build process to 0). */
-   private static Integer fixNum = new Integer(0);
-
-   /**
-    * Get fixNum (set during build process to 0).
-    * @return Integer fixNum
-    */
-   public static final Integer getFixNum() { return fixNum; }
+   public static final int getBuildNumber() { return 25; }
 
 
    /** project (set during build process to "Xena"). */
@@ -251,21 +241,11 @@ public class ReleaseInfo {
    public static final String getProject() { return project; }
 
 
-   /** revisionNum (set during build process to 0). */
-   private static Integer revisionNum = new Integer(0);
+   /** version (set during build process to "6.0.0"). */
+   private static String version = new String("6.0.0");
 
    /**
-    * Get revisionNum (set during build process to 0).
-    * @return Integer revisionNum
-    */
-   public static final Integer getRevisionNum() { return revisionNum; }
-
-
-   /** version (set during build process to "5.0.0"). */
-   private static String version = new String("5.0.0");
-
-   /**
-    * Get version (set during build process to "5.0.0").
+    * Get version (set during build process to "6.0.0").
     * @return String version
     */
    public static final String getVersion() { return version; }
