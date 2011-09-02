@@ -1,12 +1,12 @@
-Xena 5.0.0
+Xena 6.0.0
 ==========
 
-Thank you for downloading Xena 5.0.0!
+Thank you for downloading Xena 6.0.0!
 
 
 Release Date
 ------------
-04 Dec 2009 AEST
+??????? Sep 2011
 
 
 License
@@ -32,6 +32,7 @@ Alternatively, Windows users who have used the installer should have a shortcut 
 
 Else, you can also run Xena manually from the Xena directory, via the command line with:
   java -jar xena.jar
+(note that audio playback will not be available when run like this, use xena.bat or xena.sh instead for this)
 
 Please note that if running the script under Linux, first ensure that it is executable with:
   chmod a+x xena.sh
@@ -46,7 +47,7 @@ Xena files you create will be 'plain text' XML files, with the metadata and cont
 
 Use any text editor to view the raw content of the Xena file itself (XML). To view and extract the original or normalised content stored in the Xena files you have created, use the Xena Viewer.
 
-To start the Xena Viewer, simply run the respective execution script for your operating system, similar to the Xena instructions above.
+To start the Xena Viewer, simply run the respective execution script for your operating system (i.e. viewer.bat or viewer.sh), similar to the Xena instructions above.
 
 Alternatively, Windows users who have used the installer should have a shortcut to Xena Viewer under ther Start Menu.
 
@@ -61,20 +62,21 @@ Have fun!
 
 Xena Plugins
 ------------
-Xena 5.0.0 includes the following plugins:
-  archive v1.2.4b11
-  audio v0.5.5b9
-  cvs v2.2.2b9
-  email v3.2.4b11
-  html v2.4.8b9
-  image v4.5.5b9
-  multipage v1.2.1b9
-  office v3.4.4b9
-  pdf v2.3.1b10
-  plaintext v3.4.3b9
-  project v2.2.2b9
-  website v0.1.4b63
-  xml v2.2.4b11
+Xena 6.0.0 includes the following plugins:
+  archive    v1.3.0
+  audio      v1.0.0
+  cvs        v2.3.0
+  email      v3.3.0
+  html       v2.5.0
+  image      v5.0.0
+  metadata   v1.0.0
+  multipage  v1.3.0
+  office     v3.5.0
+  pdf        v2.4.0
+  plaintext  v3.5.0
+  project    v2.3.0
+  website    v1.0.0
+  xml        v2.3.0
 
 
 Feedback
@@ -86,4 +88,3 @@ Please visit our website at http://xena.sourceforge.net for further details. Tha
 Support
 -------
 Help with Xena is available online at our website (http://xena.sourceforge.net) and within the Xena program under the 'Help' menu.
-

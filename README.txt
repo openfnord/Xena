@@ -1,8 +1,11 @@
+BUILD INSTRUCTIONS
+------------------
+
 For more detailed installation instructions, refer to the Xena wiki at: https://sourceforge.net/apps/mediawiki/xena/index.php?title=Main_Page
 
 FROM THE COMMAND CONSOLE
 
-1. Go to the xena-source directory you created earlier:
+1. Go to the directory of this README file (this is the xena directory under the directory where you cloned the Xena git repository or where you extracted the Xena source build archive):
 cd <path to the xena-source directory>
 
 
