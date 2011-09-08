@@ -1,5 +1,5 @@
 We use the Jflac library for obviously flac encoding.
-We store the source for the version of the library we use in our own source code repository and compile it as apart of our build scripts.
+We store the source for the version of the library we use in our own source code repository and compile it as a part of our build scripts.
 
 Annoyingly, jflac doesn't use ant, or doesn't at least ship with an ant build script. As we use ant for ALL our build scripts we had to write our own in order to build jflac when required.
 

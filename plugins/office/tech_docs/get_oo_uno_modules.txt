@@ -5,7 +5,7 @@ First we need to login to the CVS server:
 
 Then checkout the source code, to check out the entire udk source run:
 	cvs -d :pserver:anoncvs@anoncvs.services.openoffice.org:/cvs checkout udk_src
-NOTE: This will checkout the source to the current directory, so make sure your in an empty directory first.
+NOTE: This will checkout the source to the current directory, so make sure you are in an empty directory first.
 
 But we actually only use 4 of the libraries so we can just check them out with:
 	cvs -d :pserver:anoncvs@anoncvs.services.openoffice.org:/cvs checkout jurt javaunohelper ridljar unoil

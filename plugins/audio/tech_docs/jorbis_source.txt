@@ -1,5 +1,5 @@
 We use the Jorbis library to process ogg and orbis files.
-We store the source for the version of the library we use in our own source code repository and compile it as apart of our build scripts.
+We store the source for the version of the library we use in our own source code repository and compile it as a part of our build scripts.
 
 Annoyingly, jorbis doesn't use ant, or doesn't at least ship with an ant build script. As we use ant for ALL our build scripts we had to write our own in order to build jorbis when required.
 
@@ -22,7 +22,7 @@ As the custom script has been written to look for source code in this structure 
 
 
 We also need to build a jar file which we need to compile the tritonus jorbis code. So there is a makejar target which puts a jorbis.jar into the dist directory. This file is then moved into tritonus directory. 
-To be able to build a jar file, we need a manifest file, so I created an etc directory witch contains a MANIFEST.MF file. Containing just the bare minimum:
+To be able to build a jar file, we need a manifest file, so I created an etc directory which contains a MANIFEST.MF file. Containing just the bare minimum:
 
 Manifest-Version: 1.0
 
