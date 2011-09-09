@@ -1148,36 +1148,44 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 	 */
 	private void displayResults(int selectedRow) throws XenaException, IOException {
 		NormaliserResults results = tableModel.getNormaliserResults(selectedRow);
-		if (results.isConvertOnly()) {
-			// Show the ConvertOnly error panel
-			XenaDialog
-			        .showInfoDialog(this,
-			                        "This file was converted but not normalised and therefore there is no Xena file to open.  Please open the file using the standard application for this filetype.",
-			                        "Conversion Only", "The file has been converted; there is no Xena file to open.");
-		} else {
-			if (results.isNormalised()) {
-				viewNormalisedFile(results);
+		if (results.hasError()) {
+			// An error has occurred, so display the error in full
+			String actionName;
+			if (convertOnlyRadio.isSelected()) {
+				actionName = "Conversion";
 			} else {
-				String actionName;
-				if (convertOnlyRadio.isSelected()) {
-					actionName = "Conversion";
-				} else {
-					actionName = "Normalisation";
-				}
-				if (results.hasError()) {
-					// An error has occurred, so display the error in full
-					XenaDialog
-				        .showExceptionDialog(this, results.getStatusDetails(), actionName + " Error", "An error occurred during " + actionName.toLowerCase() + ".");
-				} else if (results.hasWarning()) {
-					// A warning has occurred, so display the warning
-					XenaDialog
-				        .showWarningDialog(this, results.getStatusDetails(), actionName + " Warning", "A warning occurred during " + actionName.toLowerCase() + ".");
-				} else {
-					// Not normalised but no error.  This should not happen.  Display a message to the user to say that this is an error
-					XenaDialog
-			        	.showExceptionDialog(this, "This input has not been processed and no error has been recorded as to the reason why", actionName + " Error", "An error occurred during " + actionName.toLowerCase() + ".");
-				}
+				actionName = "Normalisation";
 			}
+			XenaDialog.showExceptionDialog(this, results.getStatusDetails(),
+					actionName + " Error", "An error occurred during " + actionName.toLowerCase() + ".");
+		} else if (results.hasWarning() && (!results.isNormalised() || results.isConvertOnly())) {
+			// A warning has occurred (other than for a normalisation success), so display the warning
+			String actionName;
+			if (convertOnlyRadio.isSelected()) {
+				actionName = "Conversion";
+			} else {
+				actionName = "Normalisation";
+			}
+			XenaDialog.showWarningDialog(this, results.getStatusDetails(),
+					actionName + " Warning", "A warning occurred during " + actionName.toLowerCase() + ".");
+		} else if (results.isConvertOnly()) {
+			// Show the ConvertOnly info panel
+			XenaDialog.showInfoDialog(this,
+					"This file was converted but not normalised and therefore there is no Xena file to open.  Please open the file using the standard application for this filetype.",
+					"Conversion Only", "The file has been converted; there is no Xena file to open.");
+		} else if (results.isNormalised()) {
+			// the file was normalised correctly so show in viewer
+			viewNormalisedFile(results);
+		} else {
+			// Not normalised but no error.  This should not happen.  Display a message to the user to say that this is an error
+			String actionName;
+			if (convertOnlyRadio.isSelected()) {
+				actionName = "Conversion";
+			} else {
+				actionName = "Normalisation";
+			}
+			XenaDialog.showExceptionDialog(this, "This input has not been processed and no error has been recorded as to the reason why",
+					actionName + " Error", "An error occurred during " + actionName.toLowerCase() + ".");
 		}
 	}
 
