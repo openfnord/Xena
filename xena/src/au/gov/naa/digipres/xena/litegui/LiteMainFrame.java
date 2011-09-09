@@ -239,6 +239,12 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 	 * Load a set of preferences from a properties file. If any of these preferences
 	 * have not previously been set, set the value to that contained in the properties file.
 	 * Otherwise, do nothing.
+	 * 
+	 * TODO Completely remove this function.  It should not be present.  The java.util.Preferences utility
+	 * caters for giving default values.  All this does is set them in the actual user preferences which
+	 * is a waste of time and makes it harder to change the defaults for users later on as they will be set
+	 * in the users actual preference even if they are only the defaults and the user has never changed them.
+	 * 
 	 * @throws IOException 
 	 */
 	private void initPreferences() throws IOException {
@@ -277,11 +283,6 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 			System.out.println("Path=" + preferencePath + ", Name=" + preferenceName + ", value=" + propertyValue);
 
 			Preferences preferenceNode = rootPreferences.node(preferencePath);
-
-			// Set the log level in the preferences 
-			if (preferenceName.contains(XENA_LOG_FILE_LEVEL)) {
-				preferenceNode.put(preferenceName, propertyValue);
-			}
 
 			// If the preference has not previously been set, set it to the value from the properties file
 			if (preferenceNode.get(preferenceName, "").equals("")) {
