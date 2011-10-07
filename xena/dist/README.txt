@@ -6,7 +6,7 @@ Thank you for downloading Xena 6.0.0!
 
 Release Date
 ------------
-??????? Sep 2011
+17 Oct 2011
 
 
 License
