@@ -1,0 +1,7 @@
+The Xena API can be generated using Javadoc.  Please go up one directory and run:
+
+ant javadoc
+
+You should then find an "api" directory in the directory with this file with the Javadoc output.
+
+Third-party applications should use the public interface of the au.gov.naa.digipres.xena.core.Xena class to perform actions with Xena.  Other than the public interface of this class and the public interfaces of classes available from it all other interfaces in Xena are liable to change in the future without notice or provision for backward compatibility.
