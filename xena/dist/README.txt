@@ -6,12 +6,12 @@ Thank you for downloading Xena 6.0.0!
 
 Release Date
 ------------
-??????? Sep 2011
+17 Oct 2011
 
 
 License
 -------
-Xena is released under the General Public License version 3. A full copy of this license can be found in the accompanying file, 'COPYING.txt'.
+Xena is released under the General Public License version 3. A full copy of this license can be found in the Help pages from within Xena and also in the accompanying file, 'COPYING.txt'.
 
 
 Requirements
@@ -19,9 +19,7 @@ Requirements
 To run this pre-compiled version of Xena you will require Sun's Java Runtime Environment 1.6, which is available for free at http://java.com.
 Xena can also be compiled using the open source Java stack, OpenJDK (http://openjdk.org).
 
-To normalise certain file formats Xena relies on external programs, such as
-OpenOffice.org for Office documents. Please see Xena help from inside the
-program for more details.
+To normalise certain file formats Xena relies on external programs, such as OpenOffice.org for Office documents. Please see Xena help from inside the program for more details.
 
 
 Run Xena
@@ -29,6 +27,8 @@ Run Xena
 The Xena program itself is called 'xena.jar' and you should be able to start it by either executing the script for your operating system ('xena.bat' for Windows or 'xena.sh' for Linux and other Unix variants).
 
 Alternatively, Windows users who have used the installer should have a shortcut to Xena under the Start Menu.
+
+Mac OS X users who have installed using the disk image should find Xena in their Applications.
 
 Else, you can also run Xena manually from the Xena directory, via the command line with:
   java -jar xena.jar
@@ -41,15 +41,22 @@ This should kick up the program.
 Have fun!
 
 
+Xena Output
+-----------
+The output directory that Xena is using can be found and set from within the Xena Program by going to the Tools menu and choosing Xena Preferences.  It is then shown under the Xena destination directory preference.  Note that for Windows users who have used the installer then the default ouput directory is Xena Output in My Documents.
+
+
 Run Xena Viewer
 ---------------
 Xena files you create will be 'plain text' XML files, with the metadata and content of the original file stored in Base64 encoding.
 
-Use any text editor to view the raw content of the Xena file itself (XML). To view and extract the original or normalised content stored in the Xena files you have created, use the Xena Viewer.
+You can use the Xena Viewer or any text editor to view the raw content of the Xena file itself (XML). To view and extract the original or normalised content stored in the Xena files you have created, use the Xena Viewer.
 
 To start the Xena Viewer, simply run the respective execution script for your operating system (i.e. viewer.bat or viewer.sh), similar to the Xena instructions above.
 
-Alternatively, Windows users who have used the installer should have a shortcut to Xena Viewer under ther Start Menu.
+Alternatively, Windows users who have used the installer should have a shortcut to Xena Viewer under ther Start Menu or can double click on xena files to open with the Xena Viewer. Note that the viewer does not handle opening files if it is already running.
+
+Mac OS X Users should find the Xena Viewer under Xena in their Applications. Note that currently opening the Xena Viewer from a file (rather than the file from the Xena Viewer) will only open the Xena Viewer and not the file.
 
 Else, you can start it manually from the Xena directory by running the following via the command line:
   java -cp xena.jar au.gov.naa.digipres.xena.viewer.ViewerMainFrame $1
