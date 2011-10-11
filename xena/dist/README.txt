@@ -41,6 +41,11 @@ This should kick up the program.
 Have fun!
 
 
+Xena Output
+-----------
+The output directory that Xena is using can be found and set from within the Xena Program by going to the Tools menu and choosing Xena Preferences.  It is then shown under the Xena destination directory preference.  Note that for Windows users who have used the installer then the default ouput directory is Xena Output in My Documents.
+
+
 Run Xena Viewer
 ---------------
 Xena files you create will be 'plain text' XML files, with the metadata and content of the original file stored in Base64 encoding.
