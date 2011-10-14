@@ -32,7 +32,7 @@ The JAR files for each of the Xena plug-in are in the 'xena/xena/dist/plugins' d
 You can now start Xena... :-D
 
 5. Go to the dist directory
-cd xena/dist
+cd dist
 
 - The dist directory holds the distribution output (i.e. the end results of what was just built using ant)
 
