@@ -1,5 +1,14 @@
-The provided executables and binary packages are not suitable for all Apple Macintosh distributions and may result in errors.  It may be required to download and install these programs separately.
+This directory contains executables for third-party applications that are used by Xena.
 
-Please note that the provided ImageMagick-x86_64-apple-darwin11.1.0.tar.gz will need to be extracted prior to use.  This binary package is for a 64 bit Machintosh running the Darwin 11.1.0 kernel.  If your Machintosh is not 64 bit or using the Darwin 11.1.0 kernel then you will need to download and install Image Magick separately from the Image Magick homepage (www.imagemagick.org).  For older distributions it may prove necessary to build the executable from source, a process which requires the installation of XCode and MacPorts.  In this case you may find it worth trying the installation provided by CactusLab under www.cactuslab.com/imagemagick/ first as this is much easier to install and does not require the installation of XCode or MacPorts (although this installation is for a slightly older version of Image Magick - 6.6.5-10).
+The provided executables are not suitable for all Apple Macintosh distributions and may result in errors.  You may be required to download and install these programs separately if this is the case.  Also note that the included versions are not necessarily the most up to date versions.  It may be worth considering updating to the latest versions if you have problems.
 
-Note that Xena needs the location of the "convert" executable which is part of Image Magick and is located in the "bin" directory of the provided binary package (ImageMagick-x86_64-apple-darwin11.1.0.tar.gz).
+The versions included here are:
+flac         version 1.2.1
+readpst      version 0.6.44
+tesseract    version 3.0.1
+
+If you followed the installation instructions you should also have:
+exiftool     version 8.6.3    /usr/bin/exiftool
+ImageMagick  version 6.5.8    /ImageMagick-6.5.8/bin/convert
+
+In the case of ImageMagick please note that convert is the only functionality used by Xena although ImageMagick also has other functions.  Also note that if you wish to upgrade ImageMagick you may find that the ImageMagick has only a single pre-built binary package for Mac OS.  If this package is not suitable for your machine they recommend building from source.  This method requires the installation of XCode and MacPorts and may not be suitable for all users.  In such a case you may find it worth trying the installation provided by CactusLab under www.cactuslab.com/imagemagick/.  This version is for 6.6.5-10 rather than the most recent version but is a much simpler install process.
