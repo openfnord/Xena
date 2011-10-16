@@ -166,7 +166,6 @@ public class ImageMagicTiffToXenaPngNormaliser extends AbstractNormaliser {
 				ch.startElement(MULTIPAGE_URI, "multipage", MULTIPAGE_PREFIX + ":" + MULTIPAGE_PREFIX, att);
 
 				for (int i = 0; i < images.size(); i++) {
-					//				for (TiffDirectory dir : tiffDirectories) {
 					TiffDirectory dir;
 					if (validSanselanTiff) {
 						dir = tiffDirectories.get(i);
