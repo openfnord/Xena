@@ -41,7 +41,7 @@ Bug Fixes
 * Fixed error with new lines when normalising tsv or csv files that resulted in export functionality not working correctly (bug-3095399)
 * Notice now given to user if file deletion fails when normalisation/migration cancelled (bug-3379425)
 
-Note that bug fixes and additions that relate to a feature listed that were not present in Xena 5.0.0 are not shown in this list (e.g. numerous bug fixes related to the addition of the "Convert" functionality)
+Note that bug fixes and additions that relate to a feature listed that was not present in Xena 5.0.0 are not shown in this list (e.g. numerous bug fixes related to the addition of the "Convert" functionality)
 
 
 
