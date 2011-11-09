@@ -406,35 +406,43 @@ public class ImageMagicTiffToXenaPngNormaliser extends AbstractNormaliser {
 			tempTiffFile.deleteOnExit();
 			FileOutputStream tempTiffOutput = new FileOutputStream(tempTiffFile);
 
-			byte[] buffer = new byte[10 * 1024];
-			int bytesRead = tiffStream.read(buffer);
-			while (bytesRead > 0) {
-				tempTiffOutput.write(buffer, 0, bytesRead);
+			int bytesRead;
+			try {
+				byte[] buffer = new byte[10 * 1024];
 				bytesRead = tiffStream.read(buffer);
+				while (bytesRead > 0) {
+					tempTiffOutput.write(buffer, 0, bytesRead);
+					bytesRead = tiffStream.read(buffer);
+				}
+				tempTiffOutput.flush();
+			} finally {
+				tempTiffOutput.close();
 			}
-			tempTiffOutput.flush();
-			tempTiffOutput.close();
 
 			// Check that we have produced a valid TIFF file
 			RandomAccessFile tiffRAF = new RandomAccessFile(tempTiffFile, "r");
-			tiffRAF.seek(0);
-			byte[] identifierBytes = new byte[2];
-			bytesRead = tiffRAF.read(identifierBytes);
-			if (bytesRead != 2) {
-				throw new IOException("Temporary TIFF file could not be read: " + tempTiffFile.getAbsolutePath());
-			}
+			try {
+				tiffRAF.seek(0);
+				byte[] identifierBytes = new byte[2];
+				bytesRead = tiffRAF.read(identifierBytes);
+				if (bytesRead != 2) {
+					throw new IOException("Temporary TIFF file could not be read: " + tempTiffFile.getAbsolutePath());
+				}
 
-			// Check the endianness of the file
-			boolean useBigEndianOrdering = false;
-			if (identifierBytes[0] == 0x4D && identifierBytes[1] == 0x4D) {
-				useBigEndianOrdering = true;
-			} else if (identifierBytes[0] == 0x49 && identifierBytes[1] == 0x49) {
-				useBigEndianOrdering = false;
-			} else {
-				throw new IOException("Temporary TIFF file has an invalid header.");
-			}
+				// Check the endianness of the file
+				boolean useBigEndianOrdering = false;
+				if (identifierBytes[0] == 0x4D && identifierBytes[1] == 0x4D) {
+					useBigEndianOrdering = true;
+				} else if (identifierBytes[0] == 0x49 && identifierBytes[1] == 0x49) {
+					useBigEndianOrdering = false;
+				} else {
+					throw new IOException("Temporary TIFF file has an invalid header.");
+				}
 
-			processExifIFD(ch, tiffRAF, exifIFDOffset, useBigEndianOrdering);
+				processExifIFD(ch, tiffRAF, exifIFDOffset, useBigEndianOrdering);
+			} finally {
+				tiffRAF.close();
+			}
 		} catch (IOException iex) {
 			String errorMessage = "EXIF Metadata could not be added due to an exception: " + iex.getMessage();
 			char[] errorMessageChars = errorMessage.toCharArray();
