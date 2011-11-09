@@ -303,29 +303,32 @@ public class ImageMagicTiffToXenaPngNormaliser extends AbstractNormaliser {
 		                 BasicImageNormaliser.PNG_DESCRIPTION_CONTENT);
 		ContentHandler ch = getContentHandler();
 		InputStream is = new FileInputStream(image);
-
-		if (convertOnly) {
-			// Copy the file to the destination
-			String tempBaseFilename = results.getOutputFileName();
-			// Remove the .PNG we added to the parent filename
-			tempBaseFilename = tempBaseFilename.substring(0, tempBaseFilename.lastIndexOf("."));
-			FileUtils.fileCopy(is, results.getDestinationDirString() + File.separator + tempBaseFilename + "-" + image.getName(), false);
-		} else {
-			// Encode
-
-			ch.startElement(PNG_URI, PNG_TAG, PNG_PREFIX + ":" + PNG_TAG, att);
-
-			// Output the image data to our Xena file
-			InputStreamEncoder.base64Encode(is, ch);
-
-			if (dir != null) {
-				// Output the TIFF metadata to our Xena file
-				outputTiffMetadata(ch, dir, tiffSource);
+		
+		try {
+			if (convertOnly) {
+				// Copy the file to the destination
+				String tempBaseFilename = results.getOutputFileName();
+				// Remove the .PNG we added to the parent filename
+				tempBaseFilename = tempBaseFilename.substring(0, tempBaseFilename.lastIndexOf("."));
+				FileUtils.fileCopy(is, results.getDestinationDirString() + File.separator + tempBaseFilename + "-" + image.getName(), false);
+			} else {
+				// Encode
+	
+				ch.startElement(PNG_URI, PNG_TAG, PNG_PREFIX + ":" + PNG_TAG, att);
+	
+				// Output the image data to our Xena file
+				InputStreamEncoder.base64Encode(is, ch);
+	
+				if (dir != null) {
+					// Output the TIFF metadata to our Xena file
+					outputTiffMetadata(ch, dir, tiffSource);
+				}
+	
+				ch.endElement(PNG_URI, PNG_TAG, PNG_PREFIX + ":" + PNG_TAG);
 			}
-
-			ch.endElement(PNG_URI, PNG_TAG, PNG_PREFIX + ":" + PNG_TAG);
+		} finally {
+			is.close();
 		}
-		is.close();
 	}
 
 	/**
