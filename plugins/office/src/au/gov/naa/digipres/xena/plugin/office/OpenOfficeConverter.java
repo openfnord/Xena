@@ -119,6 +119,7 @@ public class OpenOfficeConverter {
 		}
 		List<String> commandList = new ArrayList<String>();
 		commandList.add(sofficeProgram.getAbsolutePath());
+		commandList.add("-headless");
 		commandList.add("-nologo");
 		commandList.add("-nodefault");
 		commandList.add("-accept=socket,port=8100;urp;");
