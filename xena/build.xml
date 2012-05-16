@@ -1,6 +1,6 @@
 <project name="xena" basedir="." default="makedist">
 
-	<property name="version" value="6.0.0"/>
+	<property name="version" value="6.0.1"/>
 	<property name="srcdir" value="src"/>
 	<property name="docdir" value="doc"/>
 	<property name="etcdir" value="etc"/>
