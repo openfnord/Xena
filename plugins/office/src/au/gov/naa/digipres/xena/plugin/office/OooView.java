@@ -57,8 +57,8 @@ import com.jclark.xsl.sax.XSLProcessorImpl;
 
 /**
  * View for Xena office documents. Show a quick and dirty version in the window
- * by using style sheets from openoffice.org to convert to HTML, and have a button
- * to show it properly in OpenOffice.org.
+ * by using style sheets from LibreOffice.org to convert to HTML, and have a button
+ * to show it properly in LibreOffice.org.
  *
  */
 public class OooView extends XenaView {
@@ -230,7 +230,7 @@ public class OooView extends XenaView {
 
 	private void jbInit() throws Exception {
 		launchButton.setToolTipText("");
-		launchButton.setText("Show in OpenOffice.org");
+		launchButton.setText("Show in LibreOffice.org");
 		launchButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				launchButton_actionPerformed();

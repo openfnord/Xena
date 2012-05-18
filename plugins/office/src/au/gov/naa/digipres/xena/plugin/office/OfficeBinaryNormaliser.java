@@ -29,7 +29,7 @@ import au.gov.naa.digipres.xena.util.InputStreamEncoder;
 /**
  * This normaliser is used to normalise files that are received of type ODF. As this is one of
  * our target formats we will just be binary normalising it, so we will use this simple process
- * rather than using the main OfficeNormaliser which would first pass it through OpenOffice.
+ * rather than using the main OfficeNormaliser which would first pass it through LibreOffice.
  * 
  * @author Justin Waddell
  * @author Jeff Stiff

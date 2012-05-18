@@ -42,7 +42,7 @@ import au.gov.naa.digipres.xena.util.FileUtils;
 import au.gov.naa.digipres.xena.util.InputStreamEncoder;
 
 /*
- * Convert office documents to the Xena office (i.e. OpenOffice.org flat) file format.
+ * Convert office documents to the Xena office (i.e. LibreOffice.org flat) file format.
  */
 public class OfficeToXenaOooNormaliser extends AbstractNormaliser {
 	protected Logger logger = Logger.getLogger(this.getClass().getName());
@@ -103,7 +103,7 @@ public class OfficeToXenaOooNormaliser extends AbstractNormaliser {
 			ZipFile openDocumentZip = new ZipFile(output);
 			// Not sure if this is even possible, but worth checking I guess...
 			if (openDocumentZip.size() == 0) {
-				throw new IOException("An empty document was created by OpenOffice.org");
+				throw new IOException("An empty document was created by LibreOffice.org");
 			}
 
 			// Check if this is a conversion only
@@ -138,7 +138,7 @@ public class OfficeToXenaOooNormaliser extends AbstractNormaliser {
 			}
 			
 		} catch (ZipException ex) {
-			throw new IOException("OpenOffice.org could not create the open document file");
+			throw new IOException("LibreOffice.org could not create the open document file");
 		} finally {
 			output.delete();
 		}

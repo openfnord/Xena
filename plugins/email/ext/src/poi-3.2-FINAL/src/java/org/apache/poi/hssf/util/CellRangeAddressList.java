@@ -24,7 +24,7 @@ import org.apache.poi.util.LittleEndian;
 
 /**
  * Implementation of the cell range address lists,like is described
- * in OpenOffice.org's Excel Documentation: excelfileformat.pdf sec 2.5.14 -
+ * in LibreOffice.org's Excel Documentation: excelfileformat.pdf sec 2.5.14 -
  * 'Cell Range Address List'
  * 
  * In BIFF8 there is a common way to store absolute cell range address lists in

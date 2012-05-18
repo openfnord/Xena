@@ -19,7 +19,7 @@ package org.apache.poi.hssf.record.formula;
 
 /**
  * Less than operator PTG "<". The SID is taken from the 
- * Openoffice.orgs Documentation of the Excel File Format,
+ * LibreOffice.orgs Documentation of the Excel File Format,
  * Table 3.5.7
  * @author Cameron Riley (criley at ekmail.com)
  */
