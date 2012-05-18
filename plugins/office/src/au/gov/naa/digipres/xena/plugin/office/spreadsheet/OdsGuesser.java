@@ -25,7 +25,7 @@ import au.gov.naa.digipres.xena.kernel.type.Type;
 import au.gov.naa.digipres.xena.plugin.office.ODFGuesser;
 
 /**
- * Guesser for the the ODS file type (ODF spreadsheet format in later versions of OpenOffice.org)
+ * Guesser for the the ODS file type (ODF spreadsheet format in later versions of LibreOffice.org)
  * 
  */
 public class OdsGuesser extends ODFGuesser {

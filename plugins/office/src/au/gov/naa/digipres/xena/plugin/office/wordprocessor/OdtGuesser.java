@@ -25,7 +25,7 @@ import au.gov.naa.digipres.xena.kernel.type.Type;
 import au.gov.naa.digipres.xena.plugin.office.ODFGuesser;
 
 /**
- * Guesser for the ODT file type (ODF word processor format in later versions of OpenOffice.org)
+ * Guesser for the ODT file type (ODF word processor format in later versions of LibreOffice.org)
  * 
  */
 public class OdtGuesser extends ODFGuesser {

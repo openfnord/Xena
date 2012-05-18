@@ -21,14 +21,14 @@ package au.gov.naa.digipres.xena.plugin.office.spreadsheet;
 import au.gov.naa.digipres.xena.plugin.office.OfficeFileType;
 
 /**
- * Type to represent the SXC file type (spreadsheet format in early versions of OpenOffice.org)
+ * Type to represent the SXC file type (spreadsheet format in early versions of LibreOffice.org)
  *
  */
 public class SxcFileType extends OfficeFileType {
 
 	@Override
 	public String getName() {
-		return "OpenOffice.org v1 Spreadsheet";
+		return "LibreOffice.org v1 Spreadsheet";
 	}
 
 	@Override

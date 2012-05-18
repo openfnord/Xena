@@ -1,0 +1,56 @@
+!SESSION 2012-05-18 12:19:57.737 -----------------------------------------------
+eclipse.buildId=M20100909-0800
+java.version=1.6.0_20
+java.vendor=Sun Microsystems Inc.
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=en_US
+Command-line arguments:  -data /home/dpadmin/build/xena -os linux -ws gtk -arch x86_64
+
+!ENTRY org.eclipse.jface 2 0 2012-05-18 12:20:01.802
+!MESSAGE Keybinding conflicts occurred.  They may interfere with normal accelerator operation.
+!SUBENTRY 1 org.eclipse.jface 2 0 2012-05-18 12:20:01.802
+!MESSAGE A conflict occurred for CTRL+SHIFT+T:
+Binding(CTRL+SHIFT+T,
+	ParameterizedCommand(Command(org.eclipse.jdt.ui.navigate.open.type,Open Type,
+		Open a type in a Java editor,
+		Category(org.eclipse.ui.category.navigate,Navigate,null,true),
+		,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,,system)
+Binding(CTRL+SHIFT+T,
+	ParameterizedCommand(Command(com.python.pydev.analysis.actions.pyGlobalsBrowserWorkbench,Python Show Class Browser,
+		Show Class Browser,
+		Category(org.python.pydev.ui.category.source,Pydev - Editor,Pydev editor category,true),
+		,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,,system)
+
+!ENTRY org.python.pydev.core 4 4 2012-05-18 12:20:02.722
+!MESSAGE Connection refused
+!STACK 0
+java.net.ConnectException: Connection refused
+	at java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:327)
+	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:193)
+	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:180)
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:384)
+	at java.net.Socket.connect(Socket.java:546)
+	at sun.security.ssl.SSLSocketImpl.connect(SSLSocketImpl.java:584)
+	at sun.security.ssl.BaseSSLSocketImpl.connect(BaseSSLSocketImpl.java:160)
+	at sun.net.NetworkClient.doConnect(NetworkClient.java:178)
+	at sun.net.www.http.HttpClient.openServer(HttpClient.java:409)
+	at sun.net.www.http.HttpClient.openServer(HttpClient.java:530)
+	at sun.net.www.protocol.https.HttpsClient.<init>(HttpsClient.java:275)
+	at sun.net.www.protocol.https.HttpsClient.New(HttpsClient.java:332)
+	at sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.getNewHttpClient(AbstractDelegateHttpsURLConnection.java:191)
+	at sun.net.www.protocol.http.HttpURLConnection.plainConnect(HttpURLConnection.java:876)
+	at sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.connect(AbstractDelegateHttpsURLConnection.java:177)
+	at sun.net.www.protocol.http.HttpURLConnection.getOutputStream(HttpURLConnection.java:979)
+	at sun.net.www.protocol.https.HttpsURLConnectionImpl.getOutputStream(HttpsURLConnectionImpl.java:250)
+	at org.python.pydev.logging.ping.LogPingSender.sendPing(LogPingSender.java:52)
+	at org.python.pydev.logging.ping.SynchedLogPing.send(SynchedLogPing.java:158)
+	at org.python.pydev.logging.ping.AsyncLogPing.consumeAllCommands(AsyncLogPing.java:125)
+	at org.python.pydev.logging.ping.AsyncLogPing.access$0(AsyncLogPing.java:94)
+	at org.python.pydev.logging.ping.AsyncLogPing$1.run(AsyncLogPing.java:41)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:54)

@@ -101,10 +101,10 @@ public class OpenOfficeConverter {
 		PropertiesManager propManager = pluginManager.getPropertiesManager();
 		String fname = propManager.getPropertyValue(OfficeProperties.OFFICE_PLUGIN_NAME, OfficeProperties.OOO_DIR_PROP_NAME);
 		if (fname == null || fname.equals("")) {
-			throw new XenaException("OpenOffice.org is not running. OpenOffice.org location not configured.");
+			throw new XenaException("LibreOffice.org is not running. LibreOffice.org location not configured.");
 		}
 
-		// NeoOffice/OpenOffice.org on OS X has a different program structure than that for Windows and Linux, so we
+		// NeoOffice/LibreOffice.org on OS X has a different program structure than that for Windows and Linux, so we
 		// need a special case...
 		File sofficeProgram;
 		if (System.getProperty("os.name").toLowerCase().equals(OS_X_ARCHITECTURE_NAME)) {
@@ -124,10 +124,10 @@ public class OpenOfficeConverter {
 		commandList.add("-accept=socket,port=8100;urp;");
 		String[] commandArr = commandList.toArray(new String[0]);
 		try {
-			logger.finest("Starting OpenOffice.org process");
+			logger.finest("Starting LibreOffice.org process");
 			Runtime.getRuntime().exec(commandArr);
 		} catch (IOException x) {
-			throw new XenaException("Cannot start OpenOffice.org. Try Checking Office Properties. " + sofficeProgram.getAbsolutePath(), x);
+			throw new XenaException("Cannot start LibreOffice.org. Try Checking Office Properties. " + sofficeProgram.getAbsolutePath(), x);
 		}
 
 		try {
@@ -135,7 +135,7 @@ public class OpenOfficeConverter {
 			    Integer.parseInt(propManager.getPropertyValue(OfficeProperties.OFFICE_PLUGIN_NAME, OfficeProperties.OOO_SLEEP_PROP_NAME));
 			Thread.sleep(1000 * sleepSeconds);
 		} catch (NumberFormatException nfex) {
-			throw new XenaException("Cannot start OpenOffice.org due to invalid startup sleep time. " + "Try Checking Office Properties. ", nfex);
+			throw new XenaException("Cannot start LibreOffice.org due to invalid startup sleep time. " + "Try Checking Office Properties. ", nfex);
 		}
 	}
 
@@ -164,7 +164,7 @@ public class OpenOfficeConverter {
 			// Getting an object that will offer a simple way to store a document to a URL.
 			XStorable xstorable = (XStorable) UnoRuntime.queryInterface(XStorable.class, objectDocumentToStore);
 			if (xstorable == null) {
-				throw new SAXException("Cannot connect to OpenOffice.org - possibly something wrong with the input file");
+				throw new SAXException("Cannot connect to LibreOffice.org - possibly something wrong with the input file");
 			}
 
 			// Preparing properties for converting the document
@@ -186,9 +186,9 @@ public class OpenOfficeConverter {
 				xstorable.storeToURL(url, propertyvalue);
 			} catch (Exception e) {
 				throw new XenaException(
-				                        "Cannot convert to open document format. Maybe your OpenOffice.org installation does not have installed: "
+				                        "Cannot convert to open document format. Maybe your LibreOffice.org installation does not have installed: "
 				                                + converter
-				                                + " or maybe the document is password protected or has some other problem. Try opening in OpenOffice.org manually.",
+				                                + " or maybe the document is password protected or has some other problem. Try opening in LibreOffice.org manually.",
 				                        e);
 			}
 
@@ -198,7 +198,7 @@ public class OpenOfficeConverter {
 			// Closing the converted document
 			xcomponent.dispose();
 			if (output.length() == 0) {
-				throw new XenaException("OpenOffice.org open document file is empty. Do you have OpenOffice.org Java integration installed?");
+				throw new XenaException("LibreOffice.org open document file is empty. Do you have LibreOffice.org Java integration installed?");
 			}
 		} catch (Exception e) {
 			logger.log(Level.FINEST, "Problem normalising office document", e);
@@ -211,7 +211,7 @@ public class OpenOfficeConverter {
 	/**
 	 * @return A string identifying the product in the form <Product Name> <version number>
 	 * 
-	 * TODO check into possibility of making this function and others non-static and having a connection setup to OpenOffice rather than connecting twice.
+	 * TODO check into possibility of making this function and others non-static and having a connection setup to LibreOffice rather than connecting twice.
 	 *      If done might have to cater for losing connection
 	 */
 	public static String getProductId(PluginManager pluginManager) throws XenaException {
@@ -224,11 +224,11 @@ public class OpenOfficeConverter {
 			throw new XenaException(ex);
 		}
 
-		// Get the ConfigurationAccess for the org.openoffice.Setup/Product category values
+		// Get the ConfigurationAccess for the org.LibreOffice.Setup/Product category values
 		PropertyValue[] params = new PropertyValue[1];
 		params[0] = new PropertyValue();
 		params[0].Name = new String("nodepath");
-		params[0].Value = new String("org.openoffice.Setup/Product");
+		params[0].Value = new String("org.LibreOffice.Setup/Product");
 		Object xAccess;
 		try {
 			xAccess = xProvider.createInstanceWithArguments("com.sun.star.configuration.ConfigurationAccess", params); // note that newer versions use NamedValue[] parameters instead but that PropertyValue[] use is still supported
@@ -242,7 +242,7 @@ public class OpenOfficeConverter {
 		try {
 			productName = xConfig.getByName("ooName").toString();
 		} catch (NoSuchElementException nsee) {
-			throw new XenaException("Could not get Product Name For OpenOffice Converter (ooName)",nsee);
+			throw new XenaException("Could not get Product Name For LibreOffice Converter (ooName)",nsee);
 		} catch (WrappedTargetException wte) {
 			throw new XenaException(wte);
 		}
@@ -255,7 +255,7 @@ public class OpenOfficeConverter {
 			try {
 				version = xConfig.getByName("ooSetupVersion").toString();
 			} catch (NoSuchElementException nsee2) {
-				throw new XenaException("Could not get Product Version for OpenOffice Converter (ooSetupVersionAboutBox/ooSetupVersion)", nsee2);
+				throw new XenaException("Could not get Product Version for LibreOffice Converter (ooSetupVersionAboutBox/ooSetupVersion)", nsee2);
 			} catch (WrappedTargetException wte) {
 				throw new XenaException(wte);
 			}
@@ -294,7 +294,7 @@ public class OpenOfficeConverter {
 		try {
 			objectInitial = xurlresolver.resolve(address);
 		} catch (com.sun.star.connection.NoConnectException ncex) {
-			// Could not connect to OpenOffice.org, so start it up and try again
+			// Could not connect to LibreOffice.org, so start it up and try again
 			try {
 				startOpenOffice(pluginManager);
 				objectInitial = xurlresolver.resolve(address);
@@ -306,7 +306,7 @@ public class OpenOfficeConverter {
 				throw new XenaException(ex);
 			}
 		} catch (com.sun.star.uno.RuntimeException rtex) {
-			// Could not connect to OpenOffice.org, so start it up and try again
+			// Could not connect to LibreOffice.org, so start it up and try again
 			try {
 				startOpenOffice(pluginManager);
 				objectInitial = xurlresolver.resolve(address);

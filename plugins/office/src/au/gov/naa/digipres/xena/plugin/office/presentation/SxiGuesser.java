@@ -25,7 +25,7 @@ import au.gov.naa.digipres.xena.kernel.guesser.GuesserManager;
 import au.gov.naa.digipres.xena.kernel.type.Type;
 
 /**
- * Guesser for the SXI file type (presentation format in early versions of OpenOffice.org)
+ * Guesser for the SXI file type (presentation format in early versions of LibreOffice.org)
  * 
  */
 public class SxiGuesser extends DefaultGuesser {
