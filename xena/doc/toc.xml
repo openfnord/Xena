@@ -6,6 +6,7 @@ PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 2.0//EN"
 <toc version="2.0">
 	<tocitem image="favicon"  text="Xena help" target="xenahelp"/>
 	<tocitem image="img.page" text="Introduction" target="introduction"/>
+	<tocitem image="img.page" text="What is new in this version" target="whatsnew"/>
 	<tocitem image="img.category" text="Getting started" target="start">
 		<tocitem image="img.category" text="Setting preferences" target="setdirectories">
 		</tocitem>
