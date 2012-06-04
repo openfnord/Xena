@@ -47,6 +47,12 @@ import au.gov.naa.digipres.xena.kernel.IconFactory;
 public class NormalisationCompleteDialog extends JDialog {
 	private static final String DIALOG_TITLE = "Complete";
 
+	public static void show(Frame owner, int totalItems, int normalisedItems, int errorItems, int warningItems, boolean isConvertOnly) throws HeadlessException {
+		NormalisationCompleteDialog ncd = new NormalisationCompleteDialog(owner, totalItems, normalisedItems, errorItems, warningItems, isConvertOnly);
+		ncd.setVisible(true);
+		ncd.dispose();
+	}
+	
 	public NormalisationCompleteDialog(Frame owner, int totalItems, int normalisedItems, int errorItems, int warningItems, boolean isConvertOnly) throws HeadlessException {
 		super(owner, DIALOG_TITLE, true);
 		initGUI(totalItems, normalisedItems, errorItems, warningItems, isConvertOnly);

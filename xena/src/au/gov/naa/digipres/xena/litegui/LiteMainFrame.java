@@ -1122,7 +1122,7 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 	 * @param errorItems
 	 */
 	private void displayConfirmationMessage(String title, int totalItems, int normalisedItems, int errorItems, int warningItems, boolean isConvertOnly) {
-		new NormalisationCompleteDialog(this, totalItems, normalisedItems, errorItems, warningItems, isConvertOnly).setVisible(true);
+		NormalisationCompleteDialog.show(this, totalItems, normalisedItems, errorItems, warningItems, isConvertOnly);
 	}
 
 	/**

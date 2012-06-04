@@ -1,3 +1,15 @@
+Xena 6.0.1
+==========
+Bug Fixes
+---------
+* Fixed an error where file descriptors were not closed when an error occurred while processing a Tiff file with a EXIF IFD tag (bug-3435270)
+* Updates references to "OpenOffice" to instead be to "LibreOffice" (bug-3527503)
+* Corrected an issue where the graphical user interface of LibreOffice would be opened when processing office documents on some machines (bug-3495834)
+* Prevented the unnecessary creation of a "dpr" directory when building (source release only) (bug-3520786)
+* Minor corrections to object cleanup, comments, spelling and eclipse launch files (source release only)
+
+
+
 Xena 6.0.0
 ==========
 

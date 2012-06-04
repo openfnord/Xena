@@ -10,14 +10,14 @@
  * You should have received a copy of the GNU General Public License along with Xena; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  * 
- * 
- * Exception to represent a blocking event that should be seen by the user as a warning
- * 
  * @author Terry O'Neill
  */
 
 package au.gov.naa.digipres.xena.kernel;
 
+/**
+ * Exception to represent a blocking event that should be seen by the user as a warning
+ */
 public class XenaWarningException extends XenaException {
 	
 	private static final long serialVersionUID = 1L;

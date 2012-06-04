@@ -54,12 +54,12 @@ import au.gov.naa.digipres.xena.kernel.type.Type;
  * This class represents an instance of XENA. it will be
  * able to load plugins, normalise, and a few other odds and ends.
  * 
- * It should act as an intermediary between everything and xena. Xena
- * should be a 'black box', and called from any application that needs
- * preservation services. This could be a stand alone preservation tool,
- * or part of something that is a workflow type thingimy.
+ * It should act as an intermediary between outside applications and xena.
+ * Xena should be a 'black box', called from any application that needs
+ * preservation services (such as a stand alone preservation tool or part
+ * of a larger preservation workflow).
  * 
- * Note that it allows access to the Xena objects by allowing
+ * The Xena class allows access to Xena objects by allowing
  * applications to get a reference to the plugin manager, which will
  * then allow users to get component plugin managers and so on.
  * 
@@ -596,10 +596,10 @@ public class Xena {
 	 * @return A NormaliserDataStore object with the results of the normalisation.
 	 * @throws XenaException in the case of an error occurring during the normalisation process.
 	 */
-	public NormaliserResults normalise(XenaInputSource xis, File destinationDir, boolean convertONly) throws XenaException {
+	public NormaliserResults normalise(XenaInputSource xis, File destinationDir, boolean convertOnly) throws XenaException {
 		AbstractMetaDataWrapper wrapper;
 
-		if (convertONly) {
+		if (convertOnly) {
 			// Set the emptyWrapper
 			wrapper = getPluginManager().getMetaDataWrapperManager().getEmptyWrapper().getWrapper();
 		} else {
@@ -607,7 +607,7 @@ public class Xena {
 			wrapper = pluginManager.getMetaDataWrapperManager().getActiveWrapperPlugin().getWrapper();
 		}
 
-		NormaliserResults results = normalise(xis, destinationDir, wrapper, convertONly);
+		NormaliserResults results = normalise(xis, destinationDir, wrapper, convertOnly);
 
 		if (results != null) {
 			return results;

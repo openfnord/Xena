@@ -21,13 +21,13 @@ package au.gov.naa.digipres.xena.plugin.office;
 import au.gov.naa.digipres.xena.kernel.type.FileType;
 
 /**
- * Type to represent a flat XML LibreOffice.org file.
+ * Type to represent a flat XML OpenOffice.org file.
  *
  */
 public class FlatOOoFileType extends FileType {
 	@Override
     public String getName() {
-		return "Flat LibreOffice.org";
+		return "Flat OpenOffice.org";
 	}
 
 	@Override

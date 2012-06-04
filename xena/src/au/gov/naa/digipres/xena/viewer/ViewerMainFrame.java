@@ -66,8 +66,6 @@ import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
  * XenaView in a NormalisedObjectViewFrame.
  * 
  * created 30/11/2005
- * xena
- * Short desc of class:
  */
 public class ViewerMainFrame extends JFrame {
 

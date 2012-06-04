@@ -119,6 +119,7 @@ public class OpenOfficeConverter {
 		}
 		List<String> commandList = new ArrayList<String>();
 		commandList.add(sofficeProgram.getAbsolutePath());
+		commandList.add("-headless");
 		commandList.add("-nologo");
 		commandList.add("-nodefault");
 		commandList.add("-accept=socket,port=8100;urp;");
@@ -224,11 +225,11 @@ public class OpenOfficeConverter {
 			throw new XenaException(ex);
 		}
 
-		// Get the ConfigurationAccess for the org.LibreOffice.Setup/Product category values
+		// Get the ConfigurationAccess for the org.openoffice.Setup/Product category values
 		PropertyValue[] params = new PropertyValue[1];
 		params[0] = new PropertyValue();
 		params[0].Name = new String("nodepath");
-		params[0].Value = new String("org.LibreOffice.Setup/Product");
+		params[0].Value = new String("org.openoffice.Setup/Product");
 		Object xAccess;
 		try {
 			xAccess = xProvider.createInstanceWithArguments("com.sun.star.configuration.ConfigurationAccess", params); // note that newer versions use NamedValue[] parameters instead but that PropertyValue[] use is still supported

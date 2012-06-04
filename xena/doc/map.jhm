@@ -24,7 +24,7 @@ PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp Map Version 2.0//EN"
 <mapID target="setemail" url="content/setemail.html">
 <mapID target="setimage" url="content/setimage.html">
 <mapID target="setmetadata" url="content/setmetadata.html">
-<mapID target="setopenoffice" url="content/setopenoffice.html">
+<mapID target="setoffice" url="content/setoffice.html">
 <mapID target="normalisation" url="content/normalisation.html">
 <mapID target="normfile" url="content/normfile.html">
 <mapID target="normdirectory" url="content/normdirectory.html">

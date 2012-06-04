@@ -64,14 +64,14 @@ public class LiteAboutDialog {
 		titleLabel.setBackground(aboutText.getBackground());
 		titleLabel.setOpaque(true);
 
-		aboutText.append("\nDigital Preservation Project Team:\n\n" + 
+		aboutText.append("\nDigital Preservation Project Team:\n\n" +
+						 "Margot Caldbick\n" +
 						 "Michael Carden\n" +
-						 "Allan Cunliffe\n" +
+						 "Kirti Chennareddy\n" +
 						 "Sara Gunn\n" +
 						 "Alan Langley\n" +
-						 "Heath Nott\n" +
+						 "Neil Muller\n" +
 						 "Terry O'Neill\n" +
-						 "Cornel Platzer\n" +
 						 "Anne Robertson\n" +
 		                 "\nhttp://xena.sourceforge.net\n" + 
 						 "http://www.naa.gov.au\n\n" +
