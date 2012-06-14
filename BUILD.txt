@@ -5,7 +5,7 @@ For more detailed installation instructions, refer to the Xena wiki at: https://
 
 FROM THE COMMAND CONSOLE
 
-1. Go to the directory of this README file (this is the xena directory under the directory where you cloned the Xena git repository or where you extracted the Xena source build archive):
+1. Go to the directory of this file (this is the xena directory under the directory where you cloned the Xena git repository or where you extracted the Xena source build archive):
 cd <path to the xena-source directory>
 
 
