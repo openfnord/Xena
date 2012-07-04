@@ -167,7 +167,7 @@ public final class HSSFSheet {
                 lastrow = hrow;
                 if (hrow == null) {
                     // Some tools (like Perl module Spreadsheet::WriteExcel - bug 41187) skip the RowRecords 
-                    // Excel, LibreOffice.org and GoogleDocs are all OK with this, so POI should be too.
+                    // Excel, OpenOffice.org and GoogleDocs are all OK with this, so POI should be too.
                     if (rowRecordsAlreadyPresent) {
                         // if at least one row record is present, all should be present.
                         throw new RuntimeException("Unexpected missing row when some rows already present");

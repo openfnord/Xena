@@ -14,7 +14,7 @@ PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 2.0//EN"
 			<tocitem image="img.page" text="Audio" target="setaudio"/>
 			<tocitem image="img.page" text="Image" target="setimage"/>
 			<tocitem image="img.page" text="Metadata" target="setmetadata"/>
-			<tocitem image="img.page" text="Office" target="setopenoffice"/>
+			<tocitem image="img.page" text="Office" target="setoffice"/>
 			<tocitem image="img.page" text="Email" target="setemail"/>
 		</tocitem>
 	</tocitem>
