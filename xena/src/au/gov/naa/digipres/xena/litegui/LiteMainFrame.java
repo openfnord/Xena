@@ -1381,9 +1381,11 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 
 			String fileIdStr = "file:";
 
+			boolean foundJarPath = false;
 			if (resourcePath.indexOf(fileIdStr) >= 0 && resourcePath.lastIndexOf("!") >= 0) {
 				String jarPath = resourcePath.substring(resourcePath.indexOf(fileIdStr) + fileIdStr.length(), resourcePath.lastIndexOf("!"));
 				if (jarPath.lastIndexOf("/") >= 0) {
+					foundJarPath = true;
 					pluginsDir = new File(jarPath.substring(0, jarPath.lastIndexOf("/") + 1) + "plugins");
 					if (pluginsDir.exists() && pluginsDir.isDirectory()) {
 						pluginsDirFound = true;
@@ -1392,7 +1394,19 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 				}
 			}
 			if (!pluginsDirFound) {
-				throw new XenaException("Cannot find default plugins directory. " + "Try running Xena Lite from the same directory as xena.jar.");
+				String errMsg = "Could not find the plugins directory.\n\n" +
+								"Expected location:\n" + pluginsDir.getAbsolutePath() +
+								"\n(i.e. under the directory of xena.jar)";
+				if (foundJarPath) {
+					File firstPluginsDir = new File("plugins");
+					if (!pluginsDir.getAbsolutePath().equals(firstPluginsDir.getAbsolutePath()))	{
+						// the current directory and xena.jar directory directory differ and we found the xena.jar directory
+						// tell the user they can also use the current directory 
+						errMsg += "\nOR\n" + (new File("plugins")).getAbsolutePath() +
+								  "\n(i.e. under the running directory)";
+					}
+				}
+				throw new XenaException(errMsg);
 			}
 		}
 
