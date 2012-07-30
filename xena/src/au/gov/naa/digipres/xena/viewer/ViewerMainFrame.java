@@ -46,6 +46,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 
@@ -403,14 +404,10 @@ public class ViewerMainFrame extends JFrame {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws UnsupportedLookAndFeelException {
 		// Set look and feel to the look and feel of the current OS
-		try {
-			UIManager.setLookAndFeel(new Plastic3DLookAndFeel());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
+		UIManager.setLookAndFeel(new Plastic3DLookAndFeel());
+		
 		ViewerMainFrame mf = new ViewerMainFrame();
 		mf.setVisible(true);
 
@@ -423,8 +420,7 @@ public class ViewerMainFrame extends JFrame {
 					mf.displayView(xenaFile);
 					gp.setVisible(false);
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					mf.handleException(e);
 				}
 			} else {
 				mf.handleException(new IOException("Invalid file - " + xenaFile.getAbsolutePath()));
