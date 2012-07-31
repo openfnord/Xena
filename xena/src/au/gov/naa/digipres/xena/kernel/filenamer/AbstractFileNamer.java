@@ -91,7 +91,7 @@ public abstract class AbstractFileNamer {
 	 * @throws XenaException - in the event of an error creating the file.
 	 */
 	public abstract File makeNewXenaFile(XenaInputSource input, AbstractNormaliser normaliser, File destinationDir) throws XenaException;
-
+	
 	/**
 	 * Make a new Open File using the destination directory as set in the FileNamerManager. This is the preferred method
 	 * for creating new Open files.
@@ -102,7 +102,7 @@ public abstract class AbstractFileNamer {
 	 *
 	 * @param xis - Input Xena Input source
 	 * @param normaliser - The normaliser that is being used during normalisation.
-	 * @return File - the new Xena File.
+	 * @return File - the new file created for which to put in the conversion.
 	 * @throws XenaException - in the case of the Xena file not being able to be created.
 	 * @see AbstractFileNamer.makeNewOpenFile(XenaInputSource input, AbstractNormaliser normaliser, File destinationDir)
 	 */
@@ -119,10 +119,23 @@ public abstract class AbstractFileNamer {
 	 * @param input
 	 * @param normaliser
 	 * @param destinationDir
-	 * @return File - the new Xena file.
+	 * @return File - the new file created for which to put in the conversion.
 	 * @throws XenaException - in the event of an error creating the file.
 	 */
 	public abstract File makeNewOpenFile(XenaInputSource input, AbstractNormaliser normaliser, File destinationDir) throws XenaException;
+	
+	/**
+	 * This method returns a new open file for when the file represented from the XenaInputSource is just to be copied to the 
+	 * destination directory with no changes to the contents (i.e. only changes to the file name) 
+	 * 
+	 * @param xis
+	 * @param destinationDir
+	 * @return File - the new file created for which to put in the conversion
+	 * @throws XenaException
+	 */
+	public File makeNewOpenFile(XenaInputSource xis, File destinationDir) throws XenaException {
+		return new File(destinationDir, xis.getFile().getName());
+	}
 
 	/**
 	 * Make a java.io.FileFilter object that a program calling Xena can use to filter files when presenting a method

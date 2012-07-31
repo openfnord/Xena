@@ -1191,7 +1191,8 @@ public class NormaliserManager {
 			} else {
 				// Copy the original file to the destination location unchanged
 				File origFile = xis.getFile();
-				File copiedFile = FileUtils.fileCopy(origFile, destinationDir + File.separator + origFile.getName(), false);
+				outputFile = fileNamer.makeNewOpenFile(xis, destinationDir);
+				File copiedFile = FileUtils.fileCopy(origFile, outputFile, false);
 
 				// File type does not get converted, notify user
 				results.addWarning("File does not get converted, copied without modification.");

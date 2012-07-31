@@ -113,7 +113,9 @@ public abstract class ArchiveNormaliser extends AbstractNormaliser {
 						entryOutputFile = fileNamer.makeNewOpenFile(childXis, entryNormaliser);
 					} else {
 						// File type does not get converted, copy file to destinatinDir, and skip to the next entry in the archive
-						FileUtils.fileCopy(tempFile, results.getDestinationDirString() + File.separator + tempFile.getName(), false);
+						// get the new file to put into from the file namer
+						entryOutputFile = fileNamer.makeNewOpenFile(childXis, new File(results.getDestinationDirString()));
+						FileUtils.fileCopy(tempFile, entryOutputFile, false);
 
 						// Delete entry's temp file
 						tempFile.delete();
