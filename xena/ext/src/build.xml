@@ -18,21 +18,22 @@
 	<property name="xalan" value="xalan-j_2_7_1" />
 	<property name="looks" value="looks-2.2.2"/>
 	<property name="commons_cli" value="commons-cli-1.1-src" />
-	<property name="xerces" value="xerces-2_9_1" />
+	<!--currently unable to build xerces in java 7-->
+	<!--<property name="xerces" value="xerces-2_11_0" />-->
 	<property name="javahelp" value="javahelp" />
 	<property name="icu4j" value="icu4j-4_2_1" />
 	
     <!-- ================================= 
           target: build_libs              
          ================================= -->
-    <target name="build_libs" depends="build_xalan, build_looks, build_xerces, build_juchardet" description="Build file for building the Xena 3rd party libs.">
+    <target name="build_libs" depends="build_xalan, build_looks, build_juchardet" description="Build file for building the Xena 3rd party libs.">
     	<echo>Building third pary libs completed</echo>
     </target>
 
 	<!-- ================================= 
 	     target: clean              
 	     ================================= -->
-	<target name="clean" depends="clean_xalan, clean_looks, clean_xerces, clean_juchardet" description="Build file for building the Xena 3rd party libs.">
+	<target name="clean" depends="clean_xalan, clean_looks, clean_juchardet" description="Build file for building the Xena 3rd party libs.">
 		<echo>Cleaning third party libs completed.</echo>
 	</target>
 	
@@ -123,27 +124,27 @@
 	<!-- - - - - - - - - - - - - - - - - - 
           target: build_xerces                      
          - - - - - - - - - - - - - - - - - -->
-    <target name="build_xerces">
-		<property name="xerces_classes" value="${xerces}/build/classes" />
+    <!--<target name="build_xerces">
+		<property name="xerces_classes" value="${xerces}/build/classes" />-->
     	
-    	<echo>Building xerces.</echo>
-    	<ant dir="${xerces}" target="compile" />
+    	<!--<echo>Building xerces.</echo>
+    	<ant dir="${xerces}" target="compile" />-->
     	
     	<!-- Move the classes to bin -->
-    	<copy todir="${bindir}">
+    	<!--<copy todir="${bindir}">
     		<fileset dir="${xerces_classes}">
     			<include name="**/*"/>
     		</fileset>
     	</copy>
-    </target>
+    </target>-->
 
 	<!-- - - - - - - - - - - - - - - - - - 
           target: clean_xerces                      
          - - - - - - - - - - - - - - - - - -->
-    <target name="clean_xerces">
+    <!--<target name="clean_xerces">
     	<echo>Cleaning xerces.</echo>
     	<ant dir="${xerces}" target="clean" />
-    </target>
+    </target>-->
 
 	<!-- - - - - - - - - - - - - - - - - - 
           target: build_javahelp                      
