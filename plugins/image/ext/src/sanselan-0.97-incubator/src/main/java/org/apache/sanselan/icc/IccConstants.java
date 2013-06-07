@@ -141,7 +141,7 @@ public interface IccConstants
 	//	public static final IccTagType AToB0Tag = new IccTagType(
 	//	"AToB0Tag",
 	//	"lut8Type or lut16Type or lutAtoBType",
-	//	"‘A2B0’ (41324230h)",
+	//	A2B0 (41324230h)",
 	//	"This tag defines a color transform from Device to PCS using lookup table tag element structures. The processing",
 	//	"mechanisms are described in lut8Type or lut16Type or lutAtoBType.",
 	//	);
@@ -189,8 +189,8 @@ public interface IccConstants
 
 	public static final IccTagType calibrationDateTimeTag = new IccTagType(
 			"calibrationDateTimeTag", "dateTimeType", 0x63616C74
-	//	"Profile calibration date and time. Initially, this tag matches the contents of the profile header’s creation",
-	//	"date/time field. This allows applications and utilities to verify if this profile matches a vendor’s profile and",
+	//	"Profile calibration date and time. Initially, this tag matches the contents of the profile headers creation",
+	//	"date/time field. This allows applications and utilities to verify if this profile matches a vendors profile and",
 	//	"how recently calibration has been performed.",
 	);
 
@@ -240,7 +240,7 @@ public interface IccConstants
 	//	"the chromatically adapted value in the PCS.",
 	//	"The chromatic adaptation matrix is a combination of three separate conversions:",
 	//	"1) Conversion of source CIE XYZ tristimulus values to cone response tristimulus values.",
-	//	"2) Adjustment of the cone response values for an observer’s chromatic adaptation.",
+	//	"2) Adjustment of the cone response values for an observers chromatic adaptation.",
 	//	"3) Conversion of the adjusted cone response tristimulus back to CIE XYZ values.",
 	);
 
@@ -282,8 +282,8 @@ public interface IccConstants
 			"lut8Type or lut16Type or lutBtoAType", 0x67616D74
 	//	"Out of gamut tag. The processing mechanisms are described in lut8Type or lut16Type or lutBtoAType.",
 	//	"This tag takes PCS values as its input and produces a single channel of output. If the output value is 0, the",
-	//	"PCS color is in-gamut. If the output is non-zero, the PCS color is out-of-gamut, with the output value “n+1”",
-	//	"being at least as far out of gamut as the output value “n”.",
+	//	"PCS color is in-gamut. If the output is non-zero, the PCS color is out-of-gamut, with the output value n+1",
+	//	"being at least as far out of gamut as the output value n.",
 	);
 
 	public static final IccTagType grayTRCTag = new IccTagType("grayTRCTag",
@@ -350,7 +350,7 @@ public interface IccConstants
 			"outputResponseTag", "responseCurveSet16Type", 0x72657370
 	//	"Structure containing a description of the device response for which the profile is intended. The content of",
 	//	"this structure is described in 6.5.16.",
-	//	"NOTE The user’s attention is called to the possibility that the use of this tag for device calibration may",
+	//	"NOTE The users attention is called to the possibility that the use of this tag for device calibration may",
 	//	"require use of an invention covered by patent rights. By publication of this specification, no position is",
 	//	"taken with respect to the validity of this claim or of any patent rights in connection therewith. The patent",
 	//	"holder has, however, filed a statement of willingness to grant a license under these rights on reasonable",
