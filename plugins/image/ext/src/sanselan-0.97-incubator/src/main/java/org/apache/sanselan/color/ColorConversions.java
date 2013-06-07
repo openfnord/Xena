@@ -193,7 +193,7 @@ public abstract class ColorConversions
 			double Z)
 	{
 
-		double var_X = X / ref_X; //ref_X =  95.047  Observer= 2°, Illuminant= D65
+		double var_X = X / ref_X; //ref_X =  95.047  Observer= 2, Illuminant= D65
 		double var_Y = Y / ref_Y; //ref_Y = 100.000
 		double var_Z = Z / ref_Z; //ref_Z = 108.883
 
@@ -240,7 +240,7 @@ public abstract class ColorConversions
 		else
 			var_Z = (var_Z - 16 / 116.0) / 7.787;
 
-		double X = ref_X * var_X; //ref_X =  95.047  Observer= 2°, Illuminant= D65
+		double X = ref_X * var_X; //ref_X =  95.047  Observer= 2, Illuminant= D65
 		double Y = ref_Y * var_Y; //ref_Y = 100.000
 		double Z = ref_Z * var_Z; //ref_Z = 108.883
 
@@ -288,10 +288,10 @@ public abstract class ColorConversions
 
 	public static final int convertXYZtoRGB(double X, double Y, double Z)
 	{
-		//Observer = 2°, Illuminant = D65
-		double var_X = X / 100.0; //Where X = 0 ÷  95.047
-		double var_Y = Y / 100.0; //Where Y = 0 ÷ 100.000
-		double var_Z = Z / 100.0; //Where Z = 0 ÷ 108.883
+		//Observer = 2, Illuminant = D65
+		double var_X = X / 100.0; //Where X = 0 /  95.047
+		double var_Y = Y / 100.0; //Where Y = 0 / 100.000
+		double var_Z = Z / 100.0; //Where Z = 0 / 108.883
 
 		double var_R = var_X * 3.2406 + var_Y * -1.5372 + var_Z * -0.4986;
 		double var_G = var_X * -0.9689 + var_Y * 1.8758 + var_Z * 0.0415;
@@ -323,9 +323,9 @@ public abstract class ColorConversions
 		int g = 0xff & (rgb >> 8);
 		int b = 0xff & (rgb >> 0);
 
-		double var_R = r / 255.0; //Where R = 0 ÷ 255
-		double var_G = g / 255.0; //Where G = 0 ÷ 255
-		double var_B = b / 255.0; //Where B = 0 ÷ 255
+		double var_R = r / 255.0; //Where R = 0 / 255
+		double var_G = g / 255.0; //Where G = 0 / 255
+		double var_B = b / 255.0; //Where B = 0 / 255
 
 		if (var_R > 0.04045)
 			var_R = Math.pow((var_R + 0.055) / 1.055, 2.4);
@@ -344,7 +344,7 @@ public abstract class ColorConversions
 		var_G = var_G * 100;
 		var_B = var_B * 100;
 
-		//		Observer. = 2°, Illuminant = D65
+		//		Observer. = 2, Illuminant = D65
 		double X = var_R * 0.4124 + var_G * 0.3576 + var_B * 0.1805;
 		double Y = var_R * 0.2126 + var_G * 0.7152 + var_B * 0.0722;
 		double Z = var_R * 0.0193 + var_G * 0.1192 + var_B * 0.9505;
@@ -358,8 +358,8 @@ public abstract class ColorConversions
 		int G = 0xff & (rgb >> 8);
 		int B = 0xff & (rgb >> 0);
 
-		//		RGB values = 0 ÷ 255
-		//		CMY values = 0 ÷ 1
+		//		RGB values = 0 / 255
+		//		CMY values = 0 / 1
 
 		double C = 1 - (R / 255.0);
 		double M = 1 - (G / 255.0);
@@ -370,8 +370,8 @@ public abstract class ColorConversions
 
 	public static final int convertCMYtoRGB(ColorCMY cmy)
 	{
-		//		CMY values = 0 ÷ 1
-		//		RGB values = 0 ÷ 255
+		//		CMY values = 0 / 1
+		//		RGB values = 0 / 255
 
 		double R = (1 - cmy.C) * 255.0;
 		double G = (1 - cmy.M) * 255.0;
@@ -382,7 +382,7 @@ public abstract class ColorConversions
 
 	public static final ColorCMYK convertCMYtoCMYK(ColorCMY cmy)
 	{
-		//		Where CMYK and CMY values = 0 ÷ 1
+		//		Where CMYK and CMY values = 0 / 1
 
 		double C = cmy.C;
 		double M = cmy.M;
@@ -419,7 +419,7 @@ public abstract class ColorConversions
 	public static final ColorCMY convertCMYKtoCMY(double C, double M, double Y,
 			double K)
 	{
-		//	Where CMYK and CMY values = 0 ÷ 1
+		//	Where CMYK and CMY values = 0 / 1
 
 		C = (C * (1 - K) + K);
 		M = (M * (1 - K) + K);
@@ -446,7 +446,7 @@ public abstract class ColorConversions
 		int G = 0xff & (rgb >> 8);
 		int B = 0xff & (rgb >> 0);
 
-		double var_R = (R / 255.0); //Where RGB values = 0 ÷ 255
+		double var_R = (R / 255.0); //Where RGB values = 0 / 255
 		double var_G = (G / 255.0);
 		double var_B = (B / 255.0);
 
@@ -460,7 +460,7 @@ public abstract class ColorConversions
 		//		Debug.debug("del_Max", del_Max);
 		if (del_Max == 0) //This is a gray, no chroma...
 		{
-			H = 0; //HSL results = 0 ÷ 1
+			H = 0; //HSL results = 0 / 1
 			S = 0;
 		}
 		else
@@ -513,9 +513,9 @@ public abstract class ColorConversions
 	{
 		double R, G, B;
 
-		if (S == 0) //HSL values = 0 ÷ 1
+		if (S == 0) //HSL values = 0 / 1
 		{
-			R = L * 255; //RGB results = 0 ÷ 255
+			R = L * 255; //RGB results = 0 / 255
 			G = L * 255;
 			B = L * 255;
 		}
@@ -559,7 +559,7 @@ public abstract class ColorConversions
 		int G = 0xff & (rgb >> 8);
 		int B = 0xff & (rgb >> 0);
 
-		double var_R = (R / 255.0); //RGB values = 0 ÷ 255
+		double var_R = (R / 255.0); //RGB values = 0 / 255
 		double var_G = (G / 255.0);
 		double var_B = (B / 255.0);
 
@@ -572,7 +572,7 @@ public abstract class ColorConversions
 		double H, S;
 		if (del_Max == 0) //This is a gray, no chroma...
 		{
-			H = 0; //HSV results = 0 ÷ 1
+			H = 0; //HSV results = 0 / 1
 			S = 0;
 		}
 		else
@@ -614,7 +614,7 @@ public abstract class ColorConversions
 	{
 		double R, G, B;
 
-		if (S == 0) //HSV values = 0 ÷ 1
+		if (S == 0) //HSV values = 0 / 1
 		{
 			R = V * 255;
 			G = V * 255;
@@ -669,7 +669,7 @@ public abstract class ColorConversions
 				var_b = var_2;
 			}
 
-			R = var_r * 255; //RGB results = 0 ÷ 255
+			R = var_r * 255; //RGB results = 0 / 255
 			G = var_g * 255;
 			B = var_b * 255;
 		}
@@ -730,7 +730,7 @@ public abstract class ColorConversions
 			//			double ref_Y = 100.000;
 			//			double ref_Z = 108.883;
 
-			X = ref_X * var_X; //ref_X =  95.047  Observer= 2°, Illuminant= D65
+			X = ref_X * var_X; //ref_X =  95.047  Observer= 2, Illuminant= D65
 			Y = ref_Y * var_Y; //ref_Y = 100.000
 			Z = ref_Z * var_Z; //ref_Z = 108.883
 
@@ -824,7 +824,7 @@ public abstract class ColorConversions
 
 	public static ColorCIELab convertCIELCHtoCIELab(double L, double C, double H)
 	{
-		//		Where CIE-H° = 0 ÷ 360°
+		//		Where CIE-H = 0 / 360
 
 		//		CIE-L* = CIE-L;
 		double a = Math.cos(degree_2_radian(H)) * C;
@@ -866,7 +866,7 @@ public abstract class ColorConversions
 		else
 			var_Y = (7.787 * var_Y) + (16 / 116.0);
 
-		double ref_X = 95.047; //Observer= 2°, Illuminant= D65
+		double ref_X = 95.047; //Observer= 2, Illuminant= D65
 		double ref_Y = 100.000;
 		double ref_Z = 108.883;
 
@@ -900,7 +900,7 @@ public abstract class ColorConversions
 		else
 			var_Y = (var_Y - 16 / 116) / 7.787;
 
-		double ref_X = 95.047; //Observer= 2°, Illuminant= D65
+		double ref_X = 95.047; //Observer= 2, Illuminant= D65
 		double ref_Y = 100.000;
 		double ref_Z = 108.883;
 
