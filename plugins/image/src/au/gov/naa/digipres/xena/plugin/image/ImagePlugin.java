@@ -37,7 +37,7 @@ import au.gov.naa.digipres.xena.plugin.image.legacy.XPMFileType;
 import au.gov.naa.digipres.xena.plugin.image.legacy.XPMGuesser;
 import au.gov.naa.digipres.xena.plugin.image.pcx.PcxFileType;
 import au.gov.naa.digipres.xena.plugin.image.pcx.PcxGuesser;
-import au.gov.naa.digipres.xena.plugin.image.tiff.ImageMagicTiffToXenaPngNormaliser;
+import au.gov.naa.digipres.xena.plugin.image.tiff.TiffToXenaPngNormaliser;
 import au.gov.naa.digipres.xena.plugin.image.tiff.TiffFileType;
 import au.gov.naa.digipres.xena.plugin.image.tiff.TiffGuesser;
 import au.gov.naa.digipres.xena.plugin.image.tiff.TiffTextNormaliser;
@@ -152,8 +152,7 @@ public class ImagePlugin extends XenaPlugin {
 		inputMap.put(svgNormaliser, svgNormaliserSet);
 
 		// TIFF
-		//		TiffToXenaPngNormaliser tiffNormaliser = new TiffToXenaPngNormaliser();
-		ImageMagicTiffToXenaPngNormaliser tiffNormaliser = new ImageMagicTiffToXenaPngNormaliser();
+		TiffToXenaPngNormaliser tiffNormaliser = new TiffToXenaPngNormaliser();
 		Set<Type> tiffNormaliserSet = new HashSet<Type>();
 		tiffNormaliserSet.add(new TiffFileType());
 		inputMap.put(tiffNormaliser, tiffNormaliserSet);
@@ -226,8 +225,7 @@ public class ImagePlugin extends XenaPlugin {
 		outputMap.put(svgNormaliser, svgNormaliserSet);
 
 		// TIFF
-		//		TiffToXenaPngNormaliser tiffNormaliser = new TiffToXenaPngNormaliser();
-		ImageMagicTiffToXenaPngNormaliser tiffNormaliser = new ImageMagicTiffToXenaPngNormaliser();
+		TiffToXenaPngNormaliser tiffNormaliser = new TiffToXenaPngNormaliser();
 		Set<Type> tiffNormaliserSet = new HashSet<Type>();
 		tiffNormaliserSet.add(new XenaPngFileType());
 		outputMap.put(tiffNormaliser, tiffNormaliserSet);
