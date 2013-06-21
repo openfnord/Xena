@@ -43,10 +43,6 @@
 	<classpathentry kind="lib" path="plugins/office/ext/jar/ooo/ridl.jar"/>
 	<classpathentry kind="lib" path="plugins/office/ext/jar/ooo/unoil.jar"/>
 	<classpathentry kind="lib" path="plugins/pdf/ext/jar/jpedal_lgpl.jar"/>
-	<classpathentry kind="lib" path="xena/ext/jar/tika-app-0.9.jar"/>
-	<classpathentry kind="lib" path="/RollingChecker/ext/bin" sourcepath="/RollingChecker/ext/src"/>
-	<classpathentry kind="lib" path="xena/ext/src/juniversalchardet/dist/juniversalchardet-1.0.3.jar"/>
-	<classpathentry kind="lib" path="xena/ext/bin/xml-apis.jar"/>
-	<classpathentry kind="lib" path="xena/ext/bin/xercesImpl.jar"/>
+	<classpathentry kind="lib" path="xena/ext/jar/tika-app-1.3.jar"/>
 	<classpathentry kind="output" path="xena/bin"/>
 </classpath>
