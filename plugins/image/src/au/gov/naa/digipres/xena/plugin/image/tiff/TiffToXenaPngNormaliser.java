@@ -14,24 +14,35 @@
  * @author Andrew Keeling
  * @author Chris Bitmead
  * @author Justin Waddell
+ * @author Jeff Stiff
  */
 
 package au.gov.naa.digipres.xena.plugin.image.tiff;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.apache.batik.ext.awt.image.codec.tiff.TIFFDirectory;
-import org.apache.batik.ext.awt.image.codec.tiff.TIFFField;
+import org.apache.sanselan.FormatCompliance;
+import org.apache.sanselan.ImageReadException;
+import org.apache.sanselan.common.RationalNumber;
+import org.apache.sanselan.common.byteSources.ByteSourceInputStream;
+import org.apache.sanselan.formats.tiff.TiffContents;
+import org.apache.sanselan.formats.tiff.TiffDirectory;
+import org.apache.sanselan.formats.tiff.TiffField;
+import org.apache.sanselan.formats.tiff.TiffImageParser;
+import org.apache.sanselan.formats.tiff.TiffReader;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -39,10 +50,17 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.XMLFilterImpl;
 
+import au.gov.naa.digipres.xena.kernel.XenaException;
+import au.gov.naa.digipres.xena.kernel.XenaInputSource;
 import au.gov.naa.digipres.xena.kernel.normalise.AbstractNormaliser;
 import au.gov.naa.digipres.xena.kernel.normalise.NormaliserResults;
+import au.gov.naa.digipres.xena.kernel.plugin.PluginManager;
+import au.gov.naa.digipres.xena.kernel.properties.PropertiesManager;
 import au.gov.naa.digipres.xena.plugin.image.BasicImageNormaliser;
+import au.gov.naa.digipres.xena.plugin.image.ImageMagicConverter;
+import au.gov.naa.digipres.xena.plugin.image.ImageProperties;
 import au.gov.naa.digipres.xena.plugin.image.ReleaseInfo;
+import au.gov.naa.digipres.xena.util.FileUtils;
 import au.gov.naa.digipres.xena.util.InputStreamEncoder;
 import au.gov.naa.digipres.xena.util.XMLCharacterValidator;
 
@@ -51,11 +69,7 @@ import au.gov.naa.digipres.xena.util.XMLCharacterValidator;
  * We also want to save the XMP and EXIF metadata contained within the image file;
  * this information will be stored in the Xena metadata wrapper.
  *
- * NOTE: This normaliser should never be used, it probably should be deleted, but is being left for the
- * time being as, once image magick is removed, then this normaliser will need to be re-implemented.
- *
  */
-@Deprecated
 public class TiffToXenaPngNormaliser extends AbstractNormaliser {
 	private final static int TIFF_TAG_SIZE = 12;
 	private final static int TAG_ENTRY_TAG_ID_OFFSET = 0;
@@ -77,80 +91,198 @@ public class TiffToXenaPngNormaliser extends AbstractNormaliser {
 	final static String MULTIPAGE_PREFIX = "multipage";
 	final static String MULTIPAGE_URI = "http://preservation.naa.gov.au/multipage/1.0";
 	final static String METADATA_TAG = "metadata";
+	final static String PAGE_TAG = "page";
+
+	private File tmpTiffDir;
 
 	@Override
 	public String getName() {
-		return "Image";
+		return "Image Tiff Normaliser";
 	}
 
 	@Override
-	public boolean isConvertible() {
-		return false;
-	}
-
-	@Override
-	public String getOutputFileExtension() {
-		return "png";
-	}
-
-	@Override
-	//public void parse(InputSource input, NormaliserResults results) throws IOException, SAXException {
 	public void parse(InputSource input, NormaliserResults results, boolean convertOnly) throws IOException, SAXException {
+		try {
 
-		//		// We use JAI to convert the image to PNG
-		//		SeekableStream ss = new FileCacheSeekableStream(input.getByteStream());
-		//		RenderedOp src = JAI.create("Stream", ss);
-		//
-		//		// Check that we have a TIFF file
-		//		Object td = src.getProperty("tiff_directory");
-		//		if (td instanceof TIFFDirectory) {
-		//			ParameterBlock pb = new ParameterBlock();
-		//			pb.add(ss);
-		//			TIFFDecodeParam param = new TIFFDecodeParam();
-		//			pb.add(param);
-		//
-		//			// Loop through all the images contained within the TIFF, storing information about the image and its metadata
-		//			int numImages = 0;
-		//			long nextOffset = 0;
-		//			List<RenderedOp> images = new ArrayList<RenderedOp>();
-		//			Map<RenderedOp, TIFFDirectory> imageToMetadataMap = new HashMap<RenderedOp, TIFFDirectory>();
-		//			do {
-		//				src = JAI.create("tiff", pb);
-		//				images.add(src);
-		//				TIFFDirectory dir = (TIFFDirectory) src.getProperty("tiff_directory");
-		//				imageToMetadataMap.put(src, dir);
-		//
-		//				nextOffset = dir.getNextIFDOffset();
-		//				if (nextOffset != 0) {
-		//					param.setIFDOffset(nextOffset);
-		//				}
-		//				numImages++;
-		//			} while (nextOffset != 0);
-		//
-		//			// If we have multiple images, we will link them in our normalised file using Multipage
-		//			if (1 < numImages) {
-		//				param.setIFDOffset(nextOffset);
-		//				ContentHandler ch = getContentHandler();
-		//				Attributestry {
-		//					//			Jimi.putImage(PNG_MIME_TYPE, image, baos);
-		//					//		} catch (JimiException e) {
-		//					//			throw new SAXException(e);
-		//					//		}Impl att = new AttributesImpl();
-		//				ch.startElement(MULTIPAGE_URI, "multipage", MULTIPAGE_PREFIX + ":multipage", att);
-		//
-		//				for (RenderedOp image : images) {
-		//					ch.startElement(MULTIPAGE_URI, "page", MULTIPAGE_PREFIX + ":page", att);
-		//					outputImage(image, imageToMetadataMap.get(image), input);
-		//					ch.endElement(MULTIPAGE_URI, "page", MULTIPAGE_PREFIX + ":page");
-		//				}
-		//				ch.endElement(PNG_URI, "multipage", MULTIPAGE_PREFIX + ":multipage");
-		//			} else {
-		//				// Just a single image in the TIFF file
-		//				outputImage(src, imageToMetadataMap.get(src), input);
-		//			}
-		//		} else {
-		//			throw new IOException("Input file is not a valid TIFF - JAI cannot find tiff_directory property");
-		//		}
+			if (!(input instanceof XenaInputSource)) {
+				throw new XenaException("Can only normalise XenaInputSource objects.");
+			}
+
+			XenaInputSource xis = (XenaInputSource) input;
+
+			// Get the Image Magick location property
+			PluginManager pluginManager = normaliserManager.getPluginManager();
+			PropertiesManager propManager = pluginManager.getPropertiesManager();
+			String imageMagickPath = propManager.getPropertyValue(ImageProperties.IMAGE_PLUGIN_NAME, ImageProperties.IMAGEMAGIC_LOCATION_PROP_NAME);
+
+			TiffReader reader = new TiffReader(TiffImageParser.isStrict(null));
+
+			// Make a sanselan ByteSourceInputStream
+			ByteSourceInputStream src = new ByteSourceInputStream(xis.getByteStream(), xis.getFile().getAbsolutePath());
+
+			// If the tiff file has broken metadata, then the reading of contents will throw an exception stopping the normalisation of this
+			// tiff file.. we don't want this, if the metadata is broken we want to still attempt to normalise the file, just without the extraction
+			// of metadata using the sanselan library. 
+			TiffContents contents = null;
+			boolean validSanselanTiff = true;
+			try {
+				contents = reader.readContents(src, null, FormatCompliance.getDefault());
+			} catch (ImageReadException irEx) {
+				validSanselanTiff = false;
+			}
+
+			List<TiffDirectory> tiffDirectories = new ArrayList<TiffDirectory>();
+
+			// Sanselan doesn't support all compression types for tiff images, but does a great job of grabbing the metadata.
+			// so we use sanselan for metadata and im4java (ImageMagick for Java) to actually do all the tiff conversions.
+			// YES this is yucky as we need to have the imagemagick binary and library installed on the machine, but we cannot
+			// use JAI as it is a GPL violation.. so we are stuck using this technique until either Sanselan is up for the job
+			// or there is another pure java tiff alternative which is GPL compatible.
+
+			// Use image magick to convert to PNG. 
+			List<File> images = imageMagickConvert(xis.getFile(), imageMagickPath);
+
+			if (validSanselanTiff) {
+				for (Object item : contents.directories) {
+					TiffDirectory dir = (TiffDirectory) item;
+
+					// The sanselan library grabs all folders including the EXIF folder, as we process this manually we
+					// don't want to process it here. 
+					if (dir.hasTiffImageData()) {
+						tiffDirectories.add(dir);
+					}
+				}
+
+				if (tiffDirectories.size() != images.size()) {
+					throw new IOException("Could not extract all the images, the number of TiffDirectories containing image data ("
+					                      + tiffDirectories.size() + ") doesn't match the number of images extracted (" + images.size() + ")!");
+				}
+			}
+
+			// If we have multiple images, we will link them in our normalised file using Multipage
+			if (images.size() > 1) {
+				ContentHandler ch = getContentHandler();
+				AttributesImpl att = new AttributesImpl();
+				ch.startElement(MULTIPAGE_URI, "multipage", MULTIPAGE_PREFIX + ":" + MULTIPAGE_PREFIX, att);
+
+				for (int i = 0; i < images.size(); i++) {
+					//				for (TiffDirectory dir : tiffDirectories) {
+					TiffDirectory dir;
+					if (validSanselanTiff) {
+						dir = tiffDirectories.get(i);
+					} else {
+						dir = null;
+					}
+
+					if (convertOnly) {
+						// Just convert the image
+						outputImage(dir, images.get(i), input, results, convertOnly);
+					} else {
+						//XML Wrap and Convert
+
+						ch.startElement(MULTIPAGE_URI, PAGE_TAG, MULTIPAGE_PREFIX + ":page", att);
+						outputImage(dir, images.get(i), input, results, convertOnly);
+						ch.endElement(MULTIPAGE_URI, PAGE_TAG, MULTIPAGE_PREFIX + ":page");
+
+						// Add the input file checksum as a normaliser property so it can be picked up when we write the metadata. 
+						addExportedChecksum(generateChecksum(images.get(i)));
+					}
+				}
+				ch.endElement(PNG_URI, MULTIPAGE_PREFIX, MULTIPAGE_PREFIX + ":" + MULTIPAGE_PREFIX);
+			} else {
+
+				// Just a single image in the TIFF file
+				outputImage((validSanselanTiff) ? tiffDirectories.get(0) : null, images.get(0), input, results, convertOnly);
+
+				// Add the input file checksum as a normaliser property so it can be picked up when we write the metadata. 
+				setExportedChecksum(generateChecksum(images.get(0)));
+			}
+
+			//Cleanup temp directory
+			cleanupTempDir();
+
+		} catch (ImageReadException e) {
+			throw new SAXException(e);
+		} catch (XenaException e) {
+			throw new SAXException(e);
+		}
+	}
+
+	private List<File> imageMagickConvert(File tiffFile, String binaryPath) throws SAXException {
+		try {
+			List<File> result = new ArrayList<File>();
+
+			//Image magic automatically creates split images, we don't know how many so we dump them into an _EMPTY_ temp directory.
+			// the names should be "<outputfilename-x>.png.
+
+			tmpTiffDir = File.createTempFile("tiffdir", "dir");
+			tmpTiffDir.delete();
+			tmpTiffDir.mkdir();
+			
+			final String outputFileName = "out.png";
+			File outfile = new File(tmpTiffDir, outputFileName);
+
+			ImageMagicConverter.setImageMagicConvertLocation(binaryPath); // TODO this functionality should be moved to the changing of preferences
+			ImageMagicConverter.convert(tiffFile, outfile);
+
+			// Get the files generated
+			if (outfile.exists()) {
+				// Only one file generated.
+				result.add(outfile);
+			} else {
+				// More then one file generated.
+				for (File file : tmpTiffDir.listFiles()) {
+					result.add(file);
+				}
+
+				Comparator<File> compare = new Comparator<File>() {
+
+					private int getFileIndex(String filename, int index) {
+						String numPart = "";
+						for (int i = index; i < filename.length(); i++) {
+							if (Character.isDigit(filename.charAt(i))) {
+								numPart += filename.charAt(i);
+							}
+						}
+
+						return Integer.parseInt(numPart);
+					}
+
+					@Override
+					public int compare(File arg0, File arg1) {
+						String part = outputFileName.substring(0, outputFileName.indexOf("."));
+						String fname0 = arg0.getAbsolutePath();
+						String fname1 = arg1.getAbsolutePath();
+
+						int val0 = getFileIndex(fname0, fname0.lastIndexOf(part));
+						int val1 = getFileIndex(fname1, fname1.lastIndexOf(part));
+
+						return val0 - val1;
+					}
+				};
+
+				Collections.sort(result, compare);
+			}
+
+			return result;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			cleanupTempDir();
+			throw new SAXException(e);
+		}
+	}
+
+	private void cleanupTempDir() {
+		if (tmpTiffDir.exists()) {
+			if (tmpTiffDir.isDirectory()) {
+				File[] files = tmpTiffDir.listFiles();
+				for (File file : files) {
+					file.delete();
+				}
+			}
+			tmpTiffDir.delete();
+		}
 	}
 
 	/**
@@ -162,36 +294,41 @@ public class TiffToXenaPngNormaliser extends AbstractNormaliser {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	void outputImage(/*RenderedOp src,*/TIFFDirectory tiffDir, InputSource tiffSource) throws SAXException, IOException {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		//		RenderedOp imageOp;
-		//		try {
-		//			// Encode the file as a PNG image.
-		//			imageOp = JAI.create("encode", src, baos, "PNG", null);
-		//		} catch (Exception x) {
-		//			// For some reason JAI can throw RuntimeExceptions on bad data.
-		//			throw new SAXException(x);
-		//		}
+	void outputImage(TiffDirectory dir, File image, InputSource tiffSource, NormaliserResults results, boolean convertOnly) throws SAXException,
+	        IOException {
 
 		// Create our Xena normalised file
 		AttributesImpl att = new AttributesImpl();
 		att.addAttribute(PNG_URI, BasicImageNormaliser.DESCRIPTION_TAG_NAME, IMG_PREFIX + ":" + BasicImageNormaliser.DESCRIPTION_TAG_NAME, "CDATA",
 		                 BasicImageNormaliser.PNG_DESCRIPTION_CONTENT);
 		ContentHandler ch = getContentHandler();
-		InputStream is = new ByteArrayInputStream(baos.toByteArray());
-		ch.startElement(PNG_URI, PNG_TAG, PNG_PREFIX + ":" + PNG_TAG, att);
-
-		// Output the image data to our Xena file
-		InputStreamEncoder.base64Encode(is, ch);
-
-		// Output the TIFF metadata to our Xena file
-		outputTiffMetadata(ch, tiffDir, tiffSource);
-
-		ch.endElement(PNG_URI, PNG_TAG, PNG_PREFIX + ":" + PNG_TAG);
-		//		imageOp.dispose();
-		//		src.dispose();
-		baos.close();
-		is.close();
+		InputStream is = new FileInputStream(image);
+		
+		try {
+			if (convertOnly) {
+				// Copy the file to the destination
+				String tempBaseFilename = results.getOutputFileName();
+				// Remove the .PNG we added to the parent filename
+				tempBaseFilename = tempBaseFilename.substring(0, tempBaseFilename.lastIndexOf("."));
+				FileUtils.fileCopy(is, results.getDestinationDirString() + File.separator + tempBaseFilename + "-" + image.getName(), false);
+			} else {
+				// Encode
+	
+				ch.startElement(PNG_URI, PNG_TAG, PNG_PREFIX + ":" + PNG_TAG, att);
+	
+				// Output the image data to our Xena file
+				InputStreamEncoder.base64Encode(is, ch);
+	
+				if (dir != null) {
+					// Output the TIFF metadata to our Xena file
+					outputTiffMetadata(ch, dir, tiffSource);
+				}
+	
+				ch.endElement(PNG_URI, PNG_TAG, PNG_PREFIX + ":" + PNG_TAG);
+			}
+		} finally {
+			is.close();
+		}
 	}
 
 	/**
@@ -203,28 +340,37 @@ public class TiffToXenaPngNormaliser extends AbstractNormaliser {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	private void outputTiffMetadata(ContentHandler ch, TIFFDirectory tiffDir, InputSource tiffSource) throws SAXException, IOException {
+	private void outputTiffMetadata(ContentHandler ch, TiffDirectory tiffDir, InputSource tiffSource) throws SAXException, IOException {
 		// Metadata elements in TIFF are called Fields. Each Field has a Tag (the ID of the Field) and associated data.
 		// The data may have a sub-structure of its own, or may be a single value.
 		// We are only interested in two top-level Fields - XMP and EXIF.
-		TIFFField[] fieldArr = tiffDir.getFields();
-		if (fieldArr.length > 0) {
+		List<Object> fieldArr = tiffDir.entries;
+
+		//		TIFFField[] fieldArr = tiffDir.getFields();
+		if (fieldArr.size() > 0) {
 			AttributesImpl atts = new AttributesImpl();
 			ch.startElement(PNG_URI, METADATA_TAG, PNG_PREFIX + ":" + METADATA_TAG, atts);
-			for (TIFFField element : fieldArr) {
-				int tagID = element.getTag();
+			for (Object item : fieldArr) {
+				TiffField element = (TiffField) item;
+				int tagID = element.tag;
 
-				// We are primarily interested in the XMP and EXIF tags
-				if (tagID == TiffTagUtilities.XMP_TAG_ID) {
-					byte[] byteArr = element.getAsBytes();
-					// XMP data consists of many substrings within a single string
-					String xmpStr = new String(byteArr).trim();
+				try {
+					// We are primarily interested in the XMP and EXIF tags
+					if (tagID == TiffTagUtilities.XMP_TAG_ID) {
+						byte[] byteArr;
+						byteArr = element.getByteArrayValue();
+						// XMP data consists of many substrings within a single string
+						String xmpStr = new String(byteArr).trim();
 
-					outputXMPMetadata(ch, xmpStr);
-				} else if (tagID == TiffTagUtilities.EXIF_IFD_TAG_ID) {
-					// EXIF data is found at a certain offset in the file, the offset is the value of the Field
-					long exifIFDOffset = element.getAsLong(0);
-					outputEXIFMetadata(ch, exifIFDOffset, tiffSource);
+						outputXMPMetadata(ch, xmpStr);
+					} else if (tagID == TiffTagUtilities.EXIF_IFD_TAG_ID) {
+						// EXIF data is found at a certain offset in the file, the offset is the value of the Field
+						long exifIFDOffset = element.getIntValue(); // .getAsLong(0);
+						//						TiffImageMetadata metadata = new TiffImageMetadata(tiffDir);
+						outputEXIFMetadata(ch, exifIFDOffset, tiffSource);
+					}
+				} catch (ImageReadException e) {
+					throw new SAXException(e);
 				}
 			}
 
@@ -260,35 +406,43 @@ public class TiffToXenaPngNormaliser extends AbstractNormaliser {
 			tempTiffFile.deleteOnExit();
 			FileOutputStream tempTiffOutput = new FileOutputStream(tempTiffFile);
 
-			byte[] buffer = new byte[10 * 1024];
-			int bytesRead = tiffStream.read(buffer);
-			while (bytesRead > 0) {
-				tempTiffOutput.write(buffer, 0, bytesRead);
+			int bytesRead;
+			try {
+				byte[] buffer = new byte[10 * 1024];
 				bytesRead = tiffStream.read(buffer);
+				while (bytesRead > 0) {
+					tempTiffOutput.write(buffer, 0, bytesRead);
+					bytesRead = tiffStream.read(buffer);
+				}
+				tempTiffOutput.flush();
+			} finally {
+				tempTiffOutput.close();
 			}
-			tempTiffOutput.flush();
-			tempTiffOutput.close();
 
 			// Check that we have produced a valid TIFF file
 			RandomAccessFile tiffRAF = new RandomAccessFile(tempTiffFile, "r");
-			tiffRAF.seek(0);
-			byte[] identifierBytes = new byte[2];
-			bytesRead = tiffRAF.read(identifierBytes);
-			if (bytesRead != 2) {
-				throw new IOException("Temporary TIFF file could not be read: " + tempTiffFile.getAbsolutePath());
-			}
+			try {
+				tiffRAF.seek(0);
+				byte[] identifierBytes = new byte[2];
+				bytesRead = tiffRAF.read(identifierBytes);
+				if (bytesRead != 2) {
+					throw new IOException("Temporary TIFF file could not be read: " + tempTiffFile.getAbsolutePath());
+				}
 
-			// Check the endianness of the file
-			boolean useBigEndianOrdering = false;
-			if (identifierBytes[0] == 0x4D && identifierBytes[1] == 0x4D) {
-				useBigEndianOrdering = true;
-			} else if (identifierBytes[0] == 0x49 && identifierBytes[1] == 0x49) {
-				useBigEndianOrdering = false;
-			} else {
-				throw new IOException("Temporary TIFF file has an invalid header.");
-			}
+				// Check the endianness of the file
+				boolean useBigEndianOrdering = false;
+				if (identifierBytes[0] == 0x4D && identifierBytes[1] == 0x4D) {
+					useBigEndianOrdering = true;
+				} else if (identifierBytes[0] == 0x49 && identifierBytes[1] == 0x49) {
+					useBigEndianOrdering = false;
+				} else {
+					throw new IOException("Temporary TIFF file has an invalid header.");
+				}
 
-			processExifIFD(ch, tiffRAF, exifIFDOffset, useBigEndianOrdering);
+				processExifIFD(ch, tiffRAF, exifIFDOffset, useBigEndianOrdering);
+			} finally {
+				tiffRAF.close();
+			}
 		} catch (IOException iex) {
 			String errorMessage = "EXIF Metadata could not be added due to an exception: " + iex.getMessage();
 			char[] errorMessageChars = errorMessage.toCharArray();
@@ -788,8 +942,8 @@ public class TiffToXenaPngNormaliser extends AbstractNormaliser {
 				byteIndex += 4;
 				long secondRationalComponent = getLongFromBytes(dataArr, byteIndex, useBigEndianOrdering);
 				byteIndex += 4;
-				//				Rational cellRational = new Rational(firstRationalComponent, secondRationalComponent);
-				//				tabularStringBuilder.append(cellRational.doubleValue());
+				RationalNumber cellRational = new RationalNumber((int) firstRationalComponent, (int) secondRationalComponent);
+				tabularStringBuilder.append(cellRational.doubleValue());
 				if (columnIndex < columnCount - 1) {
 					tabularStringBuilder.append("\t");
 				}
@@ -865,17 +1019,17 @@ public class TiffToXenaPngNormaliser extends AbstractNormaliser {
 		}
 
 		switch (dataType) {
-		case TIFFField.TIFF_UNDEFINED:
+		case TiffTagUtilities.TIFF_UNDEFINED:
 			retValueBuilder.append(new String(valueBytes));
 			break;
-		case TIFFField.TIFF_ASCII:
+		case TiffTagUtilities.TIFF_ASCII:
 			// ASCII values are null-terminated
 			retValueBuilder.append(new String(valueBytes, 0, valueBytes.length - 1));
 			break;
-		case TIFFField.TIFF_FLOAT: // Not used by EXIF... just return byte representation
-		case TIFFField.TIFF_DOUBLE: // Not used by EXIF... just return byte representation
-		case TIFFField.TIFF_BYTE:
-		case TIFFField.TIFF_SBYTE:
+		case TiffTagUtilities.TIFF_FLOAT: // Not used by EXIF... just return byte representation
+		case TiffTagUtilities.TIFF_DOUBLE: // Not used by EXIF... just return byte representation
+		case TiffTagUtilities.TIFF_BYTE:
+		case TiffTagUtilities.TIFF_SBYTE:
 			for (int byteIndex = 0; byteIndex < dataCount; byteIndex++) {
 				retValueBuilder.append(valueBytes[byteIndex]);
 				if (byteIndex < dataCount - 1) {
@@ -883,8 +1037,8 @@ public class TiffToXenaPngNormaliser extends AbstractNormaliser {
 				}
 			}
 			break;
-		case TIFFField.TIFF_SHORT:
-		case TIFFField.TIFF_SSHORT:
+		case TiffTagUtilities.TIFF_SHORT:
+		case TiffTagUtilities.TIFF_SSHORT:
 			for (int shortIndex = 0; shortIndex < dataCount; shortIndex++) {
 				int tiffShort = getIntFromBytes(valueBytes, shortIndex * 2, useBigEndianOrdering);
 				retValueBuilder.append(tiffShort);
@@ -893,8 +1047,8 @@ public class TiffToXenaPngNormaliser extends AbstractNormaliser {
 				}
 			}
 			break;
-		case TIFFField.TIFF_LONG:
-		case TIFFField.TIFF_SLONG:
+		case TiffTagUtilities.TIFF_LONG:
+		case TiffTagUtilities.TIFF_SLONG:
 			for (int longIndex = 0; longIndex < dataCount; longIndex++) {
 				long tiffLong = getLongFromBytes(valueBytes, longIndex * 4, useBigEndianOrdering);
 				retValueBuilder.append(tiffLong);
@@ -903,15 +1057,15 @@ public class TiffToXenaPngNormaliser extends AbstractNormaliser {
 				}
 			}
 			break;
-		case TIFFField.TIFF_RATIONAL:
-		case TIFFField.TIFF_SRATIONAL:
+		case TiffTagUtilities.TIFF_RATIONAL:
+		case TiffTagUtilities.TIFF_SRATIONAL:
 			for (int rationalIndex = 0; rationalIndex < dataCount; rationalIndex++) {
 				long tiffRationalFirstComponent = getLongFromBytes(valueBytes, rationalIndex * 8, useBigEndianOrdering);
 				long tiffRationalSecondComponent = getLongFromBytes(valueBytes, rationalIndex * 8 + 4, useBigEndianOrdering);
-				//				retValueBuilder.append(new Rational(tiffRationalFirstComponent, tiffRationalSecondComponent));
-				//				if (rationalIndex < dataCount - 1) {
-				//					retValueBuilder.append(", ");
-				//				}
+				retValueBuilder.append(new RationalNumber((int) tiffRationalFirstComponent, (int) tiffRationalSecondComponent));
+				if (rationalIndex < dataCount - 1) {
+					retValueBuilder.append(", ");
+				}
 			}
 			break;
 		default:
@@ -928,25 +1082,26 @@ public class TiffToXenaPngNormaliser extends AbstractNormaliser {
 	 */
 	private long getByteCount(int dataType, long dataCount) {
 		int dataSize = 0;
+
 		switch (dataType) {
-		case TIFFField.TIFF_BYTE:
-		case TIFFField.TIFF_ASCII:
-		case TIFFField.TIFF_SBYTE:
-		case TIFFField.TIFF_UNDEFINED:
+		case TiffTagUtilities.TIFF_BYTE:
+		case TiffTagUtilities.TIFF_ASCII:
+		case TiffTagUtilities.TIFF_SBYTE:
+		case TiffTagUtilities.TIFF_UNDEFINED:
 			dataSize = 1;
 			break;
-		case TIFFField.TIFF_SHORT:
-		case TIFFField.TIFF_SSHORT:
+		case TiffTagUtilities.TIFF_SHORT:
+		case TiffTagUtilities.TIFF_SSHORT:
 			dataSize = 2;
 			break;
-		case TIFFField.TIFF_LONG:
-		case TIFFField.TIFF_SLONG:
-		case TIFFField.TIFF_FLOAT:
+		case TiffTagUtilities.TIFF_LONG:
+		case TiffTagUtilities.TIFF_SLONG:
+		case TiffTagUtilities.TIFF_FLOAT:
 			dataSize = 4;
 			break;
-		case TIFFField.TIFF_RATIONAL:
-		case TIFFField.TIFF_SRATIONAL:
-		case TIFFField.TIFF_DOUBLE:
+		case TiffTagUtilities.TIFF_RATIONAL:
+		case TiffTagUtilities.TIFF_SRATIONAL:
+		case TiffTagUtilities.TIFF_DOUBLE:
 			dataSize = 8;
 			break;
 		}
@@ -958,4 +1113,13 @@ public class TiffToXenaPngNormaliser extends AbstractNormaliser {
 		return ReleaseInfo.getVersion() + "b" + ReleaseInfo.getBuildNumber();
 	}
 
+	@Override
+	public boolean isConvertible() {
+		return true;
+	}
+
+	@Override
+	public String getOutputFileExtension() {
+		return "png";
+	}
 }
