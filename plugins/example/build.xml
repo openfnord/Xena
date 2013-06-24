@@ -4,7 +4,7 @@
 	<property name="srcdir" value="src"/>
 	<property name="etcdir" value="etc"/>
 	<property name="builddir" value="bin"/>
-    <property name="distdir" value="dist"/>
+	<property name="distdir" value="dist"/>
 	<property name="extdir" value="ext"/>
 	<property name="xenaplugindir" value="../xena/dist/plugins"/>
 

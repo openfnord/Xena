@@ -1,12 +1,13 @@
 <project name="project" basedir="." default="makejar">
 
 	<property name="pluginname" value="project"/>
-	
+
+	<property file="../../version.properties"/>	
 	<property name="srcdir" value="src"/>
 	<property name="docdir" value="doc"/>
 	<property name="etcdir" value="etc"/>
 	<property name="builddir" value="bin"/>
-    <property name="distdir" value="dist"/>
+	<property name="distdir" value="dist"/>
 	<property name="extdir" value="ext"/>
 	<property name="extbin" value="${extdir}/bin" />
 	<property name="extjar" value="${extdir}/jar" />
@@ -53,7 +54,7 @@
     		buildNumFile="${basedir}/etc/buildnum.properties"
     		buildNumProperty="buildnum"
     		version="2.3.0">
-		<parameter name="Release" type="Boolean" value="false" />
+		<parameter name="Release" type="Boolean" value="${is_release}" />
     	</jreleaseinfo>
 	</target>	
 
