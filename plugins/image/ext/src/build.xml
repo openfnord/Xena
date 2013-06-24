@@ -25,14 +25,14 @@
     <!-- ================================= 
           target: build_libs              
          ================================= -->
-    <target name="build_libs" depends="build_jreleaseinfo, build_batik, build_xerces, build_im4java, build_sanselan, build_w3c-svg, build_w3c-sac" description="Build file for building the image plug 3rd party libs.">
+    <target name="build_libs" depends="build_jreleaseinfo, build_batik, build_im4java, build_sanselan, build_w3c-svg, build_w3c-sac" description="Build file for building the image plug 3rd party libs.">
     	<echo>Building third pary libs completed</echo>
     </target>
 
 	<!-- ================================= 
 	     target: clean              
 	     ================================= -->
-	<target name="clean" depends="clean_jreleaseinfo, clean_batik, clean_xerces, clean_im4java, clean_sanselan, clean_w3c-svg, clean_w3c-sac" description="Build file for cleaning the image plugin 3rd party libs.">
+	<target name="clean" depends="clean_jreleaseinfo, clean_batik, clean_im4java, clean_sanselan, clean_w3c-svg, clean_w3c-sac" description="Build file for cleaning the image plugin 3rd party libs.">
 		<echo>Cleaning third party libs completed.</echo>
 	</target>
 
@@ -95,27 +95,27 @@
 	<!-- - - - - - - - - - - - - - - - - - 
           target: build_xerces                      
          - - - - - - - - - - - - - - - - - -->
-    <target name="build_xerces">
+    <!--<target name="build_xerces">
 		<property name="xerces_classes" value="${xerces}/build/classes" />
-    	
-    	<echo>Building xerces.</echo>
+    	-->
+    	<!--<echo>Building xerces.</echo>
     	<ant dir="${xerces}" target="compile" />
+    	-->
     	
-    	<!-- Move the classes to bin -->
-    	<copy todir="${bindir}">
+    	<!-- <copy todir="${bindir}">
     		<fileset dir="${xerces_classes}">
     			<include name="**/*"/>
     		</fileset>
     	</copy>
-    </target>
+    </target>-->
 
 	<!-- - - - - - - - - - - - - - - - - - 
           target: clean_xerces                      
          - - - - - - - - - - - - - - - - - -->
-    <target name="clean_xerces">
+    <!--<target name="clean_xerces">
     	<echo>Cleaning xerces.</echo>
     	<ant dir="${xerces}" target="clean" />
-    </target>	
+    </target>-->	
 	
 	<!-- - - - - - - - - - - - - - - - - - 
           target: build_im4java                      

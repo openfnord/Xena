@@ -712,11 +712,6 @@ public class Xena {
 
 		setDestinationDir(destinationDir);
 
-		NormaliserResults results = new NormaliserResults(xis);
-
-		// Set the isConvertOnly flag
-		results.setConvertOnly(convertOnly);
-
 		if (xis.getType() == null) {
 			// find the most likely type for this XIS...
 			Type type = null;
@@ -731,12 +726,17 @@ public class Xena {
 			}
 			xis.setType(type);
 		}
-
+		
 		AbstractNormaliser normaliser = pluginManager.getNormaliserManager().lookup(xis.getType());
-
 		if (normaliser == null) {
 			throw new XenaException("No normaliser for this input.");
 		}
+		
+		NormaliserResults results = new NormaliserResults(xis, normaliser, destinationDir, fileNamer, wrapper);
+
+		// Set the isConvertOnly flag
+		results.setConvertOnly(convertOnly);
+
 		try {
 			// Run the normalisation as Convert only
 			results = pluginManager.getNormaliserManager().normalise(xis, normaliser, destinationDir, fileNamer, wrapper, convertOnly);

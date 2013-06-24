@@ -17,6 +17,7 @@ PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp Map Version 2.0//EN"
 <mapID target="img.page" url="images/page.png">
 <mapID target="xenahelp" url="content/xenahelp.html">
 <mapID target="introduction" url="content/introduction.html">
+<mapID target="whatsnew" url="content/whatsnew.html">
 <mapID target="start" url="content/getstarted.html">
 <mapID target="setdirectories" url="content/setdirectories.html">
 <mapID target="setplugins" url="content/setplugins.html">

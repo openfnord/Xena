@@ -137,9 +137,10 @@ public class WebsiteNormaliser extends AbstractNormaliser {
 					} else {
 						// File type does not get converted, copy it, including its relative path
 						String strOutputPath = tempFile.toString().replaceFirst(tempStagingDir.toString(), results.getDestinationDirString());
-
+						entryOutputFile = fileNamer.makeNewOpenFile(childXis, new File(strOutputPath));
+						
 						// Copy the file to the destination path
-						FileUtils.fileCopy(tempFile, strOutputPath, false);
+						FileUtils.fileCopy(tempFile, entryOutputFile, false);
 
 						// Delete entry's temp file
 						tempFile.delete();

@@ -1,12 +1,12 @@
-Xena 6.0.1
+Xena 6.1.0
 ==========
 
-Thank you for downloading Xena 6.0.1!
+Thank you for downloading Xena 6.1.0!
 
 
 Release Date
 ------------
-14 Jul 2012
+28 Jul 2013
 
 
 License
@@ -16,7 +16,7 @@ Xena is released under the General Public License version 3. A full copy of this
 
 Requirements
 ------------
-To run this pre-compiled version of Xena you will require Sun's Java Runtime Environment 1.6, which is available for free at http://java.com.
+To run this pre-compiled version of Xena you will require Sun's Java Runtime Environment 1.7, which is available for free at http://java.com.
 Xena can also be compiled using the open source Java stack, OpenJDK (http://openjdk.java.net).
 
 To normalise certain file formats Xena relies on external programs, such as LibreOffice.org for Office documents. All users will need to install LibreOffice.org separately and configure Xena for its use if functionality for Office documents is needed. Windows users who have installed from the installer and Mac OS users who have installed from the Mac OS Disk Image will find all other external programs included.  Mac OS users will need to configure Xena to use these external programs. Other users will need to download and install required external programs and configure Xena for their use. Please see Xena help from inside the program for more details. Note that where external programs are included they may not be the most up to date versions of these programs.
@@ -66,7 +66,7 @@ All:
 
 Xena Plugins
 ------------
-Xena 6.0.1 includes the following plugins:
+Xena 6.1.0 includes the following plugins:
   archive    v1.3.0
   audio      v1.0.0
   cvs        v2.3.0

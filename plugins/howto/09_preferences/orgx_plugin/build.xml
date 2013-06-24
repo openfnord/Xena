@@ -50,7 +50,7 @@
 		<copy file="${distdir}/${pluginname}.jar" todir="${xenadir}/plugins" />
 	</target>
 	
-	<target name="run" description="Runs Xena Lite" depends="copyjar">
+	<target name="run" description="Runs Xena" depends="copyjar">
 		<java dir="${xenadir}" 
 			  classpath="${xenadir}/xena.jar" 
 			  classname="au.gov.naa.digipres.xena.litegui.LiteMainFrame"

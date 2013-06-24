@@ -1,3 +1,16 @@
+Xena 6.1.0
+==========
+Bug Fixes
+---------
+- Corrected references to 'Xena Lite' to refer to 'Xena' and further improved the error message displayed when the plugins directory is not found (bug-3551095, ticket #372)
+
+Feature Enhancements
+--------------------
+- Updated Xena for use with Java 7
+- Added display of error message in graphical interface for errors when opening a file via a command line argument or when the plastic look and feel is unsupported (rfe-3551878, ticket #328)
+
+
+
 Xena 6.0.1
 ==========
 Bug Fixes

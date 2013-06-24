@@ -116,14 +116,17 @@ public class FileNamerManager {
 
 	public void addFileNamers(List<AbstractFileNamer> fileNamerList) {
 		for (AbstractFileNamer namer : fileNamerList) {
-			namer.setFileNamerManager(this);
-			namers.put(namer.getClass().getName(), namer);
+			addFileNamer(namer, activeFileNamerUnchanged);
+		}
+	}
+	
+	private void addFileNamer(AbstractFileNamer namer, boolean makeActive) {
+		namer.setFileNamerManager(this);
+		namers.put(namer.getClass().getName(), namer);
 
-			if (activeFileNamerUnchanged) {
-				activeFileNamer = namer;
-				activeFileNamerUnchanged = false;
-			}
-
+		if (makeActive) {
+			activeFileNamer = namer;
+			activeFileNamerUnchanged = false;
 		}
 	}
 
@@ -173,8 +176,7 @@ public class FileNamerManager {
 	 */
 	public boolean setActiveFileNamer(AbstractFileNamer fileNamer) {
 		if (fileNamer != null) {
-			activeFileNamer = fileNamer;
-			activeFileNamerUnchanged = false;
+			addFileNamer(fileNamer, true);			
 			return true;
 		}
 		return false;

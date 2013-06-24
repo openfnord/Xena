@@ -1,6 +1,6 @@
 <project name="xena" basedir="." default="makedist">
 
-	<property name="version" value="6.0.1"/>
+	<property file="../version.properties" />
 	<property name="srcdir" value="src"/>
 	<property name="docdir" value="doc"/>
 	<property name="etcdir" value="etc"/>
@@ -56,18 +56,18 @@
 	</target>
 
 	<target name="updateversion">
-		<jreleaseinfo 
-			className="ReleaseInfo" 
-			packageName="au.gov.naa.digipres.xena.core"
-			targetDir="${basedir}/src" 
-			project="Xena"
-			version="${version}"
-			withViewer="true" 
-			buildNumFile="${basedir}/etc/buildnum.properties"
-			buildNumProperty="buildnum"
-			>
-			<parameter name="Release" type="Boolean" value="true" />
-		</jreleaseinfo>
+	<jreleaseinfo 
+		className="ReleaseInfo" 
+		packageName="au.gov.naa.digipres.xena.core"
+		targetDir="${basedir}/src" 
+		project="Xena"
+		version="${version}"
+		withViewer="true" 
+		buildNumFile="${basedir}/etc/buildnum.properties"
+		buildNumProperty="buildnum"
+		>
+		<parameter name="Release" type="Boolean" value="${is_release}" />
+	</jreleaseinfo>
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 

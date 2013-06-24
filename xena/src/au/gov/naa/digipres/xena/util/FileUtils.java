@@ -110,7 +110,7 @@ public class FileUtils {
 
 		return testFile;
 	}
-
+	
 	/**
 	 * Copy a given file to the specified destination directory, overwriting the file if
 	 * specified.
@@ -126,12 +126,15 @@ public class FileUtils {
 	 * @return the copied file
 	 */
 	public static File fileCopy(File inputFile, String destPath, boolean overwrite) throws IOException {
+		return fileCopy(inputFile, new File(destPath), overwrite);
+	}
+	
+	public static File fileCopy(File inputFile, File outputFile, boolean overwrite) throws IOException {
 		// Create the streams
 		InputStream in = new FileInputStream(inputFile);
-
-		File outputFile = fileCopy(in, destPath, overwrite);
-
-		if (in != null) {
+		try {
+			outputFile = fileCopy(in, outputFile, overwrite);
+		} finally {
 			in.close();
 		}
 		return outputFile; 
@@ -151,9 +154,8 @@ public class FileUtils {
 	 */
 
 	public static void fileCopy(byte[] byteArrayInput, String destPath, boolean overwrite) throws IOException {
-		// Create/Open the output file
 		File outputFile = new File(destPath);
-
+		
 		// Check if the file exists
 		if (outputFile.exists() && !overwrite) {
 			//throw new IOException("File " + outputFile.getAbsolutePath() + " exists.  Please remove before continuing");
@@ -167,10 +169,10 @@ public class FileUtils {
 			String fileName = destPath.substring(0, lastDot);
 			String fileExt = destPath.substring(lastDot); // May not always be an extension, just the bit after the last . in the filename
 			DecimalFormat idFormatter = new DecimalFormat("0000");
-			while (outputFile.exists()) {
+			do {
 				outputFile = new File(fileName + "." + idFormatter.format(i) + fileExt);
 				i++;
-			}
+			} while (outputFile.exists());
 		}
 
 		// Create the streams
@@ -191,6 +193,10 @@ public class FileUtils {
 		}
 	}
 
+	public static File fileCopy(InputStream inputStream, String destPath, boolean overwrite) throws IOException {
+		return fileCopy(inputStream, new File(destPath), overwrite);
+	}
+	
 	/**
 	 * Copy the contents of the inputStream to the specified destination directory, overwriting the file if
 	 * specified.
@@ -205,19 +211,16 @@ public class FileUtils {
 	 * 
 	 * @return the copied file
 	 */
-	public static File fileCopy(InputStream inputStream, String destPath, boolean overwrite) throws IOException {
-
-		// Create/Open the output file
-		File outputFile = new File(destPath);
-
+	public static File fileCopy(InputStream inputStream, File outputFile, boolean overwrite) throws IOException {
 		// Check if the directory exists, if not, create it
-		if (!(new File(outputFile.getParent())).exists()) {
+		if (!outputFile.getParentFile().exists()) {
 			// Create the directory structure first
-			(new File(outputFile.getParent())).mkdirs();
+			outputFile.getParentFile().mkdirs();
 		}
 
 		// Check if the file exists
 		if (outputFile.exists() && !overwrite) {
+			String destPath = outputFile.getAbsolutePath();
 			// Add an incrementing numerical ID and check again
 			int i = 1;
 			int lastDot = destPath.lastIndexOf(".");
@@ -228,10 +231,10 @@ public class FileUtils {
 			String fileName = destPath.substring(0, lastDot);
 			String fileExt = destPath.substring(lastDot); // May not always be an extension, just the bit after the last . in the filename
 			DecimalFormat idFormatter = new DecimalFormat("0000");
-			while (outputFile.exists()) {
+			do {
 				outputFile = new File(fileName + "." + idFormatter.format(i) + fileExt);
 				i++;
-			}
+			} while (outputFile.exists());
 		}
 
 		// Create the streams
