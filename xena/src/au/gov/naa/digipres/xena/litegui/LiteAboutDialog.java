@@ -66,9 +66,8 @@ public class LiteAboutDialog {
 
 		aboutText.append("\nDigital Preservation Project Team:\n\n" +
 						 "Margot Caldbick\n" +
-						 "Michael Carden\n" +
 						 "Kirti Chennareddy\n" +
-						 "Sara Gunn\n" +
+						 "Karen Horsfall\n" +
 						 "Alan Langley\n" +
 						 "Neil Muller\n" +
 						 "Terry O'Neill\n" +
