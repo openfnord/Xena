@@ -1,0 +1,1 @@
+Note that xerces-impl.jar and xml-apis.jar come from xerces-J-2.11.0-tools
