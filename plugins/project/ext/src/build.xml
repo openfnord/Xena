@@ -16,7 +16,7 @@
 	<property name="antlib_bindir" value="../antlib/bin"/>
 	<property name="jreleaseinfo" value="jreleaseinfo-1.2.1" />
 	<property name="mpxj" value="mpxj" />
-	<property name="poi" value="poi-3.2-FINAL" />
+	<property name="poi" value="poi-3.9" />
 	<property name="relaxngDatatype" value="relaxngDatatype-1.0" />
 	
 	

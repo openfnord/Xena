@@ -25,7 +25,7 @@
 
 	<property name="bindir" value="../bin"/>
 	<property name="antlib_bindir" value="../antlib/bin"/>
-	<property name="poi" value="poi-3.2-FINAL" />
+	<property name="poi" value="poi-3.9" />
 	<property name="activation" value="activation-1.1.1"/>
 	<property name="activation.jar" value="activation.jar"/>
 	<property name="inetlib" value="inetlib-1.1.1"/>

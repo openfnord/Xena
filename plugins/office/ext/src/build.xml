@@ -15,7 +15,7 @@
 	<property name="bindir" value="../bin"/>
 	<property name="antlib_bindir" value="../antlib/bin"/>
 	<property name="jreleaseinfo" value="jreleaseinfo-1.2.1" />
-	<property name="poi" value="poi-3.2-FINAL" />
+	<property name="poi" value="poi-3.9" />
 	<property name="xalan" value="xalan-j_2_7_1" />
 	
     <!-- ================================= 
