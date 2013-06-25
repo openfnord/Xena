@@ -3,10 +3,13 @@ Xena 6.1.0
 Bug Fixes
 ---------
 - Corrected references to 'Xena Lite' to refer to 'Xena' and further improved the error message displayed when the plugins directory is not found (bug-3551095, ticket #372)
+- Creating your own Custom File Namer is now correctly handled and no longer results in a NullPointerException (bug-3515030, ticket #366)
 
 Feature Enhancements
 --------------------
 - Updated Xena for use with Java 7
+- Updated Apache POI libraries used in email, office and project plugins to version 3.9 (from 3.2-FINAL)
+- Updated Apache Tika libary used to version 1.3 (from 0.9)
 - Added display of error message in graphical interface for errors when opening a file via a command line argument or when the plastic look and feel is unsupported (rfe-3551878, ticket #328)
 
 

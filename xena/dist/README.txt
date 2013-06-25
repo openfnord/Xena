@@ -70,15 +70,15 @@ Xena 6.1.0 includes the following plugins:
   archive    v1.3.0
   audio      v1.0.0
   cvs        v2.3.0
-  email      v3.3.0
+  email      v3.3.1
   html       v2.5.0
   image      v5.0.0
   metadata   v1.0.0
   multipage  v1.3.0
-  office     v3.5.0
+  office     v3.5.1
   pdf        v2.4.0
   plaintext  v3.5.0
-  project    v2.3.0
+  project    v2.3.1
   website    v1.0.0
   xml        v2.3.0
 
