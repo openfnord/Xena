@@ -20,8 +20,6 @@
 	<classpathentry kind="lib" path="xena/antlib/jreleaseinfo-1.2.1.jar"/>
 	<classpathentry kind="lib" path="xena/ext/jar/commons-cli-1.1.jar"/>
 	<classpathentry kind="lib" path="xena/ext/jar/jhall.jar"/>
-	<classpathentry kind="lib" path="xena/ext/src/xerces-2_9_1/tools/xercesImpl.jar"/>
-	<classpathentry kind="lib" path="xena/ext/src/xerces-2_9_1/tools/xml-apis.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="plugins/archive/ext/bin"/>
 	<classpathentry kind="lib" path="plugins/audio/ext/bin"/>
@@ -43,6 +41,6 @@
 	<classpathentry kind="lib" path="plugins/office/ext/jar/ooo/ridl.jar"/>
 	<classpathentry kind="lib" path="plugins/office/ext/jar/ooo/unoil.jar"/>
 	<classpathentry kind="lib" path="plugins/pdf/ext/jar/jpedal_lgpl.jar"/>
-	<classpathentry kind="lib" path="xena/ext/jar/tika-app-1.3.jar"/>
+	<classpathentry kind="lib" path="xena/ext/jar/tika-app-1.3.jar" sourcepath="xena/ext/src/tika-1.3/tika-parsers/src/main/java"/>
 	<classpathentry kind="output" path="xena/bin"/>
 </classpath>

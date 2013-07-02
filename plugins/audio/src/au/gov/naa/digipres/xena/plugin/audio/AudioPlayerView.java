@@ -28,6 +28,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -35,6 +37,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.xml.transform.stream.StreamResult;
@@ -51,24 +54,30 @@ public class AudioPlayerView extends XenaView {
 	private static final int PLAYER_SAMPLE_SIZE_BITS = 16;
 	private static final String PLAY_TEXT = "Play";
 	private static final String PAUSE_TEXT = "Pause";
+	private static final Logger logger = Logger.getLogger(AudioPlayerView.class.getName());
 
 	private static final int STOPPED = 0;
 	private static final int PLAYING = 1;
 	private static final int PAUSED = 2;
 
-	private int playerStatus = STOPPED;
+	private volatile int playerStatus = STOPPED;
 
 	private File flacFile;
 	private SourceDataLine sourceLine;
 	private JButton playPauseButton;
+	private LineWriterThread lwThread;
 
 	public AudioPlayerView() {
 		super();
 		initGUI();
 	}
+	
+	private synchronized void setPlayerStatus(int playerStatus) {
+		this.playerStatus = playerStatus;
+	}
 
 	private void initGUI() {
-		JPanel playerPanel = new JPanel(new FlowLayout());
+		final JPanel playerPanel = new JPanel(new FlowLayout());
 		playPauseButton = new JButton(PLAY_TEXT);
 		JButton stopButton = new JButton("Stop");
 		playerPanel.add(playPauseButton);
@@ -79,34 +88,47 @@ public class AudioPlayerView extends XenaView {
 
 			public void actionPerformed(ActionEvent e) {
 				if (playerStatus == PLAYING) {
-					sourceLine.stop();
-					playerStatus = PAUSED;
+					// Previously this action would use sourceLine.stop to cause the audio to stop.  For some reason this caused
+					// the program to hang in some circumstances when using OpenJDK 7.  This seemed to be a locking issue.
+					// The stopping functionality is now simply based on the lwThread.  This thread checks after each write for
+					// a change of player status.  This allows for stopping to work in OpenJDK 7 but does introduce a small time
+					// frame of playing after the button is pressed as the audio finishes playing what data is left in the buffer.
+					setPlayerStatus(PAUSED);
 					playPauseButton.setText(PLAY_TEXT);
 				} else if (playerStatus == PAUSED) {
-					sourceLine.start();
-					playerStatus = PLAYING;
+					// Previously sourceLine.start was used here.  Now we just notify the lwThread to continue writing to the buffer
+					// to solve the same issues mentioned above
+					setPlayerStatus(PLAYING);
+					synchronized (lwThread) {
+						lwThread.notify();
+					}
 					playPauseButton.setText(PAUSE_TEXT);
 				} else if (playerStatus == STOPPED) {
-					playerStatus = PLAYING;
+					setPlayerStatus(PLAYING);
 					playPauseButton.setText(PAUSE_TEXT);
 					try {
 						FlacAudioFileReader flacReader = new FlacAudioFileReader();
 						AudioInputStream flacStream = flacReader.getAudioInputStream(flacFile);
 						initAudioLine(flacStream);
-					} catch (Exception ex) {
-						// TODO Auto-generated catch block
-						ex.printStackTrace();
+					} catch (IOException ioe) {
+						logger.log(Level.WARNING, "IOException when attempting to start playing audio file (" +
+								   flacFile.getAbsolutePath() + "): " + ioe.getMessage(), ioe);
+					} catch (UnsupportedAudioFileException uafe) {
+						logger.log(Level.WARNING, "UnsupportedAudioFileException when attempting to start playing audio file (" +
+								   flacFile.getAbsolutePath() + "): " + uafe.getMessage(), uafe);
+					} catch (LineUnavailableException lue) {
+						logger.log(Level.WARNING, "LineUnavailableException when attempting to start playing audio file (" +
+								   flacFile.getAbsolutePath() + "): " + lue.getMessage(), lue);
 					}
 				}
+				playerPanel.repaint();
 			}
 
 		});
 
 		stopButton.addActionListener(new ActionListener() {
-
 			public void actionPerformed(ActionEvent e) {
-				sourceLine.stop();
-				playerStatus = STOPPED;
+				setPlayerStatus(STOPPED);
 				playPauseButton.setText(PLAY_TEXT);
 			}
 
@@ -115,8 +137,11 @@ public class AudioPlayerView extends XenaView {
 	}
 
 	private void initAudioLine(AudioInputStream audioStream) throws LineUnavailableException {
-
 		AudioFormat audioFormat = audioStream.getFormat();
+		if (logger.isLoggable(Level.FINEST)) {
+			logger.finest("Beggining initialisation of Audio Line for Audio Stream (Frame Size: " + audioFormat.getFrameSize() +
+					      ", Frame Rate: " + audioFormat.getFrameRate() + ", Encoding: " + audioFormat.getEncoding().toString() + ")");
+		}
 		DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat, AudioSystem.NOT_SPECIFIED);
 
 		if (!AudioSystem.isLineSupported(info)) {
@@ -134,7 +159,7 @@ public class AudioPlayerView extends XenaView {
 		sourceLine = getSourceDataLine(audioFormat);
 		sourceLine.start();
 
-		LineWriterThread lwThread = new LineWriterThread(audioStream, audioFormat.getFrameSize());
+		lwThread = new LineWriterThread(audioStream, sourceLine.getBufferSize());
 		lwThread.start();
 	}
 
@@ -143,11 +168,14 @@ public class AudioPlayerView extends XenaView {
 	 */
 	@Override
 	protected void close() {
-		if (sourceLine != null) {
-			sourceLine.stop();
-			sourceLine.close();
+		setPlayerStatus(STOPPED);
+		try {
+			lwThread.join(1000); // wait one second maximum
+		} catch (InterruptedException e) {
+			// Just log and keep going
+			logger.log(Level.WARNING, "InterruptedException while waiting for audio thread to stop: " +
+					   e.getMessage(), e);
 		}
-		playerStatus = STOPPED;
 		super.close();
 	}
 
@@ -160,13 +188,35 @@ public class AudioPlayerView extends XenaView {
 		 * SourceDataLine (for playback), Clip (for repeated playback) and TargetDataLine (for recording). Here, we want
 		 * to do normal playback, so we ask for a SourceDataLine. Then, we have to pass an AudioFormat object, so that
 		 * the Line knows which format the data passed to it will have. Furthermore, we can give Java Sound a hint about
-		 * how big the internal buffer for the line should be. This isn't used here, signaling that we don't care about
-		 * the exact size. Java Sound will use some default value for the buffer size.
+		 * how big the internal buffer for the line should be. Because of our issues with using the stop() function on the
+		 * line we wish to set the internal buffer to be small enough so as not be very noticable that there can be a delay
+		 * between the user pressing stop or pause and the actual cease of audio playing.  We try to get a buffer for about
+		 * a quarter of a seconds audio for this purpose.
 		 */
 		SourceDataLine line = null;
 		DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat, AudioSystem.NOT_SPECIFIED);
 		line = (SourceDataLine) AudioSystem.getLine(info);
-		line.open();
+		// limit the maximum buffer size so as to get around issues with the workaround we are currently using of simply letting
+		// the buffer play until empty when stopping or pausing.  Using a smaller buffer in these circumstances makes the maximum
+		// delay in stopping or pausing shorter (at the higher risk of buffer underrun).  If we can fix the hanging issue with
+		// OpenJDK and put back in the use of sourceLine.stop() calls then this buffer size can be increased.
+		int bufferSize = line.getBufferSize(); // default buffer size
+		int frameSize = audioFormat.getFrameSize();
+		float frameRate = audioFormat.getFrameRate();
+		if (frameSize != AudioSystem.NOT_SPECIFIED && frameRate != AudioSystem.NOT_SPECIFIED) {
+			int quarterSecondBuffer = frameSize * (int) (frameRate / 4);
+			if (quarterSecondBuffer < bufferSize) {
+				bufferSize = quarterSecondBuffer;
+			}
+		}
+		if (bufferSize < info.getMinBufferSize()) {
+			bufferSize = info.getMinBufferSize();
+		}
+		if (logger.isLoggable(Level.FINEST)) {
+			logger.finest("For Audio playing using buffer size: " + bufferSize);
+		}
+		
+		line.open(audioFormat, bufferSize);
 		return line;
 	}
 
@@ -199,11 +249,11 @@ public class AudioPlayerView extends XenaView {
 
 	private class LineWriterThread extends Thread {
 		private AudioInputStream audioStream;
-		private int frameSize;
+		private int bufferSize;
 
-		public LineWriterThread(AudioInputStream audioStream, int frameSize) {
+		public LineWriterThread(AudioInputStream audioStream, int bufferSize) {
 			this.audioStream = audioStream;
-			this.frameSize = frameSize;
+			this.bufferSize = bufferSize;
 		}
 
 		/*
@@ -214,7 +264,7 @@ public class AudioPlayerView extends XenaView {
 		public void run() {
 			try {
 				int bytesRead;
-				byte[] buffer = new byte[frameSize];
+				byte[] buffer = new byte[bufferSize];
 
 				while (true) {
 					if (playerStatus == PLAYING) {
@@ -222,12 +272,14 @@ public class AudioPlayerView extends XenaView {
 							sourceLine.write(buffer, 0, bytesRead);
 						} else {
 							// File has finished playing
-							playerStatus = STOPPED;
+							setPlayerStatus(STOPPED);
 							playPauseButton.setText(PLAY_TEXT);
 						}
 					} else if (playerStatus == PAUSED) {
 						try {
-							sleep(10);
+							synchronized (this) {
+								wait();
+							}
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
@@ -238,9 +290,8 @@ public class AudioPlayerView extends XenaView {
 						break;
 					}
 				}
-			} catch (IOException iex) {
-				// Probably should do some kind of handling here...
-				iex.printStackTrace();
+			} catch (IOException ioe) {
+				logger.log(Level.WARNING, ioe.getMessage(), ioe);
 			}
 		}
 
