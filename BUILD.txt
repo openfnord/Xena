@@ -1,7 +1,7 @@
 BUILD INSTRUCTIONS
 ------------------
 
-For more detailed installation instructions, refer to the Xena wiki at: https://sourceforge.net/apps/mediawiki/xena/index.php?title=Main_Page
+For more detailed installation instructions, refer to the Xena wiki at: https://sourceforge.net/p/xena/wiki/Main_Page/
 
 FROM THE COMMAND CONSOLE
 

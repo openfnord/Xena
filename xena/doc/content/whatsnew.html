@@ -15,6 +15,8 @@
 <h3>Bug Fixes</h3>
 <ul>
  <li>Corrected references to 'Xena Lite' to refer to 'Xena' and further improved the error message displayed when the plugins directory is not found <em>(bug-3551095, ticket #372)</em></li>
+ <li>When running under OpenJDK 7 and playing an audio file in the view using the pause or stop button no longer result in Xena hanging.  This fix does introduce a very small delay in stopping music after pressing pause or stop or closing the view window <em>(bug ticket #255)</em></li>
+ <li>Creating your own Custom File Namer is now correctly handled and no longer results in a NullPointerException <em>(bug-3515030, ticket #366)</em></li>
 </ul>
 <h3>Feature Enhancements</h3>
 <ul>

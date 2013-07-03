@@ -6,7 +6,7 @@ Thank you for downloading Xena 6.1.0!
 
 Release Date
 ------------
-28 Jul 2013
+31 July 2013
 
 
 License
@@ -18,7 +18,7 @@ Requirements
 ------------
 To run this pre-compiled version of Xena you will require a version 1.7 Java Runtime Environment.  You can download the open source Java stack, OpenJDK version 1.7 (http://openjdk.java.net) or Oracle's Java Runtime Environment 1.7 (http://java.com).
 
-To normalise certain file formats Xena relies on external programs, such as LibreOffice.org for Office documents. All users will need to install LibreOffice.org separately and configure Xena for its use if functionality for Office documents is needed. Windows users who have installed from the installer and Mac OS users who have installed from the Mac OS Disk Image will find all other external programs included.  Mac OS users will need to configure Xena to use these external programs. Other users will need to download and install required external programs and configure Xena for their use. Please see Xena help from inside the program for more details. Note that where external programs are included they may not be the most up to date versions of these programs.
+To normalise certain file formats Xena relies on external programs, such as LibreOffice for Office documents. All users will need to install LibreOffice separately and configure Xena for its use if functionality for Office documents is needed. Windows users who have installed from the installer and Mac OS users who have installed from the Mac OS Disk Image will find all other external programs included.  Mac OS users will need to configure Xena to use these external programs. Other users will need to download and install required external programs and configure Xena for their use. Please see Xena help from inside the program for more details. Note that where external programs are included they may not be the most up to date versions of these programs.
 
 
 Run Xena
@@ -28,7 +28,7 @@ Windows:
   Windows users who have installed from source can run the xena.bat script.
 
 Mac OS X:
-  Mac OS X users who have installed using the disk image should find Xena in their Applications.  
+  Mac OS X users who have installed using the disk image should find Xena in their Applications.
 
 Linux:
   Xena can be run by executing the xena.sh script.
