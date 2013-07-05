@@ -16,7 +16,7 @@
 	<property name="jchardet" value="jchardet-1.1"/>
 	<property name="juchardet" value="juniversalchardet"/>
 	<property name="xalan" value="xalan-j_2_7_1" />
-	<property name="looks" value="looks-2.2.2"/>
+	<property name="looks" value="looks-2.3.1"/>
 	<property name="commons_cli" value="commons-cli-1.1-src" />
 	<!--currently unable to build xerces in java 7-->
 	<!--<property name="xerces" value="xerces-2_11_0" />-->
