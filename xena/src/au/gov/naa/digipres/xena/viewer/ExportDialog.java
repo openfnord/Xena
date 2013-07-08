@@ -24,6 +24,7 @@ package au.gov.naa.digipres.xena.viewer;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -37,6 +38,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
@@ -65,7 +67,8 @@ public class ExportDialog extends JDialog {
 
 		itemSelectionPanel = new FileAndDirectorySelectionPanel(new XenaFileFilter());
 		TitledBorder itemsBorder = new TitledBorder(new EtchedBorder(), "Items to Export");
-		itemsBorder.setTitleFont(itemsBorder.getTitleFont().deriveFont(13.0f));
+		Font font = UIManager.getDefaults().getFont("TitledBorder.font");
+		itemsBorder.setTitleFont(font.deriveFont(Font.BOLD));
 		itemSelectionPanel.setBorder(itemsBorder);
 
 		// JLabel outputDirLabel = new JLabel("Output directory:");

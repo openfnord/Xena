@@ -36,6 +36,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -1431,8 +1432,9 @@ public class NormaliserManager {
 	 * @throws XenaException
 	 */
 	public String getExportFilename(XenaInputSource xis, AbstractDeNormaliser deNormaliser) throws XenaException {
-		String sourceSysId = pluginManager.getMetaDataWrapperManager().getSourceName(xis);
-
+		//String sourcesysId = pluginManager.getMetaDataWrapperManager().getSourceName(xis);
+		String sourceSysId=xis.getSystemId();
+		//System.out.println("Source Sys "+sourceSysId);
 		URI uri = null;
 		try {
 			uri = new java.net.URI(sourceSysId);
@@ -1442,7 +1444,7 @@ public class NormaliserManager {
 		String outFileName = "";
 		try {
 			outFileName = new File(uri).toString();
-		} catch (IllegalArgumentException iae) {
+		
 			// there seems to have been a problem of some description. In this
 			// case, we will
 			// just get the system id, and take the last part of it for now...
@@ -1452,7 +1454,10 @@ public class NormaliserManager {
 			if (sourceSysId.lastIndexOf('\\') != -1) {
 				outFileName = sourceSysId.substring(sourceSysId.lastIndexOf('\\'));
 			}
+		} catch (IllegalArgumentException iae) {
+			logger.log(Level.SEVERE,iae.getMessage());
 		}
+		
 
 		if (outFileName == null || outFileName.length() == 0) {
 			throw new XenaException("Could not get output filename for some reason.");
@@ -1600,12 +1605,18 @@ public class NormaliserManager {
 				// No dot found, no extension, use entire filename
 				lastDot = outFileName.length();
 			}
-			String fileName = outFileName.substring(0, lastDot);
+			int lastIndex=0;
+			lastIndex = outFileName.indexOf("/",lastIndex);
+			String fileName = outFileName.substring(lastIndex, lastDot);
 			String fileExt = outFileName.substring(lastDot); // May not always be an extension, just the bit after the last . in the filename
 			DecimalFormat idFormatter = new DecimalFormat("0000");
 			while (newFile.exists()) {
 				// Change outFIleName, as we use it later.
 				outFileName = fileName + "." + idFormatter.format(i) + fileExt;
+				
+				
+				//outFileName = outFileName.substring(lastIndex);
+				System.out.println(outFileName);
 				newFile = new File(outDir, outFileName);
 				i++;
 			}
