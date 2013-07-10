@@ -56,6 +56,8 @@ public class AudioPlayerView extends XenaView {
 	private static final String PAUSE_TEXT = "Pause";
 	private static final Logger logger = Logger.getLogger(AudioPlayerView.class.getName());
 
+	private static final boolean isOpenJDK = System.getProperty("java.vm.name").contains("OpenJDK");
+	
 	private static final int STOPPED = 0;
 	private static final int PLAYING = 1;
 	private static final int PAUSED = 2;
@@ -65,7 +67,7 @@ public class AudioPlayerView extends XenaView {
 	private File flacFile;
 	private SourceDataLine sourceLine;
 	private JButton playPauseButton;
-	private LineWriterThread lwThread;
+	private LineWriterThread lwThread = null;
 
 	public AudioPlayerView() {
 		super();
@@ -88,16 +90,23 @@ public class AudioPlayerView extends XenaView {
 
 			public void actionPerformed(ActionEvent e) {
 				if (playerStatus == PLAYING) {
-					// Previously this action would use sourceLine.stop to cause the audio to stop.  For some reason this caused
-					// the program to hang in some circumstances when using OpenJDK 7.  This seemed to be a locking issue.
-					// The stopping functionality is now simply based on the lwThread.  This thread checks after each write for
-					// a change of player status.  This allows for stopping to work in OpenJDK 7 but does introduce a small time
-					// frame of playing after the button is pressed as the audio finishes playing what data is left in the buffer.
+					if (!isOpenJDK) {
+						// For some reason using sourceLine.stop causes the program to hang in some circumstances when using OpenJDK 7.
+						// This seemed to be a locking issue.  Thus when using OpenJDK we the stopping functionality is based on the
+						// lwThread.  This thread checks after each write for a change of player status.  This allows for stopping to
+						// work in OpenJDK 7 but does introduce a small time frame of playing after the button is pressed as the audio
+						// finishes playing what data is left in the buffer.
+						sourceLine.stop();
+					}
 					setPlayerStatus(PAUSED);
 					playPauseButton.setText(PLAY_TEXT);
 				} else if (playerStatus == PAUSED) {
-					// Previously sourceLine.start was used here.  Now we just notify the lwThread to continue writing to the buffer
-					// to solve the same issues mentioned above
+					if (!isOpenJDK) {
+						// to solve the same issues mentioned above sourceLine.start is only used when not running on OpenJDK.
+						// if running on OpenJDK we simply let the later notify to start the lwThread writing to the buffer again and
+						// hence start playing again.
+						sourceLine.start();
+					}
 					setPlayerStatus(PLAYING);
 					synchronized (lwThread) {
 						lwThread.notify();
@@ -128,6 +137,11 @@ public class AudioPlayerView extends XenaView {
 
 		stopButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if (!isOpenJDK) {
+					// stop the source line to stop the audio.  For reasons mentioned above we do not do this under OpenJDK.
+					// In this case we instead just let the buffer of lwThread empty.
+					sourceLine.stop();
+				}
 				setPlayerStatus(STOPPED);
 				playPauseButton.setText(PLAY_TEXT);
 			}
@@ -169,12 +183,14 @@ public class AudioPlayerView extends XenaView {
 	@Override
 	protected void close() {
 		setPlayerStatus(STOPPED);
-		try {
-			lwThread.join(1000); // wait one second maximum
-		} catch (InterruptedException e) {
-			// Just log and keep going
-			logger.log(Level.WARNING, "InterruptedException while waiting for audio thread to stop: " +
-					   e.getMessage(), e);
+		if (lwThread != null) {
+			try {
+				lwThread.join(1000); // wait one second maximum
+			} catch (InterruptedException e) {
+				// Just log and keep going
+				logger.log(Level.WARNING, "InterruptedException while waiting for audio thread to stop: " +
+						   e.getMessage(), e);
+			}
 		}
 		super.close();
 	}
@@ -188,25 +204,24 @@ public class AudioPlayerView extends XenaView {
 		 * SourceDataLine (for playback), Clip (for repeated playback) and TargetDataLine (for recording). Here, we want
 		 * to do normal playback, so we ask for a SourceDataLine. Then, we have to pass an AudioFormat object, so that
 		 * the Line knows which format the data passed to it will have. Furthermore, we can give Java Sound a hint about
-		 * how big the internal buffer for the line should be. Because of our issues with using the stop() function on the
-		 * line we wish to set the internal buffer to be small enough so as not be very noticable that there can be a delay
-		 * between the user pressing stop or pause and the actual cease of audio playing.  We try to get a buffer for about
-		 * a quarter of a seconds audio for this purpose.
+		 * how big the internal buffer for the line should be.
 		 */
 		SourceDataLine line = null;
 		DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat, AudioSystem.NOT_SPECIFIED);
 		line = (SourceDataLine) AudioSystem.getLine(info);
-		// limit the maximum buffer size so as to get around issues with the workaround we are currently using of simply letting
-		// the buffer play until empty when stopping or pausing.  Using a smaller buffer in these circumstances makes the maximum
-		// delay in stopping or pausing shorter (at the higher risk of buffer underrun).  If we can fix the hanging issue with
-		// OpenJDK and put back in the use of sourceLine.stop() calls then this buffer size can be increased.
 		int bufferSize = line.getBufferSize(); // default buffer size
-		int frameSize = audioFormat.getFrameSize();
-		float frameRate = audioFormat.getFrameRate();
-		if (frameSize != AudioSystem.NOT_SPECIFIED && frameRate != AudioSystem.NOT_SPECIFIED) {
-			int quarterSecondBuffer = frameSize * (int) (frameRate / 4);
-			if (quarterSecondBuffer < bufferSize) {
-				bufferSize = quarterSecondBuffer;
+		if (!isOpenJDK) {
+			// limit the maximum buffer size so as to get around issues with the workaround for OpenJDK that we are currently using
+			// of simply letting the buffer play until empty when stopping or pausing.  Using a smaller buffer in these circumstances
+			// makes the maximum delay in stopping or pausing shorter (at the higher risk of buffer underrun).  If we can fix the
+			// hanging issue with OpenJDK then this section can be removed.
+			int frameSize = audioFormat.getFrameSize();
+			float frameRate = audioFormat.getFrameRate();
+			if (frameSize != AudioSystem.NOT_SPECIFIED && frameRate != AudioSystem.NOT_SPECIFIED) {
+				int quarterSecondBuffer = frameSize * (int) (frameRate / 4);
+				if (quarterSecondBuffer < bufferSize) {
+					bufferSize = quarterSecondBuffer;
+				}
 			}
 		}
 		if (bufferSize < info.getMinBufferSize()) {
