@@ -47,6 +47,9 @@ import au.gov.naa.digipres.xena.util.FileUtils;
 import au.gov.naa.digipres.xena.util.InputStreamEncoder;
 
 public class SpeexAudioNormaliser extends AbstractNormaliser {
+	// WARNING: When changing any getters in this class check that these are passed through correctly
+	//          to OggAudioNormaliser which may use this class to do the actual normalisation.
+	
 	public final static String AUDIO_PREFIX = "audio";
 	public final static String FLAC_TAG = "flac";
 	public final static String AUDIO_URI = "http://preservation.naa.gov.au/audio/1.0";

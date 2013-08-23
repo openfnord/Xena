@@ -19,6 +19,7 @@ package au.gov.naa.digipres.xena.plugin.audio;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.tika.metadata.Property;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -48,6 +49,11 @@ public class OggAudioNormaliser extends AbstractNormaliser {
 	private static final byte vorbisMagic[] = {(byte) 0x01, 'v', 'o', 'r', 'b', 'i', 's'};
 	private static final byte flacMagic[] = {(byte) 0x7F, 'F', 'L', 'A', 'C'};
 	private static final byte speexMagic[] = {'S', 'p', 'e', 'e', 'x', ' ', ' ', ' '};
+	
+	private AbstractNormaliser underlyingNormaliser = null;
+	//TODO This class usese an underlying normaliser to do essentially all the work and thus has to give back the correct properties from
+	//     the underlying normaliser and may in future need to pass through the correct results of other getters.  It seems a bit messy
+	//     the way it works at the moment.  This should be looked at to see if there is a nicer way.
 
 	/** Endianess value to use in conversion.
 	 * If a conversion of the AudioInputStream is done,
@@ -96,28 +102,39 @@ public class OggAudioNormaliser extends AbstractNormaliser {
 			byteStream.read(possbileMagic);
 			byteStream.close();
 
-			AbstractNormaliser normaliser;
-
 			// Check which codec it matches
 			if (GuesserUtils.compareByteArrays(vorbisMagic, possbileMagic)) {
 				// We have vorbis
-				normaliser = new VorbisAudioNormaliser();
+				underlyingNormaliser = new VorbisAudioNormaliser();
 			} else if (GuesserUtils.compareByteArrays(flacMagic, possbileMagic)) {
 				// We have flac, and the flac encoder we use, supports the ogg file containing flac.
-				normaliser = new DirectAudioNormaliser();
+				underlyingNormaliser = new DirectAudioNormaliser();
 			} else if (GuesserUtils.compareByteArrays(speexMagic, possbileMagic)) {
 				// We Have speex
-				normaliser = new SpeexAudioNormaliser();
+				underlyingNormaliser = new SpeexAudioNormaliser();
 			} else {
 				// We don't know so binary normalise.
-				normaliser = new BinaryToXenaBinaryNormaliser();
+				underlyingNormaliser = new BinaryToXenaBinaryNormaliser();
 			}
-			normaliser.setNormaliserManager(normaliserManager);
-			normaliser.setContentHandler(getContentHandler());
-			normaliser.parse(input, results, convertOnly);
+			underlyingNormaliser.setNormaliserManager(normaliserManager);
+			underlyingNormaliser.setContentHandler(getContentHandler());
+			underlyingNormaliser.parse(input, results, convertOnly);
 		} catch (XenaException x) {
 			throw new SAXException(x);
 		}
+	}
+	
+	// We override the get property function to return the properties of the underlying normaliser where they exist
+	@Override
+	public Object getProperty(String name) {
+		Object property = null;
+		if (underlyingNormaliser != null) {
+			property = underlyingNormaliser.getProperty(name);
+		}
+		if (property == null) {
+			property = properties.get(name);
+		}
+		return property;
 	}
 
 	@Override

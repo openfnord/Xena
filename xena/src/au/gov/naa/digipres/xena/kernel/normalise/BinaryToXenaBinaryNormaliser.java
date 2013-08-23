@@ -36,6 +36,9 @@ import au.gov.naa.digipres.xena.util.InputStreamEncoder;
  * @created    1 July 2002
  */
 public class BinaryToXenaBinaryNormaliser extends AbstractNormaliser {
+	// WARNING: When changing any getters in this class check that these are passed through correctly
+	//          to OggAudioNormaliser which may use this class to do the actual normalisation.
+	
 	public final static String BINARY_NORMALISER_NAME = "Binary";
 
 	final static String PREFIX = "binary-object";
