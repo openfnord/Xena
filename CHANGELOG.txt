@@ -1,3 +1,11 @@
+Next Release (in development)
+=============================
+Bug Fixes
+---------
+* Normalisations made by the Ogg Audio normaliser now correctly add in the exported checksum (bug-#383)
+
+
+
 Xena 6.1.0
 ==========
 Bug Fixes
