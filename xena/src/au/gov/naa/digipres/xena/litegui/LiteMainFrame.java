@@ -989,11 +989,21 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 		}
 
 		// Ensure destination directory has been set
-		String destDir = prefs.get(XENA_DEST_DIR_KEY, "");
-		if ("".equals(destDir.trim())) {
+		String destDirStr = prefs.get(XENA_DEST_DIR_KEY, "");
+		if ("".equals(destDirStr.trim())) {
 			JOptionPane.showMessageDialog(this, "Please set the destination directory" + " in Tools->" + XENA_LITE_TITLE + " Preferences.",
 			                              "Destination Directory Not Set", JOptionPane.INFORMATION_MESSAGE);
 			logger.finest("Attempted to normalise with no destination directory");
+			return;
+		}
+		File destDir = new File(destDirStr);
+		// check the destination directory
+		if (!destDir.exists()) {
+			handleException(new XenaException("Destination Directory is not Valid!"));
+			return;
+		}
+		if (!destDir.isDirectory()) {
+			handleException(new XenaException("Destination Directory is not actually a directory!"));
 			return;
 		}
 
@@ -1015,7 +1025,7 @@ public class LiteMainFrame extends JFrame implements NormalisationStateChangeLis
 			// Create the normalisation thread
 			normalisationThread =
 			    new NormalisationThread(mode, retainDirectoryStructure, performTextNormalisation, getXenaInterface(), tableModel, itemList,
-			                            new File(destDir), this);
+			                            destDir, this);
 			if (mode != NormalisationThread.BINARY_ERRORS_MODE) {
 				// Display the results panel
 				mainPanel.removeAll();

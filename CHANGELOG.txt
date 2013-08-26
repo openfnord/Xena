@@ -3,6 +3,7 @@ Next Release (in development)
 Bug Fixes
 ---------
 * Normalisations made by the Ogg Audio normaliser now correctly add in the exported checksum (bug-#383)
+* A correct error message is now shown when trying to normalise or convert files when the output directory does not exist (normally because it has been deleted) (bug-#385)
 
 
 
