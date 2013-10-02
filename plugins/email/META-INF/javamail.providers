@@ -16,8 +16,12 @@ protocol=smtps; type=transport; class=gnu.mail.providers.smtp.SMTPTransport; ven
 protocol=imap; type=store; class=gnu.mail.providers.imap.IMAPStore; vendor=dog@gnu.org;
 protocol=pop3; type=store; class=gnu.mail.providers.pop3.POP3Store; vendor=dog@gnu.org;
 
-#if the user selected the mbox provider
-protocol=mbox; type=store; class=gnu.mail.providers.mbox.MboxStore; vendor=dog@gnu.org;
+# if the user selected the mbox provider
+# We use mstor here rather than the GNU provider as the GNU provider assumes that all email is encoded in US-ASCII
+# which converts non-ascii characters to the replacement character.  Mstor correctly handles the email using the
+# provided encoding. (Terry - 2/10/2013)
+#protocol=mbox; type=store; class=gnu.mail.providers.mbox.MboxStore; vendor=dog@gnu.org;
+protocol=mbox; type=store; class=net.fortuna.mstor.MStorStore; vendor=Ben Fortuna;
 #if the user selected the maildir provider
 protocol=maildir; type=store; class=gnu.mail.providers.maildir.MaildirStore; vendor=dog@gnu.org;
 #if the user selected the nntp provider

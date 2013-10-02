@@ -29,6 +29,7 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.mail.Folder;
@@ -94,7 +95,7 @@ public class EmailToXenaEmailNormaliser extends AbstractNormaliser {
 	private boolean doMany = true;
 
 	// JRW - adding java logging
-	Logger logger;
+	private static final Logger logger = Logger.getLogger(EmailToXenaEmailNormaliser.class.getName());
 
 	@Override
 	public String getName() {
@@ -107,8 +108,7 @@ public class EmailToXenaEmailNormaliser extends AbstractNormaliser {
 	}
 
 	public EmailToXenaEmailNormaliser() {
-		mailProperties.setProperty("mail.mbox.attemptfalback", "false");
-		logger = Logger.getLogger(this.getClass().getName());
+		mailProperties.setProperty("mail.mbox.attemptfallback", "false");
 	}
 
 	protected static List<String> allFolders(Store store) throws MessagingException {
@@ -135,7 +135,7 @@ public class EmailToXenaEmailNormaliser extends AbstractNormaliser {
 				}
 			}
 		} catch (FolderNotFoundException x) {
-			// Nothing
+			logger.log(Level.FINE, x.getMessage(), x);
 		}
 	}
 
@@ -155,7 +155,7 @@ public class EmailToXenaEmailNormaliser extends AbstractNormaliser {
 				mailProperties.setProperty("mail.mbox.mailhome", file.getParent());
 			}
 			mailboxType = "mbox";
-			urln = new URLName("mbox://" + input.getSystemId());
+			urln = new URLName("mbox://file://" + file.getAbsolutePath());
 		} else if (type instanceof ImapType) {
 			mailProperties.setProperty(IMAP_HOST, hostName);
 			mailProperties.setProperty(IMAP_PORT, Integer.toString(port));

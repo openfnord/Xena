@@ -54,6 +54,7 @@ import au.gov.naa.digipres.xena.kernel.normalise.BinaryToXenaBinaryNormaliser;
 import au.gov.naa.digipres.xena.kernel.normalise.NormaliserManager;
 import au.gov.naa.digipres.xena.kernel.normalise.NormaliserResults;
 import au.gov.naa.digipres.xena.kernel.type.Type;
+import au.gov.naa.digipres.xena.plugin.plaintext.PlainTextFileType;
 import au.gov.naa.digipres.xena.util.DOMUtil;
 import au.gov.naa.digipres.xena.util.UrlEncoder;
 
@@ -238,14 +239,56 @@ public class MessageNormaliser extends AbstractNormaliser {
 		if (partContentType != null) {
 			// Make sure we only have the mime type - for plaintext the character encoding may appear after a ';'
 			String mimeType = partContentType;
-			if (mimeType.indexOf(";") != -1) {
-				mimeType = mimeType.substring(0, mimeType.indexOf(";"));
+			int semiColonIndex = mimeType.indexOf(";");
+			if (semiColonIndex != -1) {
+				mimeType = mimeType.substring(0, semiColonIndex);
+				// set the character encoding if one is given
+				String attributes = partContentType.substring(semiColonIndex + 1);
+				final String charsetParamStr = "charset=";
+				int charsetIndex = attributes.indexOf(charsetParamStr);
+				if (charsetIndex != -1) {
+					int startIndex = charsetIndex + charsetParamStr.length();
+					int endIndex;
+					if (attributes.charAt(startIndex) == '"') {
+						startIndex++;
+						endIndex = attributes.indexOf('"', startIndex);
+						if (endIndex != -1) {
+							xis.setEncoding(attributes.substring(startIndex, endIndex));
+						}
+					} else {
+						endIndex = attributes.indexOf(' ', startIndex);
+						if (endIndex == -1) {
+							xis.setEncoding(attributes.substring(startIndex));
+						} else {
+							xis.setEncoding(attributes.substring(startIndex, endIndex));
+						}
+					}
+				}
 			}
 			xis.setMimeType(mimeType);
 		}
 
 		if (localType == null) {
-			localType = normaliserManager.getPluginManager().getGuesserManager().mostLikelyType(xis);
+			if (xis.getMimeType().startsWith("text/") ||
+				xis.getMimeType().startsWith("multipart/") ||
+				(xis.getEncoding() != null && ! xis.getEncoding().contains("ascii")))
+			{
+				//TODO This section is a workaround to data loss due to encoding issues.  Fix the guessing and normalising so that this
+				//     workaround is not necessary.
+				//
+				// Use the PlainText normaliser for all text mimetypes for multipart mime-type or for any situation where
+				// the character encoding has been specified and is not ascii.  We do this because errors in other normalisers have been
+				// seen to result in data loss due to using the wrong encoding in these cases.  This workaround may still cause issues and
+				// will probably not cover all situations of data loss due to using the wrong character encoding.
+				//
+				// TODO Note that for multipart mimetypes we really should use the bp.getContent and then individually process each type.
+				// The problem here is that this code only currently handles a single level of multitype (processed in the parse function)
+				// rather than any arbitrary number of levels.
+				localType = normaliserManager.getPluginManager().getTypeManager().lookup(PlainTextFileType.class);
+			} else {
+				// guess the type
+				localType = normaliserManager.getPluginManager().getGuesserManager().mostLikelyType(xis);
+			}
 		}
 
 		Element el = null;
@@ -260,7 +303,7 @@ public class MessageNormaliser extends AbstractNormaliser {
 			el = DOMUtil.parseToElement(localNormaliser, xis);
 		} catch (Exception x) {
 			logger.log(Level.FINER,
-			           "No Normaliser found, falling back to Binary Normalisation." + "file: " + bp.getFileName() + " subject: " + msg.getSubject(),
+			           "No Normaliser found, falling back to Binary Normalisation. file: " + bp.getFileName() + " subject: " + msg.getSubject(),
 			           x);
 			el = getBinary(xis);
 		}
