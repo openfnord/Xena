@@ -54,7 +54,6 @@ import au.gov.naa.digipres.xena.kernel.normalise.BinaryToXenaBinaryNormaliser;
 import au.gov.naa.digipres.xena.kernel.normalise.NormaliserManager;
 import au.gov.naa.digipres.xena.kernel.normalise.NormaliserResults;
 import au.gov.naa.digipres.xena.kernel.type.Type;
-import au.gov.naa.digipres.xena.plugin.plaintext.PlainTextFileType;
 import au.gov.naa.digipres.xena.util.DOMUtil;
 import au.gov.naa.digipres.xena.util.UrlEncoder;
 
@@ -284,7 +283,18 @@ public class MessageNormaliser extends AbstractNormaliser {
 				// TODO Note that for multipart mimetypes we really should use the bp.getContent and then individually process each type.
 				// The problem here is that this code only currently handles a single level of multitype (processed in the parse function)
 				// rather than any arbitrary number of levels.
-				localType = normaliserManager.getPluginManager().getTypeManager().lookup(PlainTextFileType.class);
+				localType = normaliserManager.getPluginManager().getTypeManager().lookup("PlainText");
+				if (localType == null) {
+					// could not get the plaintext normaliser, just guess the type
+					String logmsg = "Could not find PlainText normaliser for processing mail part in file \"" +
+					                xis.getSystemId() + "\" (part mime type = \"" + xis.getMimeType();
+					if (xis.getEncoding() != null) {
+						logmsg += ", part encoding = \"" + xis.getEncoding();
+					}
+					logmsg += "\")";
+					logger.warning(logmsg);
+					localType = normaliserManager.getPluginManager().getGuesserManager().mostLikelyType(xis);
+				}
 			} else {
 				// guess the type
 				localType = normaliserManager.getPluginManager().getGuesserManager().mostLikelyType(xis);
