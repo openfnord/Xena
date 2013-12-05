@@ -91,7 +91,7 @@ final class TaskModel
     * This method populates the task model from data read from an MPX file.
     *
     * @param record data read from an MPX file
-    * @param isText flag indicating whether the tetxual or numeric data is being supplied
+    * @param isText flag indicating whether the textual or numeric data is being supplied
     */
    public void update(Record record, boolean isText) throws MPXJException
    {
@@ -179,8 +179,8 @@ final class TaskModel
       int number;
       char delimiter = m_parentFile.getDelimiter();
 
-      StringBuffer textual = new StringBuffer();
-      StringBuffer numeric = new StringBuffer();
+      StringBuilder textual = new StringBuilder();
+      StringBuilder numeric = new StringBuilder();
 
       textual.append(MPXConstants.TASK_MODEL_TEXT_RECORD_NUMBER);
       numeric.append(MPXConstants.TASK_MODEL_NUMERIC_RECORD_NUMBER);
@@ -243,7 +243,7 @@ final class TaskModel
    private ProjectFile m_parentFile;
 
    /**
-    * Array of flags indicting whether each field has already been
+    * Array of flags indicating whether each field has already been
     * added to the model.
     */
    private boolean[] m_flags = new boolean[MPXTaskField.MAX_FIELDS];

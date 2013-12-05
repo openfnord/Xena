@@ -32,7 +32,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -84,23 +83,31 @@ public final class PlannerWriter extends AbstractProjectWriter
    /**
     * {@inheritDoc}
     */
-   public void write(ProjectFile projectFile, OutputStream stream) throws IOException
+   @Override public void write(ProjectFile projectFile, OutputStream stream) throws IOException
    {
       try
       {
          m_projectFile = projectFile;
 
-         JAXBContext context = JAXBContext.newInstance("net.sf.mpxj.planner.schema");
-         Marshaller marshaller = context.createMarshaller();
+         if (CONTEXT == null)
+         {
+            throw CONTEXT_EXCEPTION;
+         }
+
+         Marshaller marshaller = CONTEXT.createMarshaller();
          marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+         if (m_encoding != null)
+         {
+            marshaller.setProperty(Marshaller.JAXB_ENCODING, m_encoding);
+         }
 
          //
          // The Planner implementation used  as the basis for this work, 0.14.1
          // does not appear to have a particularly robust parser, and rejects
          // files with the full XML declaration produced by JAXB. The
          // following property suppresses this declaration.
-         //
-         marshaller.setProperty("com.sun.xml.bind.xmlDeclaration", Boolean.FALSE);
+         //         
+         marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 
          m_factory = new ObjectFactory();
          m_plannerProject = m_factory.createProject();
@@ -138,12 +145,12 @@ public final class PlannerWriter extends AbstractProjectWriter
       m_plannerProject.setManager(mpxjHeader.getManager());
       m_plannerProject.setName(getString(mpxjHeader.getName()));
       m_plannerProject.setProjectStart(getDateTime(mpxjHeader.getStartDate()));
-
+      m_plannerProject.setCalendar(getIntegerString(m_projectFile.getCalendar().getUniqueID()));
       m_plannerProject.setMrprojectVersion("2");
    }
 
    /**
-    * This method writes calandar data to a Planner file.
+    * This method writes calendar data to a Planner file.
     *
     * @throws JAXBException on xml creation errors
     */
@@ -160,7 +167,7 @@ public final class PlannerWriter extends AbstractProjectWriter
       //
       // Process each calendar in turn
       //    
-      for (ProjectCalendar mpxjCalendar : m_projectFile.getBaseCalendars())
+      for (ProjectCalendar mpxjCalendar : m_projectFile.getCalendars())
       {
          net.sf.mpxj.planner.schema.Calendar plannerCalendar = m_factory.createCalendar();
          calendar.add(plannerCalendar);
@@ -260,6 +267,8 @@ public final class PlannerWriter extends AbstractProjectWriter
       plannerCalendar.setDays(plannerDays);
       List<net.sf.mpxj.planner.schema.Day> dayList = plannerDays.getDay();
       processExceptionDays(mpxjCalendar, dayList);
+
+      m_projectFile.fireCalendarWrittenEvent(mpxjCalendar);
 
       //
       // Process any derived calendars
@@ -431,7 +440,7 @@ public final class PlannerWriter extends AbstractProjectWriter
       plannerTask.setName(getString(mpxjTask.getName()));
       plannerTask.setNote(mpxjTask.getNotes());
       plannerTask.setPercentComplete(getIntegerString(mpxjTask.getPercentageWorkComplete()));
-      plannerTask.setPriority(getIntegerString(mpxjTask.getPriority().getValue() * 10));
+      plannerTask.setPriority(mpxjTask.getPriority() == null ? null : getIntegerString(mpxjTask.getPriority().getValue() * 10));
       plannerTask.setScheduling(getScheduling(mpxjTask.getType()));
       plannerTask.setStart(getDateTimeString(DateUtility.getDayStartDate(mpxjTask.getStart())));
       if (mpxjTask.getMilestone())
@@ -495,53 +504,24 @@ public final class PlannerWriter extends AbstractProjectWriter
     */
    private void writePredecessors(Task mpxjTask, net.sf.mpxj.planner.schema.Task plannerTask)
    {
-      TreeSet<Integer> set = new TreeSet<Integer>();
-
       Predecessors plannerPredecessors = m_factory.createPredecessors();
       plannerTask.setPredecessors(plannerPredecessors);
       List<Predecessor> predecessorList = plannerPredecessors.getPredecessor();
       int id = 0;
 
-      //
-      // Process the list of predecessors specified by Unique ID
-      //
-      List<Relation> predecessors = mpxjTask.getUniqueIDPredecessors();
+      List<Relation> predecessors = mpxjTask.getPredecessors();
       if (predecessors != null)
       {
          for (Relation rel : predecessors)
          {
-            Integer taskUniqueID = rel.getTaskUniqueID();
-            set.add(taskUniqueID);
-
+            Integer taskUniqueID = rel.getTargetTask().getUniqueID();
             Predecessor plannerPredecessor = m_factory.createPredecessor();
             plannerPredecessor.setId(getIntegerString(++id));
             plannerPredecessor.setPredecessorId(getIntegerString(taskUniqueID));
-            plannerPredecessor.setLag(getDurationString(rel.getDuration()));
+            plannerPredecessor.setLag(getDurationString(rel.getLag()));
             plannerPredecessor.setType(RELATIONSHIP_TYPES.get(rel.getType()));
             predecessorList.add(plannerPredecessor);
-         }
-      }
-
-      //
-      // Process the list of predecessors specified by ID.
-      // Note that this code ensures that if both lists are populated,
-      // we avoid creating duplicate links.
-      //
-      predecessors = mpxjTask.getPredecessors();
-      if (predecessors != null)
-      {
-         for (Relation rel : predecessors)
-         {
-            Integer taskUniqueID = rel.getTaskUniqueID();
-            if (set.contains(taskUniqueID) == false)
-            {
-               Predecessor plannerPredecessor = m_factory.createPredecessor();
-               plannerPredecessor.setId(getIntegerString(++id));
-               plannerPredecessor.setPredecessorId(getIntegerString(taskUniqueID));
-               plannerPredecessor.setLag(getDurationString(rel.getDuration()));
-               plannerPredecessor.setType(RELATIONSHIP_TYPES.get(rel.getType()));
-               predecessorList.add(plannerPredecessor);
-            }
+            m_projectFile.fireRelationWrittenEvent(rel);
          }
       }
    }
@@ -564,6 +544,8 @@ public final class PlannerWriter extends AbstractProjectWriter
          plannerAllocation.setTaskId(getIntegerString(mpxjAssignment.getTask().getUniqueID()));
          plannerAllocation.setResourceId(getIntegerString(mpxjAssignment.getResourceUniqueID()));
          plannerAllocation.setUnits(getIntegerString(mpxjAssignment.getUnits()));
+
+         m_projectFile.fireAssignmentWrittenEvent(mpxjAssignment);
       }
    }
 
@@ -577,7 +559,7 @@ public final class PlannerWriter extends AbstractProjectWriter
     */
    private String getDateTime(Date value)
    {
-      StringBuffer result = new StringBuffer(16);
+      StringBuilder result = new StringBuilder(16);
 
       if (value != null)
       {
@@ -633,21 +615,21 @@ public final class PlannerWriter extends AbstractProjectWriter
 
       switch (mpxjCalendar.getWorkingDay(day))
       {
-         case ProjectCalendar.WORKING :
+         case WORKING:
          {
             result = true;
             break;
          }
 
-         case ProjectCalendar.NON_WORKING :
+         case NON_WORKING:
          {
             result = false;
             break;
          }
 
-         case ProjectCalendar.DEFAULT :
+         case DEFAULT:
          {
-            result = isWorkingDay(mpxjCalendar.getBaseCalendar(), day);
+            result = isWorkingDay(mpxjCalendar.getParent(), day);
             break;
          }
       }
@@ -669,19 +651,19 @@ public final class PlannerWriter extends AbstractProjectWriter
 
       switch (mpxjCalendar.getWorkingDay(day))
       {
-         case ProjectCalendar.WORKING :
+         case WORKING:
          {
             result = "0";
             break;
          }
 
-         case ProjectCalendar.NON_WORKING :
+         case NON_WORKING:
          {
             result = "1";
             break;
          }
 
-         case ProjectCalendar.DEFAULT :
+         case DEFAULT:
          {
             result = "2";
             break;
@@ -706,7 +688,7 @@ public final class PlannerWriter extends AbstractProjectWriter
       int hours = cal.get(Calendar.HOUR_OF_DAY);
       int minutes = cal.get(Calendar.MINUTE);
 
-      StringBuffer sb = new StringBuffer(4);
+      StringBuilder sb = new StringBuilder(4);
       sb.append(m_twoDigitFormat.format(hours));
       sb.append(m_twoDigitFormat.format(minutes));
 
@@ -730,7 +712,7 @@ public final class PlannerWriter extends AbstractProjectWriter
       int month = cal.get(Calendar.MONTH) + 1;
       int day = cal.get(Calendar.DAY_OF_MONTH);
 
-      StringBuffer sb = new StringBuffer(8);
+      StringBuilder sb = new StringBuilder(8);
       sb.append(m_fourDigitFormat.format(year));
       sb.append(m_twoDigitFormat.format(month));
       sb.append(m_twoDigitFormat.format(day));
@@ -748,18 +730,23 @@ public final class PlannerWriter extends AbstractProjectWriter
     */
    private String getDateTimeString(Date value)
    {
-      Calendar cal = Calendar.getInstance();
-      cal.setTime(value);
-      StringBuffer sb = new StringBuffer(16);
-      sb.append(m_fourDigitFormat.format(cal.get(Calendar.YEAR)));
-      sb.append(m_twoDigitFormat.format(cal.get(Calendar.MONTH) + 1));
-      sb.append(m_twoDigitFormat.format(cal.get(Calendar.DAY_OF_MONTH)));
-      sb.append('T');
-      sb.append(m_twoDigitFormat.format(cal.get(Calendar.HOUR_OF_DAY)));
-      sb.append(m_twoDigitFormat.format(cal.get(Calendar.MINUTE)));
-      sb.append(m_twoDigitFormat.format(cal.get(Calendar.SECOND)));
-      sb.append('Z');
-      return (sb.toString());
+      String result = null;
+      if (value != null)
+      {
+         Calendar cal = Calendar.getInstance();
+         cal.setTime(value);
+         StringBuilder sb = new StringBuilder(16);
+         sb.append(m_fourDigitFormat.format(cal.get(Calendar.YEAR)));
+         sb.append(m_twoDigitFormat.format(cal.get(Calendar.MONTH) + 1));
+         sb.append(m_twoDigitFormat.format(cal.get(Calendar.DAY_OF_MONTH)));
+         sb.append('T');
+         sb.append(m_twoDigitFormat.format(cal.get(Calendar.HOUR_OF_DAY)));
+         sb.append(m_twoDigitFormat.format(cal.get(Calendar.MINUTE)));
+         sb.append(m_twoDigitFormat.format(cal.get(Calendar.SECOND)));
+         sb.append('Z');
+         result = sb.toString();
+      }
+      return result;
    }
 
    /**
@@ -783,47 +770,47 @@ public final class PlannerWriter extends AbstractProjectWriter
 
          switch (value.getUnits())
          {
-            case MINUTES :
-            case ELAPSED_MINUTES :
+            case MINUTES:
+            case ELAPSED_MINUTES:
             {
                seconds = value.getDuration() * 60;
                break;
             }
 
-            case HOURS :
-            case ELAPSED_HOURS :
+            case HOURS:
+            case ELAPSED_HOURS:
             {
-               seconds = value.getDuration() * (8 * 60 * 60);
+               seconds = value.getDuration() * (60 * 60);
                break;
             }
 
-            case DAYS :
+            case DAYS:
             {
                double minutesPerDay = m_projectFile.getProjectHeader().getMinutesPerDay().doubleValue();
                seconds = value.getDuration() * (minutesPerDay * 60);
                break;
             }
 
-            case ELAPSED_DAYS :
+            case ELAPSED_DAYS:
             {
                seconds = value.getDuration() * (24 * 60 * 60);
                break;
             }
 
-            case WEEKS :
+            case WEEKS:
             {
                double minutesPerWeek = m_projectFile.getProjectHeader().getMinutesPerWeek().doubleValue();
                seconds = value.getDuration() * (minutesPerWeek * 60);
                break;
             }
 
-            case ELAPSED_WEEKS :
+            case ELAPSED_WEEKS:
             {
                seconds = value.getDuration() * (7 * 24 * 60 * 60);
                break;
             }
 
-            case MONTHS :
+            case MONTHS:
             {
                double minutesPerDay = m_projectFile.getProjectHeader().getMinutesPerDay().doubleValue();
                double daysPerMonth = m_projectFile.getProjectHeader().getDaysPerMonth().doubleValue();
@@ -831,13 +818,13 @@ public final class PlannerWriter extends AbstractProjectWriter
                break;
             }
 
-            case ELAPSED_MONTHS :
+            case ELAPSED_MONTHS:
             {
                seconds = value.getDuration() * (30 * 24 * 60 * 60);
                break;
             }
 
-            case YEARS :
+            case YEARS:
             {
                double minutesPerDay = m_projectFile.getProjectHeader().getMinutesPerDay().doubleValue();
                double daysPerMonth = m_projectFile.getProjectHeader().getDaysPerMonth().doubleValue();
@@ -845,13 +832,13 @@ public final class PlannerWriter extends AbstractProjectWriter
                break;
             }
 
-            case ELAPSED_YEARS :
+            case ELAPSED_YEARS:
             {
                seconds = value.getDuration() * (365 * 24 * 60 * 60);
                break;
             }
 
-            default :
+            default:
             {
                break;
             }
@@ -891,6 +878,28 @@ public final class PlannerWriter extends AbstractProjectWriter
       return (value == null ? "" : value);
    }
 
+   /**
+    * Set the encoding used to write the file. By default UTF-8 is used.
+    * 
+    * @param encoding encoding name
+    */
+   public void setEncoding(String encoding)
+   {
+      m_encoding = encoding;
+   }
+
+   /**
+    * Retrieve the encoding used to write teh file. If this value is null,
+    * UTF-8 is used.
+    * 
+    * @return encoding name
+    */
+   public String getEncoding()
+   {
+      return m_encoding;
+   }
+
+   private String m_encoding;
    private ProjectFile m_projectFile;
    private ObjectFactory m_factory;
    private Project m_plannerProject;
@@ -907,4 +916,35 @@ public final class PlannerWriter extends AbstractProjectWriter
       RELATIONSHIP_TYPES.put(RelationType.START_START, "SS");
    }
 
+   /**
+    * Cached context to minimise construction cost.
+    */
+   private static JAXBContext CONTEXT;
+
+   /**
+    * Note any error occurring during context construction.
+    */
+   private static JAXBException CONTEXT_EXCEPTION;
+
+   static
+   {
+      try
+      {
+         //
+         // JAXB RI property to speed up construction
+         //
+         System.setProperty("com.sun.xml.bind.v2.runtime.JAXBContextImpl.fastBoot", "true");
+
+         //
+         // Construct the context
+         //
+         CONTEXT = JAXBContext.newInstance("net.sf.mpxj.planner.schema", PlannerWriter.class.getClassLoader());
+      }
+
+      catch (JAXBException ex)
+      {
+         CONTEXT_EXCEPTION = ex;
+         CONTEXT = null;
+      }
+   }
 }

@@ -29,9 +29,19 @@ package net.sf.mpxj;
 public abstract class AbstractView implements View
 {
    /**
+    * Constructor.
+    * 
+    * @param parent parent file
+    */
+   public AbstractView(ProjectFile parent)
+   {
+      m_parent = parent;
+   }
+
+   /**
     * {@inheritDoc}
     */
-   public Integer getID()
+   @Override public Integer getID()
    {
       return (m_id);
    }
@@ -39,7 +49,7 @@ public abstract class AbstractView implements View
    /**
     * {@inheritDoc}
     */
-   public String getName()
+   @Override public String getName()
    {
       return (m_name);
    }
@@ -47,9 +57,30 @@ public abstract class AbstractView implements View
    /**
     * {@inheritDoc}
     */
-   public ViewType getType()
+   @Override public ViewType getType()
    {
       return (m_type);
+   }
+
+   /**
+    * Retrieve the name of the table part of the view.
+    *
+    * @return table name
+    */
+   public String getTableName()
+   {
+      return (m_tableName);
+   }
+
+   /**
+    * Retrieve an instance of the Table class representing the
+    * table part of this view.
+    *
+    * @return table instance
+    */
+   public Table getTable()
+   {
+      return (m_parent.getTaskTableByName(m_tableName));
    }
 
    /**
@@ -60,10 +91,12 @@ public abstract class AbstractView implements View
     */
    @Override public String toString()
    {
-      return ("[View id=" + m_id + " type=" + m_type + " name=" + m_name + "]");
+      return ("[View id=" + m_id + " type=" + m_type + " name=" + m_name + (m_tableName == null ? "" : " table=" + m_tableName) + "]");
    }
 
+   protected ProjectFile m_parent;
    protected Integer m_id;
    protected String m_name;
    protected ViewType m_type;
+   protected String m_tableName;
 }

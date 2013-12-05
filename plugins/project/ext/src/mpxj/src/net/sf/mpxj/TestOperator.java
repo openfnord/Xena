@@ -23,8 +23,7 @@
 
 package net.sf.mpxj;
 
-import java.util.EnumSet;
-
+import net.sf.mpxj.utility.EnumUtility;
 import net.sf.mpxj.utility.MpxjEnum;
 import net.sf.mpxj.utility.NumberUtility;
 
@@ -183,6 +182,28 @@ public enum TestOperator implements MpxjEnum
       {
          return (evaluateContainsExactly(lhs, rhs));
       }
+   },
+
+   AND(12) // Extension used by MPXJ, Not MS Project
+   {
+      /**
+       * {@inheritDoc}
+       */
+      @Override public boolean evaluate(Object lhs, Object rhs)
+      {
+         throw new UnsupportedOperationException();
+      }
+   },
+
+   OR(13) // Extension used by MPXJ, Not MS Project
+   {
+      /**
+       * {@inheritDoc}
+       */
+      @Override public boolean evaluate(Object lhs, Object rhs)
+      {
+         throw new UnsupportedOperationException();
+      }
    };
 
    /**
@@ -235,7 +256,7 @@ public enum TestOperator implements MpxjEnum
     *
     * @return int representation of the enum
     */
-   public int getValue()
+   @Override public int getValue()
    {
       return (m_value);
    }
@@ -276,20 +297,32 @@ public enum TestOperator implements MpxjEnum
     * @param rhs range operand
     * @return boolean result
     */
-   @SuppressWarnings("unchecked") protected boolean evaluateWithin(Object lhs, Object rhs)
+   @SuppressWarnings(
+   {
+      "unchecked",
+      "rawtypes"
+   }) protected boolean evaluateWithin(Object lhs, Object rhs)
    {
       boolean result = false;
 
-      if (lhs != null && rhs instanceof Object[])
+      if (rhs instanceof Object[])
       {
-         Comparable lhsComparable = (Comparable) lhs;
          Object[] rhsList = (Object[]) rhs;
-         if (rhsList[0] != null && rhsList[1] != null)
+         if (lhs != null)
          {
-            result = (lhsComparable.compareTo(rhsList[0]) >= 0 && lhsComparable.compareTo(rhsList[1]) <= 0);
+            Comparable lhsComparable = (Comparable) lhs;
+            if (rhsList[0] != null && rhsList[1] != null)
+            {
+               // Project also tries with the values flipped
+               result = (lhsComparable.compareTo(rhsList[0]) >= 0 && lhsComparable.compareTo(rhsList[1]) <= 0) || (lhsComparable.compareTo(rhsList[0]) <= 0 && lhsComparable.compareTo(rhsList[1]) >= 0);
+            }
+         }
+         else
+         {
+            // Project also respects null equality (e.g. NA dates)
+            result = rhsList[0] == null || rhsList[1] == null;
          }
       }
-
       return (result);
    }
 
@@ -301,7 +334,11 @@ public enum TestOperator implements MpxjEnum
     * @param rhs operand
     * @return boolean result
     */
-   @SuppressWarnings("unchecked") protected int evaluateCompareTo(Object lhs, Object rhs)
+   @SuppressWarnings(
+   {
+      "unchecked",
+      "rawtypes"
+   }) protected int evaluateCompareTo(Object lhs, Object rhs)
    {
       int result;
 
@@ -380,14 +417,7 @@ public enum TestOperator implements MpxjEnum
    /**
     * Array mapping int types to enums.
     */
-   private static final TestOperator[] TYPE_VALUES = new TestOperator[12];
-   static
-   {
-      for (TestOperator e : EnumSet.range(TestOperator.IS_ANY_VALUE, TestOperator.CONTAINS_EXACTLY))
-      {
-         TYPE_VALUES[e.getValue()] = e;
-      }
-   }
+   private static final TestOperator[] TYPE_VALUES = EnumUtility.createTypeArray(TestOperator.class);
 
    /**
     * Internal representation of the enum int type.

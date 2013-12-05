@@ -24,8 +24,8 @@
 package net.sf.mpxj.mpp;
 
 import java.awt.Color;
-import java.util.EnumSet;
 
+import net.sf.mpxj.utility.EnumUtility;
 import net.sf.mpxj.utility.MpxjEnum;
 import net.sf.mpxj.utility.NumberUtility;
 
@@ -37,19 +37,19 @@ public enum ColorType implements MpxjEnum
    BLACK(0, "Black", Color.BLACK),
    RED(1, "Red", Color.RED),
    YELLOW(2, "Yellow", Color.YELLOW),
-   LIME(3, "Lime", Color.GREEN),
-   AQUA(4, "Aqua", Color.CYAN),
+   LIME(3, "Lime", new Color(148, 255, 148)),
+   AQUA(4, "Aqua", new Color(194, 220, 255)),
    BLUE(5, "Blue", Color.BLUE),
    FUSCHIA(6, "Fuschia", Color.MAGENTA),
    WHITE(7, "White", Color.WHITE),
-   MAROON(8, "Maroon", new Color(132, 0, 0)),
-   GREEN(9, "Green", new Color(0, 130, 0)),
-   OLIVE(10, "Olive", new Color(132, 130, 0)),
-   NAVY(11, "Navy", new Color(0, 0, 132)),
-   PURPLE(12, "Purple", new Color(132, 0, 132)),
-   TEAL(13, "Teal", new Color(0, 130, 132)),
-   GRAY(14, "Gray", new Color(132, 130, 132)),
-   SILVER(15, "Silver", new Color(198, 195, 198)),
+   MAROON(8, "Maroon", new Color(128, 0, 0)),
+   GREEN(9, "Green", new Color(0, 128, 0)),
+   OLIVE(10, "Olive", new Color(128, 128, 0)),
+   NAVY(11, "Navy", new Color(0, 0, 128)),
+   PURPLE(12, "Purple", new Color(128, 0, 128)),
+   TEAL(13, "Teal", new Color(0, 128, 128)),
+   GRAY(14, "Gray", new Color(128, 128, 128)),
+   SILVER(15, "Silver", new Color(192, 192, 192)),
    AUTOMATIC(16, "Automatic", null);
 
    /**
@@ -127,7 +127,7 @@ public enum ColorType implements MpxjEnum
     *
     * @return int representation of the enum
     */
-   public int getValue()
+   @Override public int getValue()
    {
       return (m_value);
    }
@@ -135,14 +135,7 @@ public enum ColorType implements MpxjEnum
    /**
     * Array mapping int types to enums.
     */
-   private static final ColorType[] TYPE_VALUES = new ColorType[17];
-   static
-   {
-      for (ColorType e : EnumSet.range(ColorType.BLACK, ColorType.AUTOMATIC))
-      {
-         TYPE_VALUES[e.getValue()] = e;
-      }
-   }
+   private static final ColorType[] TYPE_VALUES = EnumUtility.createTypeArray(ColorType.class);
 
    /**
     * Internal representation of the enum int type.

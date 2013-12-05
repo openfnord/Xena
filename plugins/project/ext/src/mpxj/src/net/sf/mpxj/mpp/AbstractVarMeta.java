@@ -30,6 +30,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import net.sf.mpxj.FieldType;
+
 /**
  * This class reads in the data from a VarMeta block. This block contains
  * meta data about variable length data items stored in a Var2Data block.
@@ -44,7 +46,7 @@ abstract class AbstractVarMeta extends MPPComponent implements VarMeta
     *
     * @return number of items
     */
-   public int getItemCount()
+   @Override public int getItemCount()
    {
       return (m_itemCount);
    }
@@ -54,7 +56,7 @@ abstract class AbstractVarMeta extends MPPComponent implements VarMeta
     *
     * @return data size
     */
-   public int getDataSize()
+   @Override public int getDataSize()
    {
       return (m_dataSize);
    }
@@ -65,7 +67,7 @@ abstract class AbstractVarMeta extends MPPComponent implements VarMeta
     *
     * @return array of unique identifiers
     */
-   public Integer[] getUniqueIdentifierArray()
+   @Override public Integer[] getUniqueIdentifierArray()
    {
       Integer[] result = new Integer[m_table.size()];
       int index = 0;
@@ -83,7 +85,7 @@ abstract class AbstractVarMeta extends MPPComponent implements VarMeta
     *
     * @return set of unique identifiers
     */
-   public Set<Integer> getUniqueIdentifierSet()
+   @Override public Set<Integer> getUniqueIdentifierSet()
    {
       return (m_table.keySet());
    }
@@ -97,12 +99,12 @@ abstract class AbstractVarMeta extends MPPComponent implements VarMeta
     * @param type data type identifier
     * @return offset of requested item
     */
-   public Integer getOffset(Integer id, Integer type)
+   @Override public Integer getOffset(Integer id, Integer type)
    {
       Integer result = null;
 
       Map<Integer, Integer> map = m_table.get(id);
-      if (map != null)
+      if (map != null && type != null)
       {
          result = map.get(type);
       }
@@ -117,7 +119,7 @@ abstract class AbstractVarMeta extends MPPComponent implements VarMeta
     * @param index index of item in the block
     * @return offset of the item in the block
     */
-   public int getOffset(int index)
+   @Override public int getOffset(int index)
    {
       return (m_offsets[index]);
    }
@@ -125,7 +127,7 @@ abstract class AbstractVarMeta extends MPPComponent implements VarMeta
    /**
     * {@inheritDoc}
     */
-   public Set<Integer> getTypes(Integer id)
+   @Override public Set<Integer> getTypes(Integer id)
    {
       Set<Integer> result;
 
@@ -143,12 +145,32 @@ abstract class AbstractVarMeta extends MPPComponent implements VarMeta
    }
 
    /**
+    * {@inheritDoc}
+    */
+   @Override public boolean containsKey(Integer key)
+   {
+      return m_table.containsKey(key);
+   }
+
+   /**
     * This method dumps the contents of this VarMeta block as a String.
     * Note that this facility is provided as a debugging aid.
     *
     * @return formatted contents of this block
     */
    @Override public String toString()
+   {
+      return toString(null);
+   }
+
+   /**
+    * This method dumps the contents of this VarMeta block as a String.
+    * Note that this facility is provided as a debugging aid.
+    *
+    * @param fieldMap field map used to decode var data keys
+    * @return formatted contents of this block
+    */
+   @Override public String toString(FieldMap fieldMap)
    {
       StringWriter sw = new StringWriter();
       PrintWriter pw = new PrintWriter(sw);
@@ -164,7 +186,8 @@ abstract class AbstractVarMeta extends MPPComponent implements VarMeta
          for (Integer type : map.keySet())
          {
             Integer offset = map.get(type);
-            pw.println("      Type=" + type + " Offset=" + offset);
+            FieldType fieldType = fieldMap == null ? null : fieldMap.getFieldTypeFromVarDataKey(type);
+            pw.println("      Type=" + (fieldType == null ? type : fieldType) + " Offset=" + offset);
          }
       }
 

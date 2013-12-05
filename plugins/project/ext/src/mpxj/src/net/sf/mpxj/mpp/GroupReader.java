@@ -28,9 +28,8 @@ import java.util.Map;
 import net.sf.mpxj.FieldType;
 import net.sf.mpxj.Group;
 import net.sf.mpxj.GroupClause;
-import net.sf.mpxj.MPPResourceField;
-import net.sf.mpxj.MPPTaskField;
 import net.sf.mpxj.ProjectFile;
+import net.sf.mpxj.utility.FieldTypeUtility;
 
 /**
  * This class allows filter definitions to be read from an MPP file.
@@ -74,6 +73,7 @@ public abstract class GroupReader
          String groupName = MPPUtility.getUnicodeString(groupFixedData, 4);
 
          // 8 byte header, 48 byte blocks for each clause
+         //System.out.println(MPPUtility.hexdump(groupVarData, true, 16, ""));
 
          // header=4 byte int for unique id
          // short 4 = show summary tasks
@@ -97,26 +97,8 @@ public abstract class GroupReader
             GroupClause clause = new GroupClause();
             group.addGroupClause(clause);
 
-            int fieldType = MPPUtility.getShort(groupVarData, offset);
-            int entityType = MPPUtility.getByte(groupVarData, offset + 3);
-
-            FieldType type = null;
-            switch (entityType)
-            {
-               case 0x0C :
-               {
-                  type = MPPResourceField.getInstance(fieldType);
-                  break;
-               }
-
-               default :
-               case 0x0B :
-               {
-                  type = MPPTaskField.getInstance(fieldType);
-                  break;
-               }
-            }
-
+            int fieldID = MPPUtility.getInt(groupVarData, offset);
+            FieldType type = FieldTypeUtility.getInstance(fieldID);
             clause.setField(type);
 
             // from byte 0 2 byte short int - field type
@@ -140,15 +122,13 @@ public abstract class GroupReader
             int fontColorIndex = MPPUtility.getByte(groupVarData, offset + 10);
             ColorType fontColor = ColorType.getInstance(fontColorIndex);
 
-            FontStyle fontStyle = new FontStyle(fontBase, italic, bold, underline, fontColor);
+            FontStyle fontStyle = new FontStyle(fontBase, italic, bold, underline, false, fontColor.getColor(), null, BackgroundPattern.SOLID);
             clause.setFont(fontStyle);
 
             int colorIndex = MPPUtility.getByte(groupVarData, offset + 12);
             ColorType color = ColorType.getInstance(colorIndex);
-            clause.setCellBackgroundColor(color);
-
-            int patternIndex = MPPUtility.getByte(groupVarData, offset + 13);
-            clause.setPattern(patternIndex);
+            clause.setCellBackgroundColor(color.getColor());
+            clause.setPattern(BackgroundPattern.getInstance(MPPUtility.getByte(groupVarData, offset + 13) & 0x0F));
 
             // offset+14=group on
             int groupOn = MPPUtility.getShort(groupVarData, offset + 14);
@@ -159,43 +139,45 @@ public abstract class GroupReader
             Object startAt = null;
             Object groupInterval = null;
 
-            switch (type.getDataType())
+            if (type != null)
             {
-               case DURATION :
-               case NUMERIC :
-               case CURRENCY :
+               switch (type.getDataType())
                {
-                  startAt = Double.valueOf(MPPUtility.getDouble(groupVarData, offset + 24));
-                  groupInterval = Double.valueOf(MPPUtility.getDouble(groupVarData, offset + 40));
-                  break;
-               }
+                  case DURATION:
+                  case NUMERIC:
+                  case CURRENCY:
+                  {
+                     startAt = Double.valueOf(MPPUtility.getDouble(groupVarData, offset + 24));
+                     groupInterval = Double.valueOf(MPPUtility.getDouble(groupVarData, offset + 40));
+                     break;
+                  }
 
-               case PERCENTAGE :
-               {
-                  startAt = Integer.valueOf(MPPUtility.getInt(groupVarData, offset + 24));
-                  groupInterval = Integer.valueOf(MPPUtility.getInt(groupVarData, offset + 40));
-                  break;
-               }
+                  case PERCENTAGE:
+                  {
+                     startAt = Integer.valueOf(MPPUtility.getInt(groupVarData, offset + 24));
+                     groupInterval = Integer.valueOf(MPPUtility.getInt(groupVarData, offset + 40));
+                     break;
+                  }
 
-               case BOOLEAN :
-               {
-                  startAt = (MPPUtility.getShort(groupVarData, offset + 24) == 1 ? Boolean.TRUE : Boolean.FALSE);
-                  break;
-               }
+                  case BOOLEAN:
+                  {
+                     startAt = (MPPUtility.getShort(groupVarData, offset + 24) == 1 ? Boolean.TRUE : Boolean.FALSE);
+                     break;
+                  }
 
-               case DATE :
-               {
-                  startAt = MPPUtility.getTimestamp(groupVarData, offset + 24);
-                  groupInterval = Integer.valueOf(MPPUtility.getInt(groupVarData, offset + 40));
-                  break;
-               }
+                  case DATE:
+                  {
+                     startAt = MPPUtility.getTimestamp(groupVarData, offset + 24);
+                     groupInterval = Integer.valueOf(MPPUtility.getInt(groupVarData, offset + 40));
+                     break;
+                  }
 
-               default :
-               {
-                  break;
+                  default:
+                  {
+                     break;
+                  }
                }
             }
-
             clause.setStartAt(startAt);
             clause.setGroupInterval(groupInterval);
 

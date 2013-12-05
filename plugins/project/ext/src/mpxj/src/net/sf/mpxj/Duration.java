@@ -106,7 +106,7 @@ public final class Duration implements Comparable<Duration>
     */
    public static Duration convertUnits(double duration, TimeUnit fromUnits, TimeUnit toUnits, ProjectHeader defaults)
    {
-      return (convertUnits(duration, fromUnits, toUnits, defaults.getMinutesPerDay().doubleValue(), defaults.getMinutesPerWeek().doubleValue()));
+      return (convertUnits(duration, fromUnits, toUnits, defaults.getMinutesPerDay().doubleValue(), defaults.getMinutesPerWeek().doubleValue(), defaults.getDaysPerMonth().doubleValue()));
    }
 
    /**
@@ -120,68 +120,69 @@ public final class Duration implements Comparable<Duration>
     * @param toUnits units to convert to
     * @param minutesPerDay number of minutes per day
     * @param minutesPerWeek number of minutes per week
+    * @param daysPerMonth number of days per month
     * @return new Duration instance
     */
-   public static Duration convertUnits(double duration, TimeUnit fromUnits, TimeUnit toUnits, double minutesPerDay, double minutesPerWeek)
+   public static Duration convertUnits(double duration, TimeUnit fromUnits, TimeUnit toUnits, double minutesPerDay, double minutesPerWeek, double daysPerMonth)
    {
       switch (fromUnits)
       {
-         case YEARS :
+         case YEARS:
          {
             duration *= (minutesPerWeek * 52);
             break;
          }
 
-         case ELAPSED_YEARS :
+         case ELAPSED_YEARS:
          {
             duration *= (60 * 24 * 7 * 52);
             break;
          }
 
-         case MONTHS :
+         case MONTHS:
          {
-            duration *= (minutesPerWeek * 4);
+            duration *= (minutesPerDay * daysPerMonth);
             break;
          }
 
-         case ELAPSED_MONTHS :
+         case ELAPSED_MONTHS:
          {
             duration *= (60 * 24 * 30);
             break;
          }
 
-         case WEEKS :
+         case WEEKS:
          {
             duration *= minutesPerWeek;
             break;
          }
 
-         case ELAPSED_WEEKS :
+         case ELAPSED_WEEKS:
          {
             duration *= (60 * 24 * 7);
             break;
          }
 
-         case DAYS :
+         case DAYS:
          {
             duration *= minutesPerDay;
             break;
          }
 
-         case ELAPSED_DAYS :
+         case ELAPSED_DAYS:
          {
             duration *= (60 * 24);
             break;
          }
 
-         case HOURS :
-         case ELAPSED_HOURS :
+         case HOURS:
+         case ELAPSED_HOURS:
          {
             duration *= 60;
             break;
          }
 
-         default :
+         default:
          {
             break;
          }
@@ -191,14 +192,14 @@ public final class Duration implements Comparable<Duration>
       {
          switch (toUnits)
          {
-            case HOURS :
-            case ELAPSED_HOURS :
+            case HOURS:
+            case ELAPSED_HOURS:
             {
                duration /= 60;
                break;
             }
 
-            case DAYS :
+            case DAYS:
             {
                if (minutesPerDay != 0)
                {
@@ -211,13 +212,13 @@ public final class Duration implements Comparable<Duration>
                break;
             }
 
-            case ELAPSED_DAYS :
+            case ELAPSED_DAYS:
             {
                duration /= (60 * 24);
                break;
             }
 
-            case WEEKS :
+            case WEEKS:
             {
                if (minutesPerWeek != 0)
                {
@@ -230,17 +231,17 @@ public final class Duration implements Comparable<Duration>
                break;
             }
 
-            case ELAPSED_WEEKS :
+            case ELAPSED_WEEKS:
             {
                duration /= (60 * 24 * 7);
                break;
             }
 
-            case MONTHS :
+            case MONTHS:
             {
-               if (minutesPerWeek != 0)
+               if (minutesPerDay != 0 && daysPerMonth != 0)
                {
-                  duration /= (minutesPerWeek * 4);
+                  duration /= (minutesPerDay * daysPerMonth);
                }
                else
                {
@@ -249,13 +250,13 @@ public final class Duration implements Comparable<Duration>
                break;
             }
 
-            case ELAPSED_MONTHS :
+            case ELAPSED_MONTHS:
             {
                duration /= (60 * 24 * 30);
                break;
             }
 
-            case YEARS :
+            case YEARS:
             {
                if (minutesPerWeek != 0)
                {
@@ -268,13 +269,13 @@ public final class Duration implements Comparable<Duration>
                break;
             }
 
-            case ELAPSED_YEARS :
+            case ELAPSED_YEARS:
             {
                duration /= (60 * 24 * 7 * 52);
                break;
             }
 
-            default :
+            default:
             {
                break;
             }
@@ -353,11 +354,11 @@ public final class Duration implements Comparable<Duration>
    /**
     * {@inheritDoc}
     */
-   public int compareTo(Duration rhs)
+   @Override public int compareTo(Duration rhs)
    {
       if (m_units != rhs.m_units)
       {
-         rhs = convertUnits(rhs.m_duration, rhs.m_units, m_units, (8 * 60), (5 * 8 * 60));
+         rhs = convertUnits(rhs.m_duration, rhs.m_units, m_units, (8 * 60), (5 * 8 * 60), 20);
       }
 
       return (m_duration < rhs.m_duration ? -1 : (m_duration == rhs.m_duration ? 0 : 1));

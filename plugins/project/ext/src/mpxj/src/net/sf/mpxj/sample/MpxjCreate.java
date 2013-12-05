@@ -27,10 +27,8 @@ import java.text.SimpleDateFormat;
 
 import net.sf.mpxj.Duration;
 import net.sf.mpxj.ProjectCalendar;
-import net.sf.mpxj.ProjectCalendarException;
 import net.sf.mpxj.ProjectFile;
 import net.sf.mpxj.ProjectHeader;
-import net.sf.mpxj.Relation;
 import net.sf.mpxj.RelationType;
 import net.sf.mpxj.Resource;
 import net.sf.mpxj.ResourceAssignment;
@@ -140,36 +138,6 @@ public class MpxjCreate
       //file.setThousandsSeparator('.');
 
       //
-      // Configure the file to automatically generate identifiers for tasks.
-      //
-      file.setAutoTaskID(true);
-      file.setAutoTaskUniqueID(true);
-
-      //
-      // Configure the file to automatically generate identifiers for resources.
-      //
-      file.setAutoResourceID(true);
-      file.setAutoResourceUniqueID(true);
-
-      //
-      // Configure the file to automatically generate outline levels
-      // and outline numbers.
-      //
-      file.setAutoOutlineLevel(true);
-      file.setAutoOutlineNumber(true);
-
-      //
-      // Configure the file to automatically generate WBS labels
-      //
-      file.setAutoWBS(true);
-
-      //
-      // Configure the file to automatically generate identifiers for calendars
-      // (not strictly necessary here, but required if generating MSPDI files)
-      //
-      file.setAutoCalendarUniqueID(true);
-
-      //
       // Add a default calendar called "Standard"
       //
       ProjectCalendar calendar = file.addDefaultBaseCalendar();
@@ -177,10 +145,7 @@ public class MpxjCreate
       //
       // Add a holiday to the calendar to demonstrate calendar exceptions
       //
-      ProjectCalendarException exception = calendar.addCalendarException();
-      exception.setFromDate(df.parse("13/03/2006"));
-      exception.setToDate(df.parse("13/03/2006"));
-      exception.setWorking(false);
+      calendar.addCalendarException(df.parse("13/03/2006"), df.parse("13/03/2006"));
 
       //
       // Retrieve the project header and set the start date. Note Microsoft
@@ -244,8 +209,7 @@ public class MpxjCreate
       //
       // Link these two tasks
       //
-      Relation rel1 = task3.addPredecessor(task2);
-      rel1.setType(RelationType.FINISH_START);
+      task3.addPredecessor(task2, RelationType.FINISH_START, null);
 
       //
       // Add a milestone
@@ -254,8 +218,7 @@ public class MpxjCreate
       milestone1.setName("Milestone");
       milestone1.setStart(df.parse("21/01/2003"));
       milestone1.setDuration(Duration.getInstance(0, TimeUnit.DAYS));
-      Relation rel2 = milestone1.addPredecessor(task3);
-      rel2.setType(RelationType.FINISH_START);
+      milestone1.addPredecessor(task3, RelationType.FINISH_START, null);
 
       //
       // This final task has a percent complete value, but no
@@ -263,7 +226,7 @@ public class MpxjCreate
       // special processing to generate the MSPDI file correctly.
       //
       Task task4 = file.addTask();
-      task4.setName("Last Task");
+      task4.setName("Next Task");
       task4.setDuration(Duration.getInstance(8, TimeUnit.DAYS));
       task4.setStart(df.parse("01/01/2003"));
       task4.setPercentageComplete(NumberUtility.getDouble(70.0));
@@ -295,6 +258,16 @@ public class MpxjCreate
       assignment2.setRemainingWork(Duration.getInstance(80, TimeUnit.HOURS));
       assignment1.setStart(df.parse("01/01/2003"));
       assignment2.setStart(df.parse("11/01/2003"));
+
+      //
+      // Write a 100% complete task
+      //
+      Task task5 = file.addTask();
+      task5.setName("Last Task");
+      task5.setDuration(Duration.getInstance(3, TimeUnit.DAYS));
+      task5.setStart(df.parse("01/01/2003"));
+      task5.setPercentageComplete(NumberUtility.getDouble(100.0));
+      task5.setActualStart(df.parse("01/01/2003"));
 
       //
       // Write the file

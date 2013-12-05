@@ -23,6 +23,8 @@
 
 package net.sf.mpxj.mpp;
 
+import java.awt.Color;
+
 /**
  * This class builds on the font described by a FontBase instance
  * and add attributes for color, bold, italic and underline.
@@ -36,15 +38,21 @@ public class FontStyle
     * @param italic italic flag
     * @param bold bold flag
     * @param underline underline flag
+    * @param strikethrough strikethrough flag
     * @param color color type
+    * @param backgroundColor background color
+    * @param backgroundPattern background pattern
     */
-   public FontStyle(FontBase fontBase, boolean italic, boolean bold, boolean underline, ColorType color)
+   public FontStyle(FontBase fontBase, boolean italic, boolean bold, boolean underline, boolean strikethrough, Color color, Color backgroundColor, BackgroundPattern backgroundPattern)
    {
       m_fontBase = fontBase;
       m_italic = italic;
       m_bold = bold;
       m_underline = underline;
+      m_strikethrough = strikethrough;
       m_color = color;
+      m_backgroundColor = backgroundColor;
+      m_backgroundPattern = backgroundPattern;
    }
 
    /**
@@ -72,7 +80,7 @@ public class FontStyle
     *
     * @return font color
     */
-   public ColorType getColor()
+   public Color getColor()
    {
       return (m_color);
    }
@@ -98,16 +106,49 @@ public class FontStyle
    }
 
    /**
+    * Retrieve the strikethrough flag.
+    *
+    * @return strikethrough flag
+    */
+   public boolean getStrikethrough()
+   {
+      return (m_strikethrough);
+   }
+
+   /**
+    * Retrieve the background color.
+    * 
+    * @return background color
+    */
+   public Color getBackgroundColor()
+   {
+      return m_backgroundColor;
+   }
+
+   /**
+    * Retrieve the background pattern.
+    * 
+    * @return background pattern
+    */
+   public BackgroundPattern getBackgroundPattern()
+   {
+      return m_backgroundPattern;
+   }
+
+   /**
     * {@inheritDoc}
     */
    @Override public String toString()
    {
-      return ("[FontStyle fontBase=" + m_fontBase + " italic=" + m_italic + " bold=" + m_bold + " underline=" + m_underline + " color=" + m_color + "]");
+      return ("[FontStyle fontBase=" + m_fontBase + " italic=" + m_italic + " bold=" + m_bold + " underline=" + m_underline + " strikethrough=" + m_strikethrough + " color=" + m_color + " backgroundColor=" + m_backgroundColor + " backgroundPattern=" + m_backgroundPattern + "]");
    }
 
    private FontBase m_fontBase;
    private boolean m_italic;
    private boolean m_bold;
    private boolean m_underline;
-   private ColorType m_color;
+   private boolean m_strikethrough;
+   private Color m_color;
+   private Color m_backgroundColor;
+   private BackgroundPattern m_backgroundPattern;
 }

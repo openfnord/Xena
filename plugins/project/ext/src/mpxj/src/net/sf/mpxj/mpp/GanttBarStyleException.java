@@ -26,55 +26,38 @@ package net.sf.mpxj.mpp;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 
-import net.sf.mpxj.MPPTaskField;
-
 /**
  * This class represents the default style for a Gantt chart bar.
  */
 public final class GanttBarStyleException extends GanttBarCommonStyle
 {
    /**
-    * Constructor.
-    *
-    * @param data data from MS project
-    * @param offset offset into data
-    */
-   public GanttBarStyleException(byte[] data, int offset)
-   {
-      m_taskID = MPPUtility.getInt(data, offset);
-      m_barStyleIndex = MPPUtility.getShort(data, offset + 4) - 1;
-      m_middleShape = data[offset + 6];
-      m_middlePattern = data[offset + 7];
-      m_middleColor = ColorType.getInstance(data[offset + 8]);
-      m_startShapeAndStyle = data[offset + 9];
-      m_startColor = ColorType.getInstance(data[offset + 10]);
-      m_endShapeAndStyle = data[offset + 11];
-      m_endColor = ColorType.getInstance(data[offset + 12]);
-
-      m_leftText = MPPTaskField.getInstance(MPPUtility.getShort(data, offset + 16));
-      m_rightText = MPPTaskField.getInstance(MPPUtility.getShort(data, offset + 20));
-      m_topText = MPPTaskField.getInstance(MPPUtility.getShort(data, offset + 24));
-      m_bottomText = MPPTaskField.getInstance(MPPUtility.getShort(data, offset + 28));
-      m_insideText = MPPTaskField.getInstance(MPPUtility.getShort(data, offset + 32));
-   }
-
-   /**
     * Retrieve the unique task ID for the task to which this style
     * exception applies.
     *
     * @return task ID
     */
-   public int getTaskID()
+   public int getTaskUniqueID()
    {
-      return (m_taskID);
+      return (m_taskUniqueID);
+   }
+
+   /**
+    * Sets the task unique ID.
+    * 
+    * @param id task unique ID
+    */
+   public void setTaskUniqueID(int id)
+   {
+      m_taskUniqueID = id;
    }
 
    /**
     * Retrieves the index of the bar style to which this exception applies.
-    * The standar bar styles are held in an array, retrieved using the
+    * The standard bar styles are held in an array, retrieved using the
     * GanttChartView.getBarStyles() method. The index returned by this method
     * is an index into the array of bar styles. The significance of this is
-    * that a single bar a=on a Gantt chart could have one or more exceptions
+    * that a single bar on a Gantt chart could have one or more exceptions
     * associated wit it, but the exceptions will only be applied if the style
     * of the bar currently being displayed matches the style recorded here
     * in the style exception.
@@ -87,6 +70,16 @@ public final class GanttBarStyleException extends GanttBarCommonStyle
    }
 
    /**
+    * Sets the bar style index.
+    * 
+    * @param index bar style index
+    */
+   public void setBarStyleIndex(int index)
+   {
+      m_barStyleIndex = index;
+   }
+
+   /**
     * Generate a string representation of this instance.
     *
     * @return string representation of this instance
@@ -96,7 +89,7 @@ public final class GanttBarStyleException extends GanttBarCommonStyle
       ByteArrayOutputStream os = new ByteArrayOutputStream();
       PrintWriter pw = new PrintWriter(os);
       pw.println("   [GanttBarStyleException");
-      pw.println("      TaskID=" + m_taskID);
+      pw.println("      TaskID=" + m_taskUniqueID);
       pw.println("      BarStyleIndex=" + m_barStyleIndex);
       pw.println(super.toString());
       pw.println("   ]");
@@ -104,6 +97,6 @@ public final class GanttBarStyleException extends GanttBarCommonStyle
       return (os.toString());
    }
 
-   private int m_taskID;
+   private int m_taskUniqueID;
    private int m_barStyleIndex;
 }

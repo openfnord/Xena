@@ -41,11 +41,11 @@ public final class SplitTaskFactory
     * @param timephasedComplete completed resource assignment work
     * @param timephasedPlanned planned resource assignment work
     */
-   public void processSplitData(Task task, List<TimephasedResourceAssignment> timephasedComplete, List<TimephasedResourceAssignment> timephasedPlanned)
+   public void processSplitData(Task task, List<TimephasedWork> timephasedComplete, List<TimephasedWork> timephasedPlanned)
    {
       Date splitsComplete = null;
-      TimephasedResourceAssignment lastComplete = null;
-      TimephasedResourceAssignment firstPlanned = null;
+      TimephasedWork lastComplete = null;
+      TimephasedWork firstPlanned = null;
       if (!timephasedComplete.isEmpty())
       {
          lastComplete = timephasedComplete.get(timephasedComplete.size() - 1);
@@ -58,11 +58,11 @@ public final class SplitTaskFactory
       }
 
       LinkedList<DateRange> splits = new LinkedList<DateRange>();
-      TimephasedResourceAssignment lastAssignment = null;
+      TimephasedWork lastAssignment = null;
       DateRange lastRange = null;
-      for (TimephasedResourceAssignment assignment : timephasedComplete)
+      for (TimephasedWork assignment : timephasedComplete)
       {
-         if (lastAssignment != null && lastRange != null && lastAssignment.getTotalWork().getDuration() != 0 && assignment.getTotalWork().getDuration() != 0)
+         if (lastAssignment != null && lastRange != null && lastAssignment.getTotalAmount().getDuration() != 0 && assignment.getTotalAmount().getDuration() != 0)
          {
             splits.removeLast();
             lastRange = new DateRange(lastRange.getStart(), assignment.getFinish());
@@ -80,7 +80,7 @@ public final class SplitTaskFactory
       // complete split.
       //
       Date splitStart = null;
-      if (lastComplete != null && firstPlanned != null && lastComplete.getTotalWork().getDuration() != 0 && firstPlanned.getTotalWork().getDuration() != 0)
+      if (lastComplete != null && firstPlanned != null && lastComplete.getTotalAmount().getDuration() != 0 && firstPlanned.getTotalAmount().getDuration() != 0)
       {
          lastRange = splits.removeLast();
          splitStart = lastRange.getStart();
@@ -88,11 +88,11 @@ public final class SplitTaskFactory
 
       lastAssignment = null;
       lastRange = null;
-      for (TimephasedResourceAssignment assignment : timephasedPlanned)
+      for (TimephasedWork assignment : timephasedPlanned)
       {
          if (splitStart == null)
          {
-            if (lastAssignment != null && lastRange != null && lastAssignment.getTotalWork().getDuration() != 0 && assignment.getTotalWork().getDuration() != 0)
+            if (lastAssignment != null && lastRange != null && lastAssignment.getTotalAmount().getDuration() != 0 && assignment.getTotalAmount().getDuration() != 0)
             {
                splits.removeLast();
                lastRange = new DateRange(lastRange.getStart(), assignment.getFinish());

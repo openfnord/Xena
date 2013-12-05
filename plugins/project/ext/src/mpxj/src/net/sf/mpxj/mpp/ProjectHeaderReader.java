@@ -23,6 +23,7 @@
 
 package net.sf.mpxj.mpp;
 
+import net.sf.mpxj.Day;
 import net.sf.mpxj.MPXJException;
 import net.sf.mpxj.ProjectFile;
 import net.sf.mpxj.ProjectHeader;
@@ -46,6 +47,7 @@ public final class ProjectHeaderReader
     */
    public void process(ProjectFile file, Props props, DirectoryEntry rootDir) throws MPXJException
    {
+      //MPPUtility.fileDump("c:\\temp\\props.txt", props.toString().getBytes());
       ProjectHeader ph = file.getProjectHeader();
       ph.setStartDate(props.getTimestamp(Props.PROJECT_START_DATE));
       ph.setFinishDate(props.getTimestamp(Props.PROJECT_FINISH_DATE));
@@ -72,6 +74,12 @@ public final class ProjectHeaderReader
       //ph.setDecimalSeparator();
       ph.setSymbolPosition(MPPUtility.getSymbolPosition(props.getShort(Props.CURRENCY_PLACEMENT)));
       //ph.setThousandsSeparator();
+      ph.setWeekStartDay(Day.getInstance(props.getShort(Props.WEEK_START_DAY) + 1));
+      ph.setFiscalYearStartMonth(Integer.valueOf(props.getShort(Props.FISCAL_YEAR_START_MONTH)));
+      ph.setFiscalYearStart(props.getShort(Props.FISCAL_YEAR_START) == 1);
+      ph.setDaysPerMonth(Integer.valueOf(props.getShort(Props.DAYS_PER_MONTH)));
+      ph.setEditableActualCosts(props.getBoolean(Props.EDITABLE_ACTUAL_COSTS));
+      ph.setHonorConstraints(!props.getBoolean(Props.HONOR_CONSTRAINTS));
 
       SummaryInformation summary = new SummaryInformation(rootDir);
       ph.setProjectTitle(summary.getProjectTitle());
@@ -88,5 +96,17 @@ public final class ProjectHeaderReader
       ph.setDocumentSummaryInformation(summary.getDocumentSummaryInformation());
 
       ph.setCalculateMultipleCriticalPaths(props.getBoolean(Props.CALCULATE_MULTIPLE_CRITICAL_PATHS));
+
+      ph.setBaselineDate(0, props.getTimestamp(Props.BASELINE_DATE));
+      ph.setBaselineDate(1, props.getTimestamp(Props.BASELINE1_DATE));
+      ph.setBaselineDate(2, props.getTimestamp(Props.BASELINE2_DATE));
+      ph.setBaselineDate(3, props.getTimestamp(Props.BASELINE3_DATE));
+      ph.setBaselineDate(4, props.getTimestamp(Props.BASELINE4_DATE));
+      ph.setBaselineDate(5, props.getTimestamp(Props.BASELINE5_DATE));
+      ph.setBaselineDate(6, props.getTimestamp(Props.BASELINE6_DATE));
+      ph.setBaselineDate(7, props.getTimestamp(Props.BASELINE7_DATE));
+      ph.setBaselineDate(8, props.getTimestamp(Props.BASELINE8_DATE));
+      ph.setBaselineDate(9, props.getTimestamp(Props.BASELINE9_DATE));
+      ph.setBaselineDate(10, props.getTimestamp(Props.BASELINE10_DATE));
    }
 }

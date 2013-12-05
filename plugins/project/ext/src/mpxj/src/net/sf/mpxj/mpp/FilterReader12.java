@@ -2,7 +2,7 @@
  * file:       FilterReader12.java
  * author:     Jon Iles
  * copyright:  (c) Packwood Software 2006
- * date:       Oct 31, 2006
+ * date:       2006-10-31
  */
 
 /*
@@ -29,14 +29,21 @@ package net.sf.mpxj.mpp;
 public final class FilterReader12 extends FilterReader
 {
    /**
-    * Retrieves the type used for the VarData lookup.
-    * 
-    * @return VarData type
+    * {@inheritDoc}
     */
    @Override protected Integer getVarDataType()
    {
       return (FILTER_DATA);
    }
 
+   /**
+    * {@inheritDoc}
+    */
+   @Override protected CriteriaReader getCriteriaReader()
+   {
+      return m_criteraReader;
+   }
+
+   private CriteriaReader m_criteraReader = new FilterCriteriaReader12();
    private static final Integer FILTER_DATA = Integer.valueOf(6);
 }

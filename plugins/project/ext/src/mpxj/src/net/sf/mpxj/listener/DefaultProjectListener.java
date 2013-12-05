@@ -23,7 +23,10 @@
 
 package net.sf.mpxj.listener;
 
+import net.sf.mpxj.ProjectCalendar;
+import net.sf.mpxj.Relation;
 import net.sf.mpxj.Resource;
+import net.sf.mpxj.ResourceAssignment;
 import net.sf.mpxj.Task;
 
 /**
@@ -37,7 +40,7 @@ public class DefaultProjectListener implements ProjectListener
    /**
     * {@inheritDoc}
     */
-   public void taskRead(Task task)
+   @Override public void taskRead(Task task)
    {
       // default implementation
    }
@@ -45,7 +48,7 @@ public class DefaultProjectListener implements ProjectListener
    /**
     * {@inheritDoc}
     */
-   public void taskWritten(Task task)
+   @Override public void taskWritten(Task task)
    {
       // default implementation
    }
@@ -53,7 +56,7 @@ public class DefaultProjectListener implements ProjectListener
    /**
     * {@inheritDoc}
     */
-   public void resourceRead(Resource resource)
+   @Override public void resourceRead(Resource resource)
    {
       // default implementation
    }
@@ -61,7 +64,55 @@ public class DefaultProjectListener implements ProjectListener
    /**
     * {@inheritDoc}
     */
-   public void resourceWritten(Resource resource)
+   @Override public void resourceWritten(Resource resource)
+   {
+      // default implementation
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override public void calendarRead(ProjectCalendar calendar)
+   {
+      // default implementation
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override public void calendarWritten(ProjectCalendar calendar)
+   {
+      // default implementation
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override public void assignmentRead(ResourceAssignment assignment)
+   {
+      // default implementation
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override public void assignmentWritten(ResourceAssignment assignment)
+   {
+      // default implementation
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override public void relationRead(Relation relation)
+   {
+      // default implementation
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override public void relationWritten(Relation relation)
    {
       // default implementation
    }

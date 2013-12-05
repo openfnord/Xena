@@ -23,8 +23,7 @@
 
 package net.sf.mpxj;
 
-import java.util.EnumSet;
-
+import net.sf.mpxj.utility.EnumUtility;
 import net.sf.mpxj.utility.MpxjEnum;
 import net.sf.mpxj.utility.NumberUtility;
 
@@ -87,7 +86,7 @@ public enum TaskType implements MpxjEnum
     *
     * @return int representation of the enum
     */
-   public int getValue()
+   @Override public int getValue()
    {
       return (m_value);
    }
@@ -95,14 +94,7 @@ public enum TaskType implements MpxjEnum
    /**
     * Array mapping int types to enums.
     */
-   private static final TaskType[] TYPE_VALUES = new TaskType[3];
-   static
-   {
-      for (TaskType e : EnumSet.range(TaskType.FIXED_UNITS, TaskType.FIXED_WORK))
-      {
-         TYPE_VALUES[e.getValue()] = e;
-      }
-   }
+   private static final TaskType[] TYPE_VALUES = EnumUtility.createTypeArray(TaskType.class);
 
    /**
     * Internal representation of the enum int type.

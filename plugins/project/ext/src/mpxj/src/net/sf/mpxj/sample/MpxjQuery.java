@@ -32,6 +32,7 @@ import net.sf.mpxj.ProjectCalendar;
 import net.sf.mpxj.ProjectFile;
 import net.sf.mpxj.ProjectHeader;
 import net.sf.mpxj.Relation;
+import net.sf.mpxj.RelationType;
 import net.sf.mpxj.Resource;
 import net.sf.mpxj.ResourceAssignment;
 import net.sf.mpxj.Task;
@@ -81,6 +82,8 @@ public class MpxjQuery
       ProjectReader reader = ProjectReaderUtility.getProjectReader(filename);
       ProjectFile mpx = reader.read(filename);
 
+      System.out.println("MPP file type: " + mpx.getMppFileType());
+
       listProjectHeader(mpx);
 
       listResources(mpx);
@@ -99,7 +102,7 @@ public class MpxjQuery
 
       listResourceNotes(mpx);
 
-      listPredecessors(mpx);
+      listRelationships(mpx);
 
       listSlack(mpx);
 
@@ -146,45 +149,36 @@ public class MpxjQuery
    private static void listTasks(ProjectFile file)
    {
       SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm z");
-      String startDate;
-      String finishDate;
-      String duration;
-      Date date;
-      Duration dur;
 
       for (Task task : file.getAllTasks())
       {
-         date = task.getStart();
-         if (date != null)
-         {
-            startDate = df.format(date);
-         }
-         else
-         {
-            startDate = "(no date supplied)";
-         }
+         Date date = task.getStart();
+         String startDate = date != null ? df.format(date) : "(no start date supplied)";
 
          date = task.getFinish();
-         if (date != null)
+         String finishDate = date != null ? df.format(date) : "(no finish date supplied)";
+
+         Duration dur = task.getDuration();
+         String duration = dur != null ? dur.toString() : "(no duration supplied)";
+
+         dur = task.getActualDuration();
+         String actualDuration = dur != null ? dur.toString() : "(no actual duration supplied)";
+
+         String baselineDuration = task.getBaselineDurationText();
+         if (baselineDuration == null)
          {
-            finishDate = df.format(date);
-         }
-         else
-         {
-            finishDate = "(no date supplied)";
+            dur = task.getBaselineDuration();
+            if (dur != null)
+            {
+               baselineDuration = dur.toString();
+            }
+            else
+            {
+               baselineDuration = "(no duration supplied)";
+            }
          }
 
-         dur = task.getDuration();
-         if (dur != null)
-         {
-            duration = dur.toString();
-         }
-         else
-         {
-            duration = "(no duration supplied)";
-         }
-
-         System.out.println("Task: " + task.getName() + " ID=" + task.getID() + " Unique ID=" + task.getUniqueID() + " (Start Date=" + startDate + " Finish Date=" + finishDate + " Duration=" + duration + " Outline Level=" + task.getOutlineLevel() + " Outline Number=" + task.getOutlineNumber() + ")");
+         System.out.println("Task: " + task.getName() + " ID=" + task.getID() + " Unique ID=" + task.getUniqueID() + " (Start Date=" + startDate + " Finish Date=" + finishDate + " Duration=" + duration + " Actual Duration" + actualDuration + " Baseline Duration=" + baselineDuration + " Outline Level=" + task.getOutlineLevel() + " Outline Number=" + task.getOutlineNumber() + " Recurring=" + task.getRecurring() + ")");
       }
       System.out.println();
    }
@@ -359,66 +353,69 @@ public class MpxjQuery
    }
 
    /**
-    * This method lists the predecessors for each task which has
-    * predecessors.
+    * This method lists task predecessor and successor relationships.
     *
-    * @param file MPX file
+    * @param file project file
     */
-   private static void listPredecessors(ProjectFile file)
+   private static void listRelationships(ProjectFile file)
    {
       for (Task task : file.getAllTasks())
       {
-         List<Relation> predecessors = task.getPredecessors();
-         if (predecessors != null && predecessors.isEmpty() == false)
+         System.out.print(task.getID());
+         System.out.print('\t');
+         System.out.print(task.getName());
+         System.out.print('\t');
+
+         dumpRelationList(task.getPredecessors());
+         System.out.print('\t');
+         dumpRelationList(task.getSuccessors());
+         System.out.println();
+      }
+   }
+
+   /**
+    * Internal utility to dump relationship lists in a structured format
+    * that can easily be compared with the tabular data in MS Project.
+    * 
+    * @param relations relation list
+    */
+   private static void dumpRelationList(List<Relation> relations)
+   {
+      if (relations != null && relations.isEmpty() == false)
+      {
+         if (relations.size() > 1)
          {
-            System.out.println(task.getName() + " predecessors:");
-            for (Relation relation : predecessors)
+            System.out.print('"');
+         }
+         boolean first = true;
+         for (Relation relation : relations)
+         {
+            if (!first)
             {
-               System.out.println("   Task: " + file.getTaskByUniqueID(relation.getTaskUniqueID()).getName());
-               System.out.println("   Type: " + relation.getType());
-               System.out.println("   Lag: " + relation.getDuration());
+               System.out.print(',');
+            }
+            first = false;
+            System.out.print(relation.getTargetTask().getID());
+            Duration lag = relation.getLag();
+            if (relation.getType() != RelationType.FINISH_START || lag.getDuration() != 0)
+            {
+               System.out.print(relation.getType());
+            }
+
+            if (lag.getDuration() != 0)
+            {
+               if (lag.getDuration() > 0)
+               {
+                  System.out.print("+");
+               }
+               System.out.print(lag);
             }
          }
+         if (relations.size() > 1)
+         {
+            System.out.print('"');
+         }
       }
-
-      //
-      // The following code is useful to produce output which can be compared
-      // directly with tabular data from MS Project.
-      //
-      /*      
-            for (Task task: file.getAllTasks())
-            {
-               System.out.print(task.getID());
-               System.out.print('\t');
-               System.out.print(task.getName());
-               System.out.print('\t');
-               
-               List<Relation> predecessors = task.getPredecessors();
-               if (predecessors != null && predecessors.isEmpty() == false)
-               {
-                  if (predecessors.size() > 1)
-                  {
-                     System.out.print('"');
-                  }
-                  boolean first = true;
-                  for (Relation relation : predecessors)
-                  {
-                     if (!first)
-                     {
-                        System.out.print(',');
-                     }
-                     first = false;
-                     System.out.print(relation.getTaskID());               
-                  }
-                  if (predecessors.size() > 1)
-                  {
-                     System.out.print('"');
-                  }            
-               }
-               
-               System.out.println();
-            }    
-      */
    }
 
    /**
@@ -441,12 +438,7 @@ public class MpxjQuery
     */
    private static void listCalendars(ProjectFile file)
    {
-      for (ProjectCalendar cal : file.getBaseCalendars())
-      {
-         System.out.println(cal.toString());
-      }
-
-      for (ProjectCalendar cal : file.getResourceCalendars())
+      for (ProjectCalendar cal : file.getCalendars())
       {
          System.out.println(cal.toString());
       }

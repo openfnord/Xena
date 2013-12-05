@@ -50,7 +50,7 @@ public final class GraphicalIndicatorReader
    public void process(ProjectFile file, Props props)
    {
       m_file = file;
-      m_data = props.getByteArray(Props.GRAPHICAL_INDICATOR_DATA);
+      m_data = props.getByteArray(Props.TASK_FIELD_ATTRIBUTES);
 
       if (m_data != null)
       {
@@ -83,13 +83,13 @@ public final class GraphicalIndicatorReader
       FieldType type = null;
       switch (entityType)
       {
-         case 0x0B :
+         case 0x0B:
          {
             type = MPPTaskField.getInstance(fieldType);
             break;
          }
 
-         case 0x0C :
+         case 0x0C:
          {
             type = MPPResourceField.getInstance(fieldType);
             break;
@@ -108,7 +108,7 @@ public final class GraphicalIndicatorReader
       indicator.setShowDataValuesInToolTips((flags & 0x01) != 0);
       m_dataOffset += 20;
 
-      //int nonSummaryRowOffset = MPPUtility.getInt(m_data, m_dataOffset) -36;
+      int nonSummaryRowOffset = MPPUtility.getInt(m_data, m_dataOffset) - 36;
       m_dataOffset += 4;
 
       int summaryRowOffset = MPPUtility.getInt(m_data, m_dataOffset) - 36;
@@ -126,6 +126,8 @@ public final class GraphicalIndicatorReader
       int maxNonSummaryRowOffset = m_dataOffset + summaryRowOffset;
       int maxSummaryRowOffset = m_dataOffset + projectSummaryOffset;
       int maxProjectSummaryOffset = m_dataOffset + dataSize;
+
+      m_dataOffset += nonSummaryRowOffset;
 
       while (m_dataOffset + 2 < maxNonSummaryRowOffset)
       {
@@ -154,7 +156,7 @@ public final class GraphicalIndicatorReader
    private GraphicalIndicatorCriteria processCriteria(FieldType type)
    {
       GraphicalIndicatorCriteria criteria = new GraphicalIndicatorCriteria(m_file);
-      criteria.setField(type);
+      criteria.setLeftValue(type);
 
       int indicatorType = MPPUtility.getInt(m_data, m_dataOffset);
       m_dataOffset += 4;
@@ -202,11 +204,11 @@ public final class GraphicalIndicatorReader
          m_dataOffset += 4;
          if (type instanceof TaskField)
          {
-            criteria.setValue(index, MPPTaskField.getInstance(field));
+            criteria.setRightValue(index, MPPTaskField.getInstance(field));
          }
          else
          {
-            criteria.setValue(index, MPPResourceField.getInstance(field));
+            criteria.setRightValue(index, MPPResourceField.getInstance(field));
          }
       }
       else
@@ -216,55 +218,55 @@ public final class GraphicalIndicatorReader
 
          switch (type.getDataType())
          {
-            case DURATION : // 0x03
+            case DURATION: // 0x03
             {
                Duration value = MPPUtility.getAdjustedDuration(m_file, MPPUtility.getInt(m_data, m_dataOffset), MPPUtility.getDurationTimeUnits(MPPUtility.getShort(m_data, m_dataOffset + 4)));
                m_dataOffset += 6;
-               criteria.setValue(index, value);
+               criteria.setRightValue(index, value);
                break;
             }
 
-            case NUMERIC : // 0x05
+            case NUMERIC: // 0x05
             {
                Double value = Double.valueOf(MPPUtility.getDouble(m_data, m_dataOffset));
                m_dataOffset += 8;
-               criteria.setValue(index, value);
+               criteria.setRightValue(index, value);
                break;
             }
 
-            case CURRENCY : // 0x06
+            case CURRENCY: // 0x06
             {
                Double value = Double.valueOf(MPPUtility.getDouble(m_data, m_dataOffset) / 100);
                m_dataOffset += 8;
-               criteria.setValue(index, value);
+               criteria.setRightValue(index, value);
                break;
             }
 
-            case STRING : // 0x08
+            case STRING: // 0x08
             {
                String value = MPPUtility.getUnicodeString(m_data, m_dataOffset);
                m_dataOffset += ((value.length() + 1) * 2);
-               criteria.setValue(index, value);
+               criteria.setRightValue(index, value);
                break;
             }
 
-            case BOOLEAN : // 0x0B
+            case BOOLEAN: // 0x0B
             {
                int value = MPPUtility.getShort(m_data, m_dataOffset);
                m_dataOffset += 2;
-               criteria.setValue(index, value == 1 ? Boolean.TRUE : Boolean.FALSE);
+               criteria.setRightValue(index, value == 1 ? Boolean.TRUE : Boolean.FALSE);
                break;
             }
 
-            case DATE : // 0x13
+            case DATE: // 0x13
             {
                Date value = MPPUtility.getTimestamp(m_data, m_dataOffset);
                m_dataOffset += 4;
-               criteria.setValue(index, value);
+               criteria.setRightValue(index, value);
                break;
             }
 
-            default :
+            default:
             {
                break;
             }

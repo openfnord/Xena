@@ -8,6 +8,144 @@
 
    <body> 
 
+	<release version="4.4.0" date="CVS HEAD">
+		<action dev="joniles" type="add">Added support for writing Primavera PM XML files.</action>
+		<action dev="joniles" type="add">Added support for reading Asta Powerproject PP and MDB files.</action>
+		<action dev="joniles" type="add">Added support for writing SDEF files (Contributed by William Iverson).</action>		
+		<action dev="joniles" type="add">Added support for reading Enterprise Custom Fields 1-50 for Task, Resources, and Resource Assignments.</action>		
+		<action dev="joniles" type="add">Added MpxjExtensionMethods assembly to simplify working with Java types in .Net (Contributed by Kyle Patmore)</action>				
+		<action dev="joniles" type="update">Provided two new .Net DLL versions in addition to the original version. These allow properties to be accessed in a ".Net style", and for languages apart from VB, provide .Net style method names.</action>
+		<action dev="joniles" type="update">Updated to remove the distinction between base calendar and resource calendars in the ProjectFile class.</action>		
+		<action dev="joniles" type="fix">Updated to improve support for custom outline codes (Contributed by Gary McKenney)</action>		
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3479557: getTimephasedOvertimeWork can return TimephasedWork with NaN</action>
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3480621: Support for timephased cost for cost type resources</action>
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3496435: Rolled Up tasks don't use default duration units</action>		
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3528901: Extract Primavera Task ID</action>		
+		<action dev="joniles" type="fix">Updated to fix an issue where the resource assignment delay attribute was not being read from or written to MSPDI files correctly</action>
+		<action dev="joniles" type="fix">Updated to fix an issue where derived calendars were not being read correctly from MPP files</action>
+		<action dev="joniles" type="update">Updated to use IKVM 7.2.</action>
+	</release>
+	
+	<release version="4.3.0" date="08/02/2012">
+		<action dev="joniles" type="add">Added support for reading Primavera PM XML files.</action>
+		<action dev="joniles" type="add">Added support for reading timephased cost, and timephased baseline cost and baseline work from MPP files.</action>
+		<action dev="joniles" type="add">Added support for Work Weeks in MSPDI files (SourceForge feature request 3429673).</action>
+		<action dev="joniles" type="update">Updated to use IKVM 7.0.</action>		
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3290224: Incorrect order of tasks when writing an MSPDI file (contributed by Jonathan Besanceney).</action>		
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3367438: ResourceAssignment.getTaskUniqueID() returns null.</action>		
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3431729: Wrong project name in MPX file.</action>
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3431731: Wrong title in XML file when importing from XER file.</action>
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3431728  Wrong record number for resource calendar in MPX file.</action>
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3431734: In the XML file the element field SaveVersion is missing.</action>		
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3410406: Loop when import task with 0% on units of works in resources.</action>			
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3378693: French locale NA incorrect.</action>		
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3435755: Invalid dependency between child and parent.</action>		
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3435733: Missing tasks from MS Project 2010 mpp file.</action>				
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3441494: Wrong WBS code and WBS when converting a Primavera XER file.</action>	
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3441426: Error reading XER file with German localisation for numbers.</action>	
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3407988: TimephasedResourceAssignments with negative TotalWork.</action>		
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3448059: Wrong currency symbol in the exported file.</action>
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 2891096: TimephasedResourceAssignment end date not correct.</action>	
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3007420: Calendar hours are incorrect.</action>		
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3476012: NullReferenceException with getTimephasedBaselineWork.</action>		
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3481612: Outline number is null when opening Project 2003 MPP file.</action>		
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3482155: Unable to parse note (unknown locale).</action>
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3483865: MPP9Reader marks all tasks after a null task as null.</action>																		
+		<action dev="joniles" type="fix">Updated to fix an issue where the Task critical attribute was incorrectly calculated for some manually scheduled tasks.</action>						
+		<action dev="joniles" type="fix">Updated to fix an issue where the Task summary attribute was not set correctly when using certain methods to add or remove child tasks.</action>		
+		<action dev="joniles" type="fix">Updated to fix an issue where subprojects were not read correctly (Contributed by Gary McKenney).</action>
+	</release>
+
+	<release version="4.2.0" date="23/06/2011">
+		<action dev="joniles" type="add">Added support for resource assignment fields Baseline Cost 1-n, Baseline Work 1-n, Baseline Start 1-n, Baseline Finish 1-n, Start 1-n, Finish 1-n, Date 1-n, Duration 1-n, Cost 1-n, Text 1-n, Number 1-n, Flag 1-n, for MPP, MPD, and MSPDI files.</action>
+		<action dev="joniles" type="add">Added support for task suspend date, task resume date, and task code read from Primavera, and represented in MS Project custom fields Date1, Date2, and Text1 respectively.</action>
+		<action dev="joniles" type="add">Added support for retrieving the table associated with any view.</action>		
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3317333: Error converting Mpp to planner.</action>
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3316806: MSPDI Linklag for TimeUnit.Percent.</action>			
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3316419: Error reading calendars for 2010 files.</action>		
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3323027: Duplication of calendar id.</action>		
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3310996: Wrong task start.</action>				
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3308542: Wrong start and finish dates for 2010 files.</action>				 		
+	</release>
+
+	<release version="4.1.0" date="30/05/2011">
+		<action dev="joniles" type="add">Updated ProjectFile class to change default value for "auto" flags to simplify programmatic creation of project files.</action>	
+		<action dev="joniles" type="add">Added support for Manual, Start Text, Finish Text, and Duration Text attributes in MSPDI files.</action>		
+		<action dev="joniles" type="add">Added support cost resource type for MPP12, MPP14 and MSPDI files.</action>		
+		<action dev="joniles" type="add">Added Task.removePredecessor method (contributed by Leslie Damon).</action>		
+		<action dev="joniles" type="add">Added "read presentation data" flag to MPPReader - allows clients to save time and memory when MPP presentation data not required.</action>		
+		<action dev="joniles" type="add">Added support for reading Primavera calendars (contributed by Bruno Gasnier).</action>				
+		<action dev="joniles" type="add">Added support for resource assignment leveling delay for MPP, MPD, and MSPDI files.</action>		
+		<action dev="joniles" type="add">Added support for "unassigned" resource assignments.</action>								
+		<action dev="joniles" type="add">Added support for task manual duration attribute for manually scheduled tasks in MPP14 and MSPDI files.</action>		
+		<action dev="joniles" type="add">Added support for resource NT account attribute for MPP9, MPP12, and MPP14 files.</action>				
+		<action dev="joniles" type="add">Added support for physical % complete for MPP9, MPP12, and MPP14 files.</action>				
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3027020: MPXJ API returns the incorrect start date of a manual task.</action>
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3033163: Task id incorrect after importing from MPP14 file.</action>		
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3040412: MPXJ 4.0 fails to work with Project 2010 format.</action>		
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3055858: Index was outside the bounds of the array.</action>				
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3100947: header.getHonorConstraints() is not working in case of MPP.</action>		
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3151871: Empty notes appear for all tasks when saving in XML format.</action>
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3028641: All Extended Attributes always added when using MSPDIWriter.</action>		
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3231597: Baseline/Actual Work in 2010 MPP missing.</action>		
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 2987295: ResourceAssignment getCalendar not using IgnoreResourceCalendar flag</action>		
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3256657: ExternalTaskProject value missing.</action>	
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3148492: Deleted Primavera tasks handling problem.</action>		
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3198864: Latest CVS version gives wrong values for inactive field.</action>		
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3043660: Task ID order when creating a project file is not correct.</action>		
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 2935476: Invalid tasks that should not be there.</action>												 									
+		<action dev="joniles" type="fix">Updated to fix task calendars read incorrectly from MPP14 files.</action>
+		<action dev="joniles" type="fix">Updated to fix incorrect month duration assumption (contributed by Frank Illenberger).</action>		
+		<action dev="joniles" type="fix">Updated to fix incorrect number format in MSPDI file in non-English locales (contributed by Frank Illenberger).</action>
+		<action dev="joniles" type="fix">Updated to fix incorrect resource assignment actual work attribute for MPP14 files.</action>
+		<action dev="joniles" type="fix">Updated to fix incorrect task leveling delay attribute for MPP9, MPP12, and MPP14 files.</action>		
+		<action dev="joniles" type="fix">Updated to fix leveling delay and link lag when writing an MSPDI file (contributed by Frank Illenberger).</action>		
+		<action dev="joniles" type="fix">Updated to fix incorrect assignment actual start date when writing an MSPDI file.</action>		
+		<action dev="joniles" type="update">Updated to improve support for material resources in MSPDI files.</action>		
+		<action dev="joniles" type="update">Updated to reduce overall size of MSPDI files by not writing default values.</action>		
+		<action dev="joniles" type="update">Updated to use IKVM 0.46.0.1.</action>
+		<action dev="joniles" type="update">Updated to use POI 3.7.</action>
+		<action dev="joniles" type="update">Updated to make task, resource, and assignment fields read from MPP files data-driven, rather than hard coded.</action>
+	</release>
+
+	<release version="4.0.0" date="25/05/2010">
+		<action dev="joniles" type="add">Added support for reading Microsoft Project 2010 MPP files.</action>
+		<action dev="joniles" type="add">Added support for reading Primavera P6 XER files.</action>
+		<action dev="joniles" type="add">Added support for reading Primavera P6 databases.</action>
+		<action dev="joniles" type="update">Updated to target Java 1.6.</action>
+		<action dev="joniles" type="add">Added Russian locale (Contributed by Roman Bilous).</action>
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 3006364: Relation.getDuration() is always giving result in 'HOUR' fmt.</action>	
+	</release>
+
+	<release version="3.2.0" date="20/01/2010">
+		<action dev="joniles" type="add">Added support for Resource cost rate tables (Based on code by Andrei Missine).</action>	
+		<action dev="joniles" type="add">Added support for Resource availability (Based on code by Andrei Missine).</action>
+		<action dev="joniles" type="add">Added support for successors (Based on an idea by John D. Lewis).</action>				
+		<action dev="joniles" type="add">Added support for task and resource GUIDs.</action>		
+		<action dev="joniles" type="add">Added a flag to allow raw timephased data to be retrieved from MPP files.</action>		
+		<action dev="joniles" type="fix">Updated to fix logical operator read issue in MPP auto filters (Contributed by Andrei Missine).</action>				
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 2822616: MPXJ Issue: Related to Project Calendar.</action>				
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 2806974: POI License in legal folder of download wrong.</action>		
+		<action dev="joniles" type="fix">Updated to fix Steelray bug 15468: Null Pointer Exception reading task constraints.</action>				
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 2877136: Planner writer causes Null Pointer exception.</action>				
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 2838998: getRecurring() task is not working</action>
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 2833075: getStandardRateFormat() is returning 'null'</action>							
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 2831387: getWeekStartDay() is not working.</action>
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 2831386: getDaysPerMonth() is not working.</action>		
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 2855700: Resource.getNotes() not working for MPP12 file.</action>										
+		<action dev="joniles" type="fix">Updated to fix SourceForge bug 2915426: MPP: getEditableActualCosts() is not behaving correctly.</action>		
+		<action dev="joniles" type="update">Updated to use POI 3.6.</action>
+		<action dev="joniles" type="update">Updated to use IKVM 0.42.0.3.</action>
+		<action dev="joniles" type="update">Updated to make MPX duration parsing more lenient (Contributed by Jari Niskala).</action>		
+		<action dev="joniles" type="update">Updated to make MPP Var2Data extraction more robust (Contributed by Jari Niskala).</action>
+		<action dev="joniles" type="update">Updated to implement MSPDI context caching to improve performance (Contributed by Jari Niskala).</action>
+		<action dev="joniles" type="update">Updated to improve MPP file task structure validation. (Contributed by Jari Niskala).</action>
+		<action dev="joniles" type="update">Updated to improve MPX file parsing. (Contributed by Jari Niskala).</action>		
+		<action dev="joniles" type="update">Updated to automatically populate missing WBS attributes. (Contributed by Jari Niskala).</action>
+		<action dev="joniles" type="update">Updated to refactor the Relation class (note minor method name changes).</action>
+		<action dev="joniles" type="update">Updated to add default calendar to Planner output.</action>
+	</release>
+	
 	<release version="3.1.0" date="20/05/2009">
 		<action dev="joniles" type="fix">Updated to fix SourceForge bug 2545883: Plan file fails to load.</action>		
 		<action dev="joniles" type="fix">Updated to fix SourceForge bug 2540447: Resource Assignment Normaliser rounding problem.</action>

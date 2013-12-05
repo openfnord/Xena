@@ -28,12 +28,15 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
 
 import net.sf.mpxj.MPXJException;
 import net.sf.mpxj.ProjectFile;
+import net.sf.mpxj.listener.ProjectListener;
 import net.sf.mpxj.reader.ProjectReader;
 
 /**
@@ -42,6 +45,18 @@ import net.sf.mpxj.reader.ProjectReader;
  */
 public final class MPDDatabaseReader implements ProjectReader
 {
+   /**
+    * {@inheritDoc}
+    */
+   @Override public void addProjectListener(ProjectListener listener)
+   {
+      if (m_projectListeners == null)
+      {
+         m_projectListeners = new LinkedList<ProjectListener>();
+      }
+      m_projectListeners.add(listener);
+   }
+
    /**
     * Populates a Map instance representing the IDs and names of
     * projects available in the current database.
@@ -63,7 +78,6 @@ public final class MPDDatabaseReader implements ProjectReader
     */
    public ProjectFile read() throws MPXJException
    {
-      // @todo implement a test for MPD8/MPD9 database formats
       MPD9DatabaseReader reader = new MPD9DatabaseReader();
       reader.setProjectID(m_projectID);
       reader.setPreserveNoteFormatting(m_preserveNoteFormatting);
@@ -125,7 +139,7 @@ public final class MPDDatabaseReader implements ProjectReader
     * @return ProjectFile instance
     * @throws MPXJException
     */
-   public ProjectFile read(String accessDatabaseFileName) throws MPXJException
+   @Override public ProjectFile read(String accessDatabaseFileName) throws MPXJException
    {
       try
       {
@@ -166,7 +180,7 @@ public final class MPDDatabaseReader implements ProjectReader
    /**
     * {@inheritDoc}
     */
-   public ProjectFile read(File file) throws MPXJException
+   @Override public ProjectFile read(File file) throws MPXJException
    {
       return (read(file.getAbsolutePath()));
    }
@@ -174,7 +188,7 @@ public final class MPDDatabaseReader implements ProjectReader
    /**
     * {@inheritDoc}
     */
-   public ProjectFile read(InputStream inputStream)
+   @Override public ProjectFile read(InputStream inputStream)
    {
       throw new UnsupportedOperationException();
    }
@@ -183,4 +197,5 @@ public final class MPDDatabaseReader implements ProjectReader
    private DataSource m_dataSource;
    private Connection m_connection;
    private boolean m_preserveNoteFormatting;
+   private List<ProjectListener> m_projectListeners;
 }

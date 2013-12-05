@@ -33,8 +33,8 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.mpxj.listener.ProjectListener;
-import net.sf.mpxj.utility.NumberUtility;
 import net.sf.mpxj.mpp.CustomFieldValueItem;
+import net.sf.mpxj.utility.NumberUtility;
 
 /**
  * This class represents a project plan.
@@ -118,7 +118,11 @@ public final class ProjectFile
          ResourceAssignment assignment = iter.next();
          if (assignment.getTask() == task)
          {
-            assignment.getResource().removeResourceAssignment(assignment);
+            Resource resource = assignment.getResource();
+            if (resource != null)
+            {
+               resource.removeResourceAssignment(assignment);
+            }
             iter.remove();
          }
       }
@@ -146,7 +150,7 @@ public final class ProjectFile
     * project, if the ID values have gaps in the sequence, there will
     * be blank task rows shown.
     */
-   public void synchronizeTaskIDs()
+   public void renumberTaskIDs()
    {
       if (m_allTasks.isEmpty() == false)
       {
@@ -173,7 +177,7 @@ public final class ProjectFile
     * project, if the ID values have gaps in the sequence, there will
     * be blank resource rows shown.
     */
-   public void synchronizeResourceIDs()
+   public void renumberResourceIDs()
    {
       if (m_allResources.isEmpty() == false)
       {
@@ -188,8 +192,157 @@ public final class ProjectFile
    }
 
    /**
+    * Renumbers all task unique IDs.
+    */
+   private void renumberTaskUniqueIDs()
+   {
+      Task firstTask = getTaskByID(Integer.valueOf(0));
+      int uid = (firstTask == null ? 1 : 0);
+
+      for (Task task : m_allTasks)
+      {
+         task.setUniqueID(Integer.valueOf(uid++));
+      }
+   }
+
+   /**
+    * Renumbers all resource unique IDs.
+    */
+   private void renumberResourceUniqueIDs()
+   {
+      int uid = 1;
+
+      for (Resource resource : m_allResources)
+      {
+         resource.setUniqueID(Integer.valueOf(uid++));
+      }
+   }
+
+   /**
+    * Renumbers all assignment unique IDs.
+    */
+   private void renumberAssignmentUniqueIDs()
+   {
+      int uid = 1;
+
+      for (ResourceAssignment assignment : m_allResourceAssignments)
+      {
+         assignment.setUniqueID(Integer.valueOf(uid++));
+      }
+   }
+
+   /**
+    * Renumbers all calendar unique IDs.
+    */
+   private void renumberCalendarUniqueIDs()
+   {
+      int uid = 1;
+
+      for (ProjectCalendar calendar : m_calendars)
+      {
+         calendar.setUniqueID(Integer.valueOf(uid++));
+      }
+   }
+
+   /**
+    * This method is called to ensure that all unique ID values
+    * held by MPXJ are within the range supported by MS Project.
+    * If any of these values fall outside of this range, the unique IDs
+    * of the relevant entities are renumbered.
+    */
+   public void validateUniqueIDsForMicrosoftProject()
+   {
+      if (!m_allTasks.isEmpty())
+      {
+         for (Task task : m_allTasks)
+         {
+            if (NumberUtility.getInt(task.getUniqueID()) > MS_PROJECT_MAX_UNIQUE_ID)
+            {
+               renumberTaskUniqueIDs();
+               break;
+            }
+         }
+      }
+
+      if (!m_allResources.isEmpty())
+      {
+         for (Resource resource : m_allResources)
+         {
+            if (NumberUtility.getInt(resource.getUniqueID()) > MS_PROJECT_MAX_UNIQUE_ID)
+            {
+               renumberResourceUniqueIDs();
+               break;
+            }
+         }
+      }
+
+      if (!m_allResourceAssignments.isEmpty())
+      {
+         for (ResourceAssignment assignment : m_allResourceAssignments)
+         {
+            if (NumberUtility.getInt(assignment.getUniqueID()) > MS_PROJECT_MAX_UNIQUE_ID)
+            {
+               renumberAssignmentUniqueIDs();
+               break;
+            }
+         }
+      }
+
+      if (!m_calendars.isEmpty())
+      {
+         for (ProjectCalendar calendar : m_calendars)
+         {
+            if (NumberUtility.getInt(calendar.getUniqueID()) > MS_PROJECT_MAX_UNIQUE_ID)
+            {
+               renumberCalendarUniqueIDs();
+               break;
+            }
+         }
+      }
+   }
+
+   /**
+    * Microsoft Project bases the order of tasks displayed on their ID
+    * value. This method takes the hierarchical structure of tasks
+    * represented in MPXJ and renumbers the ID values to ensure that
+    * this structure is displayed as expected in Microsoft Project. This
+    * is typically used to deal with the case where a hierarchical task
+    * structure has been created programatically in MPXJ.  
+    */
+   public void synchronizeTaskIDToHierarchy()
+   {
+      m_allTasks.clear();
+
+      int currentID = (getTaskByID(Integer.valueOf(0)) == null ? 1 : 0);
+      for (Task task : m_childTasks)
+      {
+         task.setID(Integer.valueOf(currentID++));
+         m_allTasks.add(task);
+         currentID = synchroizeTaskIDToHierarchy(task, currentID);
+      }
+   }
+
+   /**
+    * Called recursively to renumber child task IDs.
+    * 
+    * @param parentTask parent task instance
+    * @param currentID current task ID
+    * @return updated current task ID
+    */
+   private int synchroizeTaskIDToHierarchy(Task parentTask, int currentID)
+   {
+      for (Task task : parentTask.getChildTasks())
+      {
+         task.setID(Integer.valueOf(currentID++));
+         m_allTasks.add(task);
+         currentID = synchroizeTaskIDToHierarchy(task, currentID);
+      }
+      return currentID;
+   }
+
+   /**
     * This method is used to retrieve a list of all of the top level tasks
-    * that are defined in this MPX file.
+    * that are defined in this project file.
     *
     * @return list of tasks
     */
@@ -200,7 +353,7 @@ public final class ProjectFile
 
    /**
     * This method is used to retrieve a list of all of the tasks
-    * that are defined in this MPX file.
+    * that are defined in this project file.
     *
     * @return list of all tasks
     */
@@ -257,6 +410,16 @@ public final class ProjectFile
    public void setAutoCalendarUniqueID(boolean flag)
    {
       m_autoCalendarUniqueID = flag;
+   }
+
+   /**
+    * Used to set whether the assignment unique ID field is automatically populated.
+    *
+    * @param flag true if automatic unique ID required.
+    */
+   public void setAutoAssignmentUniqueID(boolean flag)
+   {
+      m_autoAssignmentUniqueID = flag;
    }
 
    /**
@@ -325,6 +488,17 @@ public final class ProjectFile
    }
 
    /**
+    * Retrieve the flag that determines whether the assignment unique ID
+    * is generated automatically.
+    *
+    * @return boolean, default is true.
+    */
+   public boolean getAutoAssignmentUniqueID()
+   {
+      return (m_autoAssignmentUniqueID);
+   }
+
+   /**
     * Retrieve the flag that determines whether the task ID
     * is generated automatically.
     *
@@ -350,9 +524,19 @@ public final class ProjectFile
     *
     * @return next unique ID
     */
-   int getCalendarUniqueID()
+   public int getCalendarUniqueID()
    {
       return (++m_calendarUniqueID);
+   }
+
+   /**
+    * This method is used to retrieve the next unique ID for an assignment.
+    *
+    * @return next unique ID
+    */
+   int getAssignmentUniqueID()
+   {
+      return (++m_assignmentUniqueID);
    }
 
    /**
@@ -438,64 +622,48 @@ public final class ProjectFile
    }
 
    /**
-    * This method is provided to create a resource calendar, before it
-    * has been attached to a resource.
+    * This method is used to add a new calendar to the file.
     *
-    * @return new ProjectCalendar instance
+    * @return new calendar object
     */
-   public ProjectCalendar addResourceCalendar()
+   public ProjectCalendar addCalendar()
    {
       ProjectCalendar calendar = new ProjectCalendar(this);
-      m_resourceCalendars.add(calendar);
+      m_calendars.add(calendar);
       return (calendar);
    }
 
    /**
-    * This method is used to add a new base calendar to the file.
-    *
-    * @return new base calendar object
-    */
-   public ProjectCalendar addBaseCalendar()
-   {
-      ProjectCalendar calendar = new ProjectCalendar(this);
-      m_baseCalendars.add(calendar);
-      return (calendar);
-   }
-
-   /**
-    * Removes a base calendar.
+    * Removes a calendar.
     *
     * @param calendar calendar to be removed
     */
    public void removeCalendar(ProjectCalendar calendar)
    {
-      if (m_baseCalendars.contains(calendar))
+      if (m_calendars.contains(calendar))
       {
-         m_baseCalendars.remove(calendar);
+         m_calendars.remove(calendar);
       }
-      else
-         if (m_resourceCalendars.contains(calendar))
-         {
-            m_resourceCalendars.remove(calendar);
-            Resource resource = calendar.getResource();
-            if (resource != null)
-            {
-               resource.setResourceCalendar(null);
-            }
-         }
-      calendar.setBaseCalendar(null);
+
+      Resource resource = calendar.getResource();
+      if (resource != null)
+      {
+         resource.setResourceCalendar(null);
+      }
+
+      calendar.setParent(null);
    }
 
    /**
-    * This is a convenience method used to add a base calendar called
+    * This is a convenience method used to add a calendar called
     * "Standard" to the file, and populate it with a default working week
     * and default working hours.
     *
-    * @return a new default base calendar
+    * @return a new default calendar
     */
    public ProjectCalendar addDefaultBaseCalendar()
    {
-      ProjectCalendar calendar = addBaseCalendar();
+      ProjectCalendar calendar = addCalendar();
 
       calendar.setName(ProjectCalendar.DEFAULT_BASE_CALENDAR_NAME);
 
@@ -513,48 +681,35 @@ public final class ProjectFile
    }
 
    /**
-    * This is a protected convenience method to add a default resource
-    * calendar. This is used when the calendar data is available before
-    * the resource data has been read, a situation which occurs with MPP
-    * files.
+    * This is a protected convenience method to add a default derived
+    * calendar.
     *
     * @return new ProjectCalendar instance
     */
-   public ProjectCalendar getDefaultResourceCalendar()
+   public ProjectCalendar addDefaultDerivedCalendar()
    {
-      ProjectCalendar calendar = new ProjectCalendar(this);
+      ProjectCalendar calendar = addCalendar();
 
-      calendar.setWorkingDay(Day.SUNDAY, ProjectCalendar.DEFAULT);
-      calendar.setWorkingDay(Day.MONDAY, ProjectCalendar.DEFAULT);
-      calendar.setWorkingDay(Day.TUESDAY, ProjectCalendar.DEFAULT);
-      calendar.setWorkingDay(Day.WEDNESDAY, ProjectCalendar.DEFAULT);
-      calendar.setWorkingDay(Day.THURSDAY, ProjectCalendar.DEFAULT);
-      calendar.setWorkingDay(Day.FRIDAY, ProjectCalendar.DEFAULT);
-      calendar.setWorkingDay(Day.SATURDAY, ProjectCalendar.DEFAULT);
+      calendar.setWorkingDay(Day.SUNDAY, DayType.DEFAULT);
+      calendar.setWorkingDay(Day.MONDAY, DayType.DEFAULT);
+      calendar.setWorkingDay(Day.TUESDAY, DayType.DEFAULT);
+      calendar.setWorkingDay(Day.WEDNESDAY, DayType.DEFAULT);
+      calendar.setWorkingDay(Day.THURSDAY, DayType.DEFAULT);
+      calendar.setWorkingDay(Day.FRIDAY, DayType.DEFAULT);
+      calendar.setWorkingDay(Day.SATURDAY, DayType.DEFAULT);
 
       return (calendar);
    }
 
    /**
-    * This method retrieves the list of base calendars defined in
+    * This method retrieves the list of calendars defined in
     * this file.
     *
-    * @return list of base calendars
+    * @return list of calendars
     */
-   public List<ProjectCalendar> getBaseCalendars()
+   public List<ProjectCalendar> getCalendars()
    {
-      return (m_baseCalendars);
-   }
-
-   /**
-    * This method retrieves the list of resource calendars defined in
-    * this file.
-    *
-    * @return list of resource calendars
-    */
-   public List<ProjectCalendar> getResourceCalendars()
-   {
-      return (m_resourceCalendars);
+      return (m_calendars);
    }
 
    /**
@@ -610,8 +765,7 @@ public final class ProjectFile
    }
 
    /**
-    * This method is used to retrieve a list of all of the resources
-    * that are defined in this MPX file.
+    * Retrieves a list of all resources in this project.
     *
     * @return list of all resources
     */
@@ -621,8 +775,7 @@ public final class ProjectFile
    }
 
    /**
-    * This method is used to retrieve a list of all of the resource assignments
-    * that are defined in this MPX file.
+    * Retrieves a list of all resource assignments in this project.
     *
     * @return list of all resources
     */
@@ -652,7 +805,11 @@ public final class ProjectFile
    {
       m_allResourceAssignments.remove(assignment);
       assignment.getTask().removeResourceAssignment(assignment);
-      assignment.getResource().removeResourceAssignment(assignment);
+      Resource resource = assignment.getResource();
+      if (resource != null)
+      {
+         resource.removeResourceAssignment(assignment);
+      }
    }
 
    /**
@@ -668,19 +825,19 @@ public final class ProjectFile
    }
 
    /**
-    * Retrieves the named base calendar. This method will return
-    * null if the named base calendar is not located.
+    * Retrieves the named calendar. This method will return
+    * null if the named calendar is not located.
     *
-    * @param calendarName name of the required base calendar
-    * @return base calendar object
+    * @param calendarName name of the required calendar
+    * @return ProjectCalendar instance
     */
-   public ProjectCalendar getBaseCalendar(String calendarName)
+   public ProjectCalendar getCalendarByName(String calendarName)
    {
       ProjectCalendar calendar = null;
 
       if (calendarName != null && calendarName.length() != 0)
       {
-         Iterator<ProjectCalendar> iter = m_baseCalendars.iterator();
+         Iterator<ProjectCalendar> iter = m_calendars.iterator();
          while (iter.hasNext() == true)
          {
             calendar = iter.next();
@@ -699,14 +856,14 @@ public final class ProjectFile
    }
 
    /**
-    * Retrieves the base calendar referred to by the supplied unique ID
+    * Retrieves the calendar referred to by the supplied unique ID
     * value. This method will return null if the required calendar is not
     * located.
     *
     * @param calendarID calendar unique ID
     * @return ProjectCalendar instance
     */
-   public ProjectCalendar getBaseCalendarByUniqueID(Integer calendarID)
+   public ProjectCalendar getCalendarByUniqueID(Integer calendarID)
    {
       return (m_calendarUniqueIDMap.get(calendarID));
    }
@@ -752,7 +909,7 @@ public final class ProjectFile
     */
    public Duration getDuration(String calendarName, Date startDate, Date endDate) throws MPXJException
    {
-      ProjectCalendar calendar = getBaseCalendar(calendarName);
+      ProjectCalendar calendar = getCalendarByName(calendarName);
 
       if (calendar == null)
       {
@@ -812,7 +969,7 @@ public final class ProjectFile
 
    /**
     * This method is used to recreate the hierarchical structure of the
-    * MPX file from scratch. The method sorts the list of all tasks,
+    * project file from scratch. The method sorts the list of all tasks,
     * then iterates through it creating the parent-child structure defined
     * by the outline level field.
     */
@@ -868,12 +1025,12 @@ public final class ProjectFile
                lastTask = task;
                lastLevel = level;
 
-               if (getAutoWBS() == true)
+               if (getAutoWBS() || task.getWBS() == null)
                {
                   task.generateWBS(parent);
                }
 
-               if (getAutoOutlineNumber() == true)
+               if (getAutoOutlineNumber())
                {
                   task.generateOutlineNumber(parent);
                }
@@ -923,9 +1080,9 @@ public final class ProjectFile
       }
 
       //
-      // Update base calendar unique IDs
+      // Update calendar unique IDs
       //
-      for (ProjectCalendar calendar : m_baseCalendars)
+      for (ProjectCalendar calendar : m_calendars)
       {
          int uniqueID = NumberUtility.getInt(calendar.getUniqueID());
          if (uniqueID > m_calendarUniqueID)
@@ -935,14 +1092,14 @@ public final class ProjectFile
       }
 
       //
-      // Update resource calendar unique IDs
+      // Update assignment unique IDs
       //
-      for (ProjectCalendar calendar : m_resourceCalendars)
+      for (ResourceAssignment assignment : m_allResourceAssignments)
       {
-         int uniqueID = NumberUtility.getInt(calendar.getUniqueID());
-         if (uniqueID > m_calendarUniqueID)
+         int uniqueID = NumberUtility.getInt(assignment.getUniqueID());
+         if (uniqueID > m_assignmentUniqueID)
          {
-            m_calendarUniqueID = uniqueID;
+            m_assignmentUniqueID = uniqueID;
          }
       }
    }
@@ -1128,6 +1285,108 @@ public final class ProjectFile
    }
 
    /**
+    * This method is called to alert project listeners to the fact that
+    * a calendar has been read from a project file.
+    *
+    * @param calendar calendar instance
+    */
+   public void fireCalendarReadEvent(ProjectCalendar calendar)
+   {
+      if (m_projectListeners != null)
+      {
+         for (ProjectListener listener : m_projectListeners)
+         {
+            listener.calendarRead(calendar);
+         }
+      }
+   }
+
+   /**
+    * This method is called to alert project listeners to the fact that
+    * a resource assignment has been read from a project file.
+    *
+    * @param resourceAssignment resourceAssignment instance
+    */
+   public void fireAssignmentReadEvent(ResourceAssignment resourceAssignment)
+   {
+      if (m_projectListeners != null)
+      {
+         for (ProjectListener listener : m_projectListeners)
+         {
+            listener.assignmentRead(resourceAssignment);
+         }
+      }
+   }
+
+   /**
+    * This method is called to alert project listeners to the fact that
+    * a resource assignment has been written to a project file.
+    *
+    * @param resourceAssignment resourceAssignment instance
+    */
+   public void fireAssignmentWrittenEvent(ResourceAssignment resourceAssignment)
+   {
+      if (m_projectListeners != null)
+      {
+         for (ProjectListener listener : m_projectListeners)
+         {
+            listener.assignmentWritten(resourceAssignment);
+         }
+      }
+   }
+
+   /**
+    * This method is called to alert project listeners to the fact that
+    * a relation has been read from a project file.
+    *
+    * @param relation relation instance
+    */
+   public void fireRelationReadEvent(Relation relation)
+   {
+      if (m_projectListeners != null)
+      {
+         for (ProjectListener listener : m_projectListeners)
+         {
+            listener.relationRead(relation);
+         }
+      }
+   }
+
+   /**
+    * This method is called to alert project listeners to the fact that
+    * a relation has been written to a project file.
+    *
+    * @param relation relation instance
+    */
+   public void fireRelationWrittenEvent(Relation relation)
+   {
+      if (m_projectListeners != null)
+      {
+         for (ProjectListener listener : m_projectListeners)
+         {
+            listener.relationWritten(relation);
+         }
+      }
+   }
+
+   /**
+    * This method is called to alert project listeners to the fact that
+    * a calendar has been written to a project file.
+    *
+    * @param calendar calendar instance
+    */
+   public void fireCalendarWrittenEvent(ProjectCalendar calendar)
+   {
+      if (m_projectListeners != null)
+      {
+         for (ProjectListener listener : m_projectListeners)
+         {
+            listener.calendarWritten(calendar);
+         }
+      }
+   }
+
+   /**
     * Adds a listener to this project file.
     *
     * @param listener listener instance
@@ -1139,6 +1398,22 @@ public final class ProjectFile
          m_projectListeners = new LinkedList<ProjectListener>();
       }
       m_projectListeners.add(listener);
+   }
+
+   /**
+    * Adds a collection of listeners to the current project.
+    * 
+    * @param listeners collection of listeners
+    */
+   public void addProjectListeners(List<ProjectListener> listeners)
+   {
+      if (listeners != null)
+      {
+         for (ProjectListener listener : listeners)
+         {
+            addProjectListener(listener);
+         }
+      }
    }
 
    /**
@@ -1290,7 +1565,7 @@ public final class ProjectFile
 
    /**
     * Allows derived classes to gain access to the mapping between
-    * MPX task field numbers and aliases.
+    * task fields and aliases.
     *
     * @return task field to alias map
     */
@@ -1300,8 +1575,8 @@ public final class ProjectFile
    }
 
    /**
-    * Allows derived classes to gain access to the mapping between
-    * MPX resource field numbers and aliases.
+    * Allows callers to gain access to the mapping between
+    * resource field numbers and aliases.
     *
     * @return resource field to alias map
     */
@@ -1828,7 +2103,7 @@ public final class ProjectFile
    public ProjectCalendar getCalendar()
    {
       String calendarName = m_projectHeader.getCalendarName();
-      ProjectCalendar calendar = getBaseCalendar(calendarName);
+      ProjectCalendar calendar = getCalendarByName(calendarName);
       return calendar;
    }
 
@@ -1842,6 +2117,26 @@ public final class ProjectFile
       m_projectHeader.setCalendarName(calendar.getName());
    }
 
+   /**
+    * Retrieve the calendar used internally for timephased baseline calculation.
+    * 
+    * @return baseline calendar
+    */
+   public ProjectCalendar getBaselineCalendar()
+   {
+      //
+      // Attempt to locate the calendar normally used by baselines
+      // If this isn't present, fall back to using the default 
+      // project calendar.
+      //
+      ProjectCalendar result = getCalendarByName("Used for Microsoft Project 98 Baseline Calendar");
+      if (result == null)
+      {
+         result = getCalendar();
+      }
+      return result;
+   }
+
    private String m_projectFilePath;
 
    /**
@@ -1853,6 +2148,11 @@ public final class ProjectFile
     * Counter used to populate the unique ID field of a calendar.
     */
    private int m_calendarUniqueID;
+
+   /**
+    * Counter used to populate the unique ID field of an assignment.
+    */
+   private int m_assignmentUniqueID;
 
    /**
     * Counter used to populate the ID field of a task.
@@ -1894,14 +2194,9 @@ public final class ProjectFile
    private List<ResourceAssignment> m_allResourceAssignments = new LinkedList<ResourceAssignment>();
 
    /**
-    * List holding references to all base calendars.
+    * List holding references to all calendars.
     */
-   private List<ProjectCalendar> m_baseCalendars = new LinkedList<ProjectCalendar>();
-
-   /**
-    * List holding references to all resource calendars.
-    */
-   private List<ProjectCalendar> m_resourceCalendars = new LinkedList<ProjectCalendar>();
+   private List<ProjectCalendar> m_calendars = new LinkedList<ProjectCalendar>();
 
    /**
     * File creation record.
@@ -1932,49 +2227,55 @@ public final class ProjectFile
     * Indicating whether WBS value should be calculated on creation, or will
     * be manually set.
     */
-   private boolean m_autoWBS;
+   private boolean m_autoWBS = true;
 
    /**
     * Indicating whether the Outline Level value should be calculated on
     * creation, or will be manually set.
     */
-   private boolean m_autoOutlineLevel;
+   private boolean m_autoOutlineLevel = true;
 
    /**
     * Indicating whether the Outline Number value should be calculated on
     * creation, or will be manually set.
     */
-   private boolean m_autoOutlineNumber;
+   private boolean m_autoOutlineNumber = true;
 
    /**
     * Indicating whether the unique ID of a task should be
     * calculated on creation, or will be manually set.
     */
-   private boolean m_autoTaskUniqueID;
+   private boolean m_autoTaskUniqueID = true;
 
    /**
     * Indicating whether the unique ID of a calendar should be
     * calculated on creation, or will be manually set.
     */
-   private boolean m_autoCalendarUniqueID;
+   private boolean m_autoCalendarUniqueID = true;
+
+   /**
+    * Indicating whether the unique ID of an assignment should be
+    * calculated on creation, or will be manually set.
+    */
+   private boolean m_autoAssignmentUniqueID = true;
 
    /**
     * Indicating whether the ID of a task should be
     * calculated on creation, or will be manually set.
     */
-   private boolean m_autoTaskID;
+   private boolean m_autoTaskID = true;
 
    /**
     * Indicating whether the unique ID of a resource should be
     * calculated on creation, or will be manually set.
     */
-   private boolean m_autoResourceUniqueID;
+   private boolean m_autoResourceUniqueID = true;
 
    /**
     * Indicating whether the ID of a resource should be
     * calculated on creation, or will be manually set.
     */
-   private boolean m_autoResourceID;
+   private boolean m_autoResourceID = true;
 
    /**
     * Maps from a task field number to a task alias.
@@ -2122,4 +2423,9 @@ public final class ProjectFile
     * Custom field value list items.
     */
    private Map<Integer, CustomFieldValueItem> m_customFieldValueItems = new HashMap<Integer, CustomFieldValueItem>();
+
+   /**
+    * Maximum unique ID value MS Project will accept.
+    */
+   private static final int MS_PROJECT_MAX_UNIQUE_ID = 0x1FFFFF;
 }

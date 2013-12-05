@@ -23,8 +23,7 @@
 
 package net.sf.mpxj;
 
-import java.util.EnumSet;
-
+import net.sf.mpxj.utility.EnumUtility;
 import net.sf.mpxj.utility.MpxjEnum;
 import net.sf.mpxj.utility.NumberUtility;
 
@@ -60,14 +59,14 @@ public enum TimeUnit implements MpxjEnum
    MONTHS(4, "mo"),
 
    /**
-    * Constant representing Years.
-    */
-   YEARS(5, "y"),
-
-   /**
     * Constant representing Percent.
     */
-   PERCENT(6, "%"),
+   PERCENT(5, "%"),
+
+   /**
+    * Constant representing Years.
+    */
+   YEARS(6, "y"),
 
    /**
     * Constant representing Elapsed Minutes.
@@ -156,7 +155,7 @@ public enum TimeUnit implements MpxjEnum
     *
     * @return int representation of the enum
     */
-   public int getValue()
+   @Override public int getValue()
    {
       return (m_value);
    }
@@ -182,14 +181,7 @@ public enum TimeUnit implements MpxjEnum
    /**
     * Array mapping int types to enums.
     */
-   private static final TimeUnit[] TYPE_VALUES = new TimeUnit[14];
-   static
-   {
-      for (TimeUnit e : EnumSet.range(TimeUnit.MINUTES, TimeUnit.ELAPSED_PERCENT))
-      {
-         TYPE_VALUES[e.getValue()] = e;
-      }
-   }
+   private static final TimeUnit[] TYPE_VALUES = EnumUtility.createTypeArray(TimeUnit.class);
 
    /**
     * Internal representation of the enum int type.

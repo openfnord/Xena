@@ -23,8 +23,7 @@
 
 package net.sf.mpxj.mpp;
 
-import java.util.EnumSet;
-
+import net.sf.mpxj.utility.EnumUtility;
 import net.sf.mpxj.utility.MpxjEnum;
 import net.sf.mpxj.utility.NumberUtility;
 
@@ -89,7 +88,7 @@ public enum Interval implements MpxjEnum
     *
     * @return int representation of the enum
     */
-   public int getValue()
+   @Override public int getValue()
    {
       return (m_value);
    }
@@ -117,14 +116,7 @@ public enum Interval implements MpxjEnum
    /**
     * Array mapping int types to enums.
     */
-   private static final Interval[] TYPE_VALUES = new Interval[3];
-   static
-   {
-      for (Interval e : EnumSet.range(Interval.DAILY, Interval.MONTHLY))
-      {
-         TYPE_VALUES[e.getValue()] = e;
-      }
-   }
+   private static final Interval[] TYPE_VALUES = EnumUtility.createTypeArray(Interval.class);
 
    /**
     * Internal representation of the enum int type.

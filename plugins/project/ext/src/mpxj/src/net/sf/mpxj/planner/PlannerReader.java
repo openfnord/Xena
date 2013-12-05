@@ -23,7 +23,6 @@
 
 package net.sf.mpxj.planner;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -41,13 +40,15 @@ import java.util.Set;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.sax.SAXSource;
 
 import net.sf.mpxj.ConstraintType;
 import net.sf.mpxj.DateRange;
 import net.sf.mpxj.Day;
+import net.sf.mpxj.DayType;
 import net.sf.mpxj.Duration;
 import net.sf.mpxj.MPXJException;
 import net.sf.mpxj.Priority;
@@ -64,6 +65,7 @@ import net.sf.mpxj.ResourceType;
 import net.sf.mpxj.Task;
 import net.sf.mpxj.TaskType;
 import net.sf.mpxj.TimeUnit;
+import net.sf.mpxj.listener.ProjectListener;
 import net.sf.mpxj.planner.schema.Allocation;
 import net.sf.mpxj.planner.schema.Allocations;
 import net.sf.mpxj.planner.schema.Calendars;
@@ -81,8 +83,9 @@ import net.sf.mpxj.planner.schema.Tasks;
 import net.sf.mpxj.reader.AbstractProjectReader;
 import net.sf.mpxj.utility.NumberUtility;
 
-import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 /**
  * This class creates a new ProjectFile instance by reading a Planner file.
@@ -92,23 +95,43 @@ public final class PlannerReader extends AbstractProjectReader
    /**
     * {@inheritDoc}
     */
-   public ProjectFile read(InputStream stream) throws MPXJException
+   @Override public void addProjectListener(ProjectListener listener)
+   {
+      if (m_projectListeners == null)
+      {
+         m_projectListeners = new LinkedList<ProjectListener>();
+      }
+      m_projectListeners.add(listener);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override public ProjectFile read(InputStream stream) throws MPXJException
    {
       try
       {
          m_projectFile = new ProjectFile();
 
-         m_projectFile.setAutoCalendarUniqueID(true);
-         m_projectFile.setAutoResourceID(true);
-         m_projectFile.setAutoTaskID(true);
+         m_projectFile.addProjectListeners(m_projectListeners);
+         m_projectFile.setAutoTaskUniqueID(false);
+         m_projectFile.setAutoResourceUniqueID(false);
+         m_projectFile.setAutoOutlineLevel(false);
+         m_projectFile.setAutoOutlineNumber(false);
+         m_projectFile.setAutoWBS(false);
 
-         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-         dbf.setNamespaceAware(true);
-         DocumentBuilder db = dbf.newDocumentBuilder();
-         Document doc = db.parse(stream);
+         SAXParserFactory factory = SAXParserFactory.newInstance();
+         factory.setNamespaceAware(true);
+         SAXParser saxParser = factory.newSAXParser();
+         XMLReader xmlReader = saxParser.getXMLReader();
+         SAXSource doc = new SAXSource(xmlReader, new InputSource(stream));
 
-         JAXBContext context = JAXBContext.newInstance("net.sf.mpxj.planner.schema");
-         Unmarshaller unmarshaller = context.createUnmarshaller();
+         if (CONTEXT == null)
+         {
+            throw CONTEXT_EXCEPTION;
+         }
+
+         Unmarshaller unmarshaller = CONTEXT.createUnmarshaller();
 
          Project plannerProject = (Project) unmarshaller.unmarshal(doc);
 
@@ -137,11 +160,6 @@ public final class PlannerReader extends AbstractProjectReader
       }
 
       catch (SAXException ex)
-      {
-         throw new MPXJException("Failed to parse file", ex);
-      }
-
-      catch (IOException ex)
       {
          throw new MPXJException("Failed to parse file", ex);
       }
@@ -184,7 +202,7 @@ public final class PlannerReader extends AbstractProjectReader
          }
 
          Integer defaultCalendarID = getInteger(project.getCalendar());
-         m_defaultCalendar = m_projectFile.getBaseCalendarByUniqueID(defaultCalendarID);
+         m_defaultCalendar = m_projectFile.getCalendarByUniqueID(defaultCalendarID);
          if (m_defaultCalendar != null)
          {
             m_projectFile.getProjectHeader().setCalendarName(m_defaultCalendar.getName());
@@ -203,22 +221,14 @@ public final class PlannerReader extends AbstractProjectReader
       //
       // Create a calendar instance
       //
-      ProjectCalendar mpxjCalendar;
-      if (parentMpxjCalendar == null)
-      {
-         mpxjCalendar = m_projectFile.addBaseCalendar();
-      }
-      else
-      {
-         mpxjCalendar = m_projectFile.addResourceCalendar();
-      }
+      ProjectCalendar mpxjCalendar = m_projectFile.addCalendar();
 
       //
       // Populate basic details
       //
       mpxjCalendar.setUniqueID(getInteger(plannerCalendar.getId()));
       mpxjCalendar.setName(plannerCalendar.getName());
-      mpxjCalendar.setBaseCalendar(parentMpxjCalendar);
+      mpxjCalendar.setParent(parentMpxjCalendar);
 
       //
       // Set working and non working days
@@ -242,6 +252,8 @@ public final class PlannerReader extends AbstractProjectReader
       //
       processExceptionDays(mpxjCalendar, plannerCalendar);
 
+      m_projectFile.fireCalendarReadEvent(mpxjCalendar);
+
       //
       // Process any derived calendars
       //
@@ -264,21 +276,21 @@ public final class PlannerReader extends AbstractProjectReader
     */
    private void setWorkingDay(ProjectCalendar mpxjCalendar, Day mpxjDay, String plannerDay)
    {
-      int dayType = ProjectCalendar.DEFAULT;
+      DayType dayType = DayType.DEFAULT;
 
       if (plannerDay != null)
       {
          switch (getInt(plannerDay))
          {
-            case 0 :
+            case 0:
             {
-               dayType = ProjectCalendar.WORKING;
+               dayType = DayType.WORKING;
                break;
             }
 
-            case 1 :
+            case 1:
             {
-               dayType = ProjectCalendar.NON_WORKING;
+               dayType = DayType.NON_WORKING;
                break;
             }
          }
@@ -430,12 +442,8 @@ public final class PlannerReader extends AbstractProjectReader
                if (day.getType().equals("day-type"))
                {
                   Date exceptionDate = getDate(day.getDate());
-                  ProjectCalendarException exception = mpxjCalendar.addCalendarException();
-                  exception.setFromDate(exceptionDate);
-                  exception.setToDate(exceptionDate);
-                  exception.setWorking(getInt(day.getId()) == 0);
-
-                  if (exception.getWorking())
+                  ProjectCalendarException exception = mpxjCalendar.addCalendarException(exceptionDate, exceptionDate);
+                  if (getInt(day.getId()) == 0)
                   {
                      for (int hoursIndex = 0; hoursIndex < m_defaultWorkingHours.size(); hoursIndex++)
                      {
@@ -489,20 +497,20 @@ public final class PlannerReader extends AbstractProjectReader
 
       ProjectCalendar calendar = mpxjResource.addResourceCalendar();
 
-      calendar.setWorkingDay(Day.SUNDAY, ProjectCalendar.DEFAULT);
-      calendar.setWorkingDay(Day.MONDAY, ProjectCalendar.DEFAULT);
-      calendar.setWorkingDay(Day.TUESDAY, ProjectCalendar.DEFAULT);
-      calendar.setWorkingDay(Day.WEDNESDAY, ProjectCalendar.DEFAULT);
-      calendar.setWorkingDay(Day.THURSDAY, ProjectCalendar.DEFAULT);
-      calendar.setWorkingDay(Day.FRIDAY, ProjectCalendar.DEFAULT);
-      calendar.setWorkingDay(Day.SATURDAY, ProjectCalendar.DEFAULT);
+      calendar.setWorkingDay(Day.SUNDAY, DayType.DEFAULT);
+      calendar.setWorkingDay(Day.MONDAY, DayType.DEFAULT);
+      calendar.setWorkingDay(Day.TUESDAY, DayType.DEFAULT);
+      calendar.setWorkingDay(Day.WEDNESDAY, DayType.DEFAULT);
+      calendar.setWorkingDay(Day.THURSDAY, DayType.DEFAULT);
+      calendar.setWorkingDay(Day.FRIDAY, DayType.DEFAULT);
+      calendar.setWorkingDay(Day.SATURDAY, DayType.DEFAULT);
 
-      ProjectCalendar baseCalendar = m_projectFile.getBaseCalendarByUniqueID(getInteger(plannerResource.getCalendar()));
+      ProjectCalendar baseCalendar = m_projectFile.getCalendarByUniqueID(getInteger(plannerResource.getCalendar()));
       if (baseCalendar == null)
       {
          baseCalendar = m_defaultCalendar;
       }
-      calendar.setBaseCalendar(baseCalendar);
+      calendar.setParent(baseCalendar);
 
       m_projectFile.fireResourceReadEvent(mpxjResource);
    }
@@ -600,33 +608,36 @@ public final class PlannerReader extends AbstractProjectReader
       // Calculate missing attributes
       //
       ProjectCalendar calendar = m_projectFile.getCalendar();
-      Duration duration = calendar.getWork(mpxjTask.getStart(), mpxjTask.getFinish(), TimeUnit.HOURS);
-      double durationDays = duration.getDuration() / 8;
-      if (durationDays > 0)
+      if (calendar != null)
       {
-         duration = Duration.getInstance(durationDays, TimeUnit.DAYS);
-      }
-      mpxjTask.setDuration(duration);
-
-      if (percentComplete.intValue() != 0)
-      {
-         mpxjTask.setActualStart(mpxjTask.getStart());
-
-         if (percentComplete.intValue() == 100)
+         Duration duration = calendar.getWork(mpxjTask.getStart(), mpxjTask.getFinish(), TimeUnit.HOURS);
+         double durationDays = duration.getDuration() / 8;
+         if (durationDays > 0)
          {
-            mpxjTask.setActualFinish(mpxjTask.getFinish());
-            mpxjTask.setActualDuration(duration);
-            mpxjTask.setActualWork(mpxjTask.getWork());
-            mpxjTask.setRemainingWork(Duration.getInstance(0, TimeUnit.HOURS));
+            duration = Duration.getInstance(durationDays, TimeUnit.DAYS);
          }
-         else
-         {
-            Duration work = mpxjTask.getWork();
-            Duration actualWork = Duration.getInstance((work.getDuration() * percentComplete.doubleValue()) / 100.0d, work.getUnits());
+         mpxjTask.setDuration(duration);
 
-            mpxjTask.setActualDuration(Duration.getInstance((duration.getDuration() * percentComplete.doubleValue()) / 100.0d, duration.getUnits()));
-            mpxjTask.setActualWork(actualWork);
-            mpxjTask.setRemainingWork(Duration.getInstance(work.getDuration() - actualWork.getDuration(), work.getUnits()));
+         if (percentComplete.intValue() != 0)
+         {
+            mpxjTask.setActualStart(mpxjTask.getStart());
+
+            if (percentComplete.intValue() == 100)
+            {
+               mpxjTask.setActualFinish(mpxjTask.getFinish());
+               mpxjTask.setActualDuration(duration);
+               mpxjTask.setActualWork(mpxjTask.getWork());
+               mpxjTask.setRemainingWork(Duration.getInstance(0, TimeUnit.HOURS));
+            }
+            else
+            {
+               Duration work = mpxjTask.getWork();
+               Duration actualWork = Duration.getInstance((work.getDuration() * percentComplete.doubleValue()) / 100.0d, work.getUnits());
+
+               mpxjTask.setActualDuration(Duration.getInstance((duration.getDuration() * percentComplete.doubleValue()) / 100.0d, duration.getUnits()));
+               mpxjTask.setActualWork(actualWork);
+               mpxjTask.setRemainingWork(Duration.getInstance(work.getDuration() - actualWork.getDuration(), work.getUnits()));
+            }
          }
       }
       mpxjTask.setEffortDriven(true);
@@ -672,9 +683,8 @@ public final class PlannerReader extends AbstractProjectReader
                   {
                      lag = Duration.getInstance(0, TimeUnit.HOURS);
                   }
-                  Relation relationship = mpxjTask.addPredecessor(predecessorTask);
-                  relationship.setDuration(lag);
-                  relationship.setType(RELATIONSHIP_TYPES.get(predecessor.getType()));
+                  Relation relation = mpxjTask.addPredecessor(predecessorTask, RELATIONSHIP_TYPES.get(predecessor.getType()), lag);
+                  m_projectFile.fireRelationReadEvent(relation);
                }
             }
          }
@@ -739,6 +749,8 @@ public final class PlannerReader extends AbstractProjectReader
                assignment.setFinish(task.getFinish());
 
                tasksWithAssignments.add(task);
+
+               m_projectFile.fireAssignmentReadEvent(assignment);
             }
          }
 
@@ -976,6 +988,7 @@ public final class PlannerReader extends AbstractProjectReader
    private NumberFormat m_twoDigitFormat = new DecimalFormat("00");
    private NumberFormat m_fourDigitFormat = new DecimalFormat("0000");
    private List<DateRange> m_defaultWorkingHours = new LinkedList<DateRange>();
+   private List<ProjectListener> m_projectListeners;
 
    private static Map<String, RelationType> RELATIONSHIP_TYPES = new HashMap<String, RelationType>();
    static
@@ -984,5 +997,37 @@ public final class PlannerReader extends AbstractProjectReader
       RELATIONSHIP_TYPES.put("FS", RelationType.FINISH_START);
       RELATIONSHIP_TYPES.put("SF", RelationType.START_FINISH);
       RELATIONSHIP_TYPES.put("SS", RelationType.START_START);
+   }
+
+   /**
+    * Cached context to minimise construction cost.
+    */
+   private static JAXBContext CONTEXT;
+
+   /**
+    * Note any error occurring during context construction.
+    */
+   private static JAXBException CONTEXT_EXCEPTION;
+
+   static
+   {
+      try
+      {
+         //
+         // JAXB RI property to speed up construction
+         //
+         System.setProperty("com.sun.xml.bind.v2.runtime.JAXBContextImpl.fastBoot", "true");
+
+         //
+         // Construct the context
+         //
+         CONTEXT = JAXBContext.newInstance("net.sf.mpxj.planner.schema", PlannerReader.class.getClassLoader());
+      }
+
+      catch (JAXBException ex)
+      {
+         CONTEXT_EXCEPTION = ex;
+         CONTEXT = null;
+      }
    }
 }

@@ -27,11 +27,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.mpxj.asta.AstaFileReader;
 import net.sf.mpxj.mpd.MPDDatabaseReader;
 import net.sf.mpxj.mpp.MPPReader;
 import net.sf.mpxj.mpx.MPXReader;
 import net.sf.mpxj.mspdi.MSPDIReader;
 import net.sf.mpxj.planner.PlannerReader;
+import net.sf.mpxj.primavera.PrimaveraPMFileReader;
+import net.sf.mpxj.primavera.PrimaveraXERFileReader;
 
 /**
  * This class contains utility methods for working with ProjectReaderss.
@@ -94,5 +97,8 @@ public final class ProjectReaderUtility
       READER_MAP.put("XML", MSPDIReader.class);
       READER_MAP.put("MPD", MPDDatabaseReader.class);
       READER_MAP.put("PLANNER", PlannerReader.class);
+      READER_MAP.put("XER", PrimaveraXERFileReader.class);
+      READER_MAP.put("PMXML", PrimaveraPMFileReader.class);
+      READER_MAP.put("PP", AstaFileReader.class);
    }
 }

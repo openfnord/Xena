@@ -23,8 +23,7 @@
 
 package net.sf.mpxj;
 
-import java.util.EnumSet;
-
+import net.sf.mpxj.utility.EnumUtility;
 import net.sf.mpxj.utility.MpxjEnum;
 import net.sf.mpxj.utility.NumberUtility;
 
@@ -32,7 +31,7 @@ import net.sf.mpxj.utility.NumberUtility;
  * This class is used to represent an accrue type. It provides a mapping
  * between the textual description of a accrue type found in an MPX
  * file, and an enumerated representation that can be more easily manipulated
- * programatically.
+ * programmatically.
  */
 public enum AccrueType implements MpxjEnum
 {
@@ -90,7 +89,7 @@ public enum AccrueType implements MpxjEnum
     *
     * @return int representation of the enum
     */
-   public int getValue()
+   @Override public int getValue()
    {
       return (m_value);
    }
@@ -98,14 +97,7 @@ public enum AccrueType implements MpxjEnum
    /**
     * Array mapping int types to enums.
     */
-   private static final AccrueType[] TYPE_VALUES = new AccrueType[4];
-   static
-   {
-      for (AccrueType e : EnumSet.range(AccrueType.START, AccrueType.PRORATED))
-      {
-         TYPE_VALUES[e.getValue()] = e;
-      }
-   }
+   private static final AccrueType[] TYPE_VALUES = EnumUtility.createTypeArray(AccrueType.class, 1);
 
    /**
     * Internal representation of the enum int type.

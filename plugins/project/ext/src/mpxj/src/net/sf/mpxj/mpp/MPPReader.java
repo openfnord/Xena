@@ -25,14 +25,18 @@ package net.sf.mpxj.mpp;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import net.sf.mpxj.DateRange;
 import net.sf.mpxj.MPXJException;
 import net.sf.mpxj.ProjectFile;
+import net.sf.mpxj.Relation;
 import net.sf.mpxj.Task;
+import net.sf.mpxj.listener.ProjectListener;
 import net.sf.mpxj.reader.AbstractProjectReader;
 
 import org.apache.poi.poifs.filesystem.DirectoryEntry;
@@ -48,16 +52,69 @@ public final class MPPReader extends AbstractProjectReader
    /**
     * {@inheritDoc}
     */
-   public ProjectFile read(InputStream is) throws MPXJException
+   @Override public void addProjectListener(ProjectListener listener)
    {
+      if (m_projectListeners == null)
+      {
+         m_projectListeners = new LinkedList<ProjectListener>();
+      }
+      m_projectListeners.add(listener);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override public ProjectFile read(InputStream is) throws MPXJException
+   {
+
+      try
+      {
+
+         //
+         // Open the file system
+         //
+         POIFSFileSystem fs = new POIFSFileSystem(is);
+
+         return read(fs);
+
+      }
+      catch (IOException ex)
+      {
+
+         throw new MPXJException(MPXJException.READ_ERROR, ex);
+
+      }
+   }
+
+   /**
+    * Alternative entry point allowing an MPP file to be read from
+    * a user-supplied POI file stream. 
+    * 
+    * @param fs POI file stream
+    * @return ProjectFile instance
+    * @throws MPXJException
+    */
+   public ProjectFile read(POIFSFileSystem fs) throws MPXJException
+   {
+
       try
       {
          ProjectFile projectFile = new ProjectFile();
 
+         projectFile.addProjectListeners(m_projectListeners);
+         projectFile.setAutoTaskID(false);
+         projectFile.setAutoTaskUniqueID(false);
+         projectFile.setAutoResourceID(false);
+         projectFile.setAutoResourceUniqueID(false);
+         projectFile.setAutoOutlineLevel(false);
+         projectFile.setAutoOutlineNumber(false);
+         projectFile.setAutoWBS(false);
+         projectFile.setAutoCalendarUniqueID(false);
+         projectFile.setAutoAssignmentUniqueID(false);
+
          //
          // Open the file system and retrieve the root directory
          //
-         POIFSFileSystem fs = new POIFSFileSystem(is);
          DirectoryEntry root = fs.getRoot();
 
          //
@@ -94,6 +151,7 @@ public final class MPPReader extends AbstractProjectReader
             {
                task.setSplits(null);
             }
+            validationRelations(task);
          }
 
          //
@@ -121,6 +179,40 @@ public final class MPPReader extends AbstractProjectReader
    }
 
    /**
+    * This method validates all relationships for a task, removing
+    * any which have been incorrectly read from the MPP file and 
+    * point to a parent task.
+    * 
+    * @param task task under test
+    */
+   private void validationRelations(Task task)
+   {
+      List<Relation> predecessors = task.getPredecessors();
+      if (predecessors != null)
+      {
+         ArrayList<Relation> invalid = new ArrayList<Relation>();
+         for (Relation relation : predecessors)
+         {
+            Task sourceTask = relation.getSourceTask();
+            Task targetTask = relation.getTargetTask();
+
+            String sourceOutlineNumber = sourceTask.getOutlineNumber();
+            String targetOutlineNumber = targetTask.getOutlineNumber();
+
+            if (sourceOutlineNumber != null && targetOutlineNumber != null && sourceOutlineNumber.startsWith(targetOutlineNumber + '.'))
+            {
+               invalid.add(relation);
+            }
+         }
+
+         for (Relation relation : invalid)
+         {
+            relation.getSourceTask().removePredecessor(relation.getTargetTask(), relation.getType(), relation.getLag());
+         }
+      }
+   }
+
+   /**
     * This method retrieves the state of the preserve note formatting flag.
     *
     * @return boolean flag
@@ -140,6 +232,50 @@ public final class MPPReader extends AbstractProjectReader
    public void setPreserveNoteFormatting(boolean preserveNoteFormatting)
    {
       m_preserveNoteFormatting = preserveNoteFormatting;
+   }
+
+   /**
+    * If this flag is true, raw timephased data will be retrieved
+    * from MS Project: no normalisation will take place.
+    * 
+    * @return boolean flag
+    */
+   public boolean getUseRawTimephasedData()
+   {
+      return m_useRawTimephasedData;
+   }
+
+   /**
+    * If this flag is true, raw timephased data will be retrieved
+    * from MS Project: no normalisation will take place. 
+    * 
+    * @param useRawTimephasedData boolean flag
+    */
+   public void setUseRawTimephasedData(boolean useRawTimephasedData)
+   {
+      m_useRawTimephasedData = useRawTimephasedData;
+   }
+
+   /**
+    * Retrieves a flag which indicates whether presentation data will
+    * be read from the MPP file. Not reading this data saves time and memory. 
+    * 
+    * @return presentation data flag
+    */
+   public boolean getReadPresentationData()
+   {
+      return m_readPresentationData;
+   }
+
+   /**
+    * Flag to allow time and memory to be saved by not reading
+    * presentation data from the MPP file. 
+    * 
+    * @param readPresentationData set to false to prevent presentation data being read
+    */
+   public void setReadPresentationData(boolean readPresentationData)
+   {
+      m_readPresentationData = readPresentationData;
    }
 
    /**
@@ -195,8 +331,20 @@ public final class MPPReader extends AbstractProjectReader
     */
    private boolean m_preserveNoteFormatting;
 
+   /**
+    * Setting this flag to true allows raw timephased data to be retrieved. 
+    */
+   private boolean m_useRawTimephasedData;
+
+   /**
+    * Flag to allow time and memory to be saved by not reading
+    * presentation data from the MPP file.
+    */
+   private boolean m_readPresentationData = true;
+
    private String m_readPassword;
    private String m_writePassword;
+   private List<ProjectListener> m_projectListeners;
 
    /**
     * Populate a map of file types and file processing classes.
@@ -212,5 +360,8 @@ public final class MPPReader extends AbstractProjectReader
       FILE_CLASS_MAP.put("MSProject.MPP12", MPP12Reader.class);
       FILE_CLASS_MAP.put("MSProject.MPT12", MPP12Reader.class);
       FILE_CLASS_MAP.put("MSProject.GLOBAL12", MPP12Reader.class);
+      FILE_CLASS_MAP.put("MSProject.MPP14", MPP14Reader.class);
+      FILE_CLASS_MAP.put("MSProject.MPT14", MPP14Reader.class);
+      FILE_CLASS_MAP.put("MSProject.GLOBAL14", MPP14Reader.class);
    }
 }

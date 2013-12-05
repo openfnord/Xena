@@ -23,6 +23,7 @@
 
 package net.sf.mpxj.mpp;
 
+import net.sf.mpxj.ProjectFile;
 import net.sf.mpxj.ViewType;
 
 /**
@@ -38,10 +39,13 @@ public final class View8 extends AbstractMppView
    /**
     * Extract the view data from the view data block.
     *
+    * @param parent parent file
     * @param data view data
     */
-   public View8(byte[] data)
+   public View8(ProjectFile parent, byte[] data)
    {
+      super(parent);
+
       m_id = Integer.valueOf(MPPUtility.getInt(data, 0));
       m_name = removeAmpersand(MPPUtility.getUnicodeString(data, 4));
       m_type = ViewType.getInstance(MPPUtility.getShort(data, 116));

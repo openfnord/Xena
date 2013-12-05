@@ -278,14 +278,20 @@ class Props extends MPPComponent
    public static final Integer OVERTIME_RATE = Integer.valueOf(37748768);
    public static final Integer END_TIME = Integer.valueOf(37748769);
 
+   public static final Integer WEEK_START_DAY = Integer.valueOf(37748773);
+   public static final Integer FISCAL_YEAR_START_MONTH = Integer.valueOf(37748780);
+   public static final Integer HONOR_CONSTRAINTS = Integer.valueOf(37748794);
+   public static final Integer FISCAL_YEAR_START = Integer.valueOf(37748801);
+   public static final Integer EDITABLE_ACTUAL_COSTS = Integer.valueOf(37748802);
+
+   public static final Integer DAYS_PER_MONTH = Integer.valueOf(37753743);
+
    public static final Integer CURRENCY_CODE = Integer.valueOf(37753787);
 
    public static final Integer CALCULATE_MULTIPLE_CRITICAL_PATHS = Integer.valueOf(37748793);
 
    public static final Integer TASK_FIELD_NAME_ALIASES = Integer.valueOf(1048577);
    public static final Integer RESOURCE_FIELD_NAME_ALIASES = Integer.valueOf(1048578);
-
-   public static final Integer TASK_FIELD_CUSTOM_VALUE_LISTS = Integer.valueOf(37753744);
 
    public static final Integer PASSWORD_FLAG = Integer.valueOf(893386752);
 
@@ -303,7 +309,7 @@ class Props extends MPPComponent
 
    public static final Integer DEFAULT_CALENDAR_HOURS = Integer.valueOf(37753736);
 
-   public static final Integer GRAPHICAL_INDICATOR_DATA = Integer.valueOf(37753744);
+   public static final Integer TASK_FIELD_ATTRIBUTES = Integer.valueOf(37753744);
 
    public static final Integer FONT_BASES = Integer.valueOf(54525952);
 
@@ -316,6 +322,28 @@ class Props extends MPPComponent
    public static final Integer RESOURCE_CREATION_DATE = Integer.valueOf(205521219);
 
    public static final Integer SHOW_PROJECT_SUMMARY_TASK = Integer.valueOf(54525961);
+
+   public static final Integer TASK_FIELD_MAP = Integer.valueOf(131092);
+   public static final Integer TASK_FIELD_MAP2 = Integer.valueOf(50331668);
+   public static final Integer ENTERPRISE_CUSTOM_FIELD_MAP = Integer.valueOf(37753797); // MPP14 37753768?      
+
+   public static final Integer RESOURCE_FIELD_MAP = Integer.valueOf(131093);
+   public static final Integer RESOURCE_FIELD_MAP2 = Integer.valueOf(50331669);
+
+   public static final Integer ASSIGNMENT_FIELD_MAP = Integer.valueOf(131095);
+   public static final Integer ASSIGNMENT_FIELD_MAP2 = Integer.valueOf(50331671);
+
+   public static final Integer BASELINE_DATE = Integer.valueOf(37753749);
+   public static final Integer BASELINE1_DATE = Integer.valueOf(37753750);
+   public static final Integer BASELINE2_DATE = Integer.valueOf(37753751);
+   public static final Integer BASELINE3_DATE = Integer.valueOf(37753752);
+   public static final Integer BASELINE4_DATE = Integer.valueOf(37753753);
+   public static final Integer BASELINE5_DATE = Integer.valueOf(37753754);
+   public static final Integer BASELINE6_DATE = Integer.valueOf(37753755);
+   public static final Integer BASELINE7_DATE = Integer.valueOf(37753756);
+   public static final Integer BASELINE8_DATE = Integer.valueOf(37753757);
+   public static final Integer BASELINE9_DATE = Integer.valueOf(37753758);
+   public static final Integer BASELINE10_DATE = Integer.valueOf(37753759);
 
    protected TreeMap<Integer, byte[]> m_map = new TreeMap<Integer, byte[]>();
 }

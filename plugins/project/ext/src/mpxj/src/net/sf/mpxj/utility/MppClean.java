@@ -117,28 +117,28 @@ public class MppClean
 
       switch (m_project.getMppFileType())
       {
-         case 8 :
+         case 8:
          {
             projectDirName = "   1";
             varDataFileName = "FixDeferFix   0";
             break;
          }
 
-         case 9 :
+         case 9:
          {
             projectDirName = "   19";
             varDataFileName = "Var2Data";
             break;
          }
 
-         case 12 :
+         case 12:
          {
             projectDirName = "   112";
             varDataFileName = "Var2Data";
             break;
          }
 
-         default :
+         default:
          {
             throw new IllegalArgumentException("Unsupported file type " + m_project.getMppFileType());
          }
@@ -227,7 +227,7 @@ public class MppClean
       List<String> keys = new ArrayList<String>(replacements.keySet());
       Collections.sort(keys, new Comparator<String>()
       {
-         public int compare(String o1, String o2)
+         @Override public int compare(String o1, String o2)
          {
             return (o2.length() - o1.length());
          }
@@ -274,7 +274,7 @@ public class MppClean
       char c2 = 0;
       if (oldText != null && oldText.length() != 0 && !replacements.containsKey(oldText))
       {
-         StringBuffer newText = new StringBuffer(oldText.length());
+         StringBuilder newText = new StringBuilder(oldText.length());
          for (int loop = 0; loop < oldText.length(); loop++)
          {
             char c = oldText.charAt(loop);

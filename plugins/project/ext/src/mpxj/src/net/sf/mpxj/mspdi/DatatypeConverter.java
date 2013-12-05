@@ -27,11 +27,13 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import net.sf.mpxj.AccrueType;
 import net.sf.mpxj.BookingType;
@@ -66,9 +68,9 @@ public final class DatatypeConverter
     * @param value currency value
     * @return string representation
     */
-   private static final String printExtendedAttributeCurrency(Number value)
+   public static final String printExtendedAttributeCurrency(Number value)
    {
-      return (getNumberFormat().format(value.doubleValue() * 100));
+      return (value == null ? null : getNumberFormat().format(value.doubleValue() * 100));
    }
 
    /**
@@ -77,7 +79,7 @@ public final class DatatypeConverter
     * @param value string representation
     * @return currency value
     */
-   private static final Number parseExtendedAttributeCurrency(String value)
+   public static final Number parseExtendedAttributeCurrency(String value)
    {
       Number result;
 
@@ -98,7 +100,7 @@ public final class DatatypeConverter
     * @param value numeric value
     * @return string representation
     */
-   private static final String printExtendedAttributeNumber(Number value)
+   public static final String printExtendedAttributeNumber(Number value)
    {
       return (getNumberFormat().format(value.doubleValue()));
    }
@@ -109,7 +111,7 @@ public final class DatatypeConverter
     * @param value string representation
     * @return numeric value
     */
-   private static final Number parseExtendedAttributeNumber(String value)
+   public static final Number parseExtendedAttributeNumber(String value)
    {
       return (new Double(value));
    }
@@ -120,7 +122,7 @@ public final class DatatypeConverter
     * @param value boolean value
     * @return string representation
     */
-   private static final String printExtendedAttributeBoolean(Boolean value)
+   public static final String printExtendedAttributeBoolean(Boolean value)
    {
       return (value.booleanValue() ? "1" : "0");
    }
@@ -131,7 +133,7 @@ public final class DatatypeConverter
     * @param value string representation
     * @return boolean value
     */
-   private static final Boolean parseExtendedAttributeBoolean(String value)
+   public static final Boolean parseExtendedAttributeBoolean(String value)
    {
       return ((value.equals("1") ? Boolean.TRUE : Boolean.FALSE));
    }
@@ -142,9 +144,9 @@ public final class DatatypeConverter
     * @param value date value
     * @return string representation
     */
-   private static final String printExtendedAttributeDate(Date value)
+   public static final String printExtendedAttributeDate(Date value)
    {
-      return (getDateFormat().format(value));
+      return (value == null ? null : getDateFormat().format(value));
    }
 
    /**
@@ -153,18 +155,21 @@ public final class DatatypeConverter
     * @param value string representation
     * @return date value
     */
-   private static final Date parseExtendedAttributeDate(String value)
+   public static final Date parseExtendedAttributeDate(String value)
    {
-      Date result;
+      Date result = null;
 
-      try
+      if (value != null)
       {
-         result = getDateFormat().parse(value);
-      }
+         try
+         {
+            result = getDateFormat().parse(value);
+         }
 
-      catch (ParseException ex)
-      {
-         result = null;
+         catch (ParseException ex)
+         {
+            // ignore exceptions
+         }
       }
 
       return (result);
@@ -232,47 +237,50 @@ public final class DatatypeConverter
     */
    public static final void parseExtendedAttribute(ProjectFile file, FieldContainer mpx, String value, FieldType mpxFieldID)
    {
-      switch (mpxFieldID.getDataType())
+      if (mpxFieldID != null)
       {
-         case STRING :
+         switch (mpxFieldID.getDataType())
          {
-            mpx.set(mpxFieldID, value);
-            break;
-         }
+            case STRING:
+            {
+               mpx.set(mpxFieldID, value);
+               break;
+            }
 
-         case DATE :
-         {
-            mpx.set(mpxFieldID, parseExtendedAttributeDate(value));
-            break;
-         }
+            case DATE:
+            {
+               mpx.set(mpxFieldID, parseExtendedAttributeDate(value));
+               break;
+            }
 
-         case CURRENCY :
-         {
-            mpx.set(mpxFieldID, parseExtendedAttributeCurrency(value));
-            break;
-         }
+            case CURRENCY:
+            {
+               mpx.set(mpxFieldID, parseExtendedAttributeCurrency(value));
+               break;
+            }
 
-         case BOOLEAN :
-         {
-            mpx.set(mpxFieldID, parseExtendedAttributeBoolean(value));
-            break;
-         }
+            case BOOLEAN:
+            {
+               mpx.set(mpxFieldID, parseExtendedAttributeBoolean(value));
+               break;
+            }
 
-         case NUMERIC :
-         {
-            mpx.set(mpxFieldID, parseExtendedAttributeNumber(value));
-            break;
-         }
+            case NUMERIC:
+            {
+               mpx.set(mpxFieldID, parseExtendedAttributeNumber(value));
+               break;
+            }
 
-         case DURATION :
-         {
-            mpx.set(mpxFieldID, parseDuration(file, null, value));
-            break;
-         }
+            case DURATION:
+            {
+               mpx.set(mpxFieldID, parseDuration(file, null, value));
+               break;
+            }
 
-         default :
-         {
-            break;
+            default:
+            {
+               break;
+            }
          }
       }
    }
@@ -289,26 +297,26 @@ public final class DatatypeConverter
 
       switch (value)
       {
-         default :
-         case BEFORE :
+         default:
+         case BEFORE:
          {
             result = "0";
             break;
          }
 
-         case AFTER :
+         case AFTER:
          {
             result = "1";
             break;
          }
 
-         case BEFORE_WITH_SPACE :
+         case BEFORE_WITH_SPACE:
          {
             result = "2";
             break;
          }
 
-         case AFTER_WITH_SPACE :
+         case AFTER_WITH_SPACE:
          {
             result = "3";
             break;
@@ -330,25 +338,25 @@ public final class DatatypeConverter
 
       switch (NumberUtility.getInt(value))
       {
-         case 0 :
+         case 0:
          {
             result = CurrencySymbolPosition.BEFORE;
             break;
          }
 
-         case 1 :
+         case 1:
          {
             result = CurrencySymbolPosition.AFTER;
             break;
          }
 
-         case 2 :
+         case 2:
          {
             result = CurrencySymbolPosition.BEFORE_WITH_SPACE;
             break;
          }
 
-         case 3 :
+         case 3:
          {
             result = CurrencySymbolPosition.AFTER_WITH_SPACE;
             break;
@@ -661,38 +669,38 @@ public final class DatatypeConverter
       {
          switch (value.intValue())
          {
-            case 1 :
+            case 1:
             {
                result = TimeUnit.MINUTES;
                break;
             }
 
-            case 3 :
+            case 3:
             {
                result = TimeUnit.DAYS;
                break;
             }
 
-            case 4 :
+            case 4:
             {
                result = TimeUnit.WEEKS;
                break;
             }
 
-            case 5 :
+            case 5:
             {
                result = TimeUnit.MONTHS;
                break;
             }
 
-            case 7 :
+            case 7:
             {
                result = TimeUnit.YEARS;
                break;
             }
 
-            default :
-            case 2 :
+            default:
+            case 2:
             {
                result = TimeUnit.HOURS;
                break;
@@ -720,38 +728,38 @@ public final class DatatypeConverter
 
       switch (value)
       {
-         case MINUTES :
+         case MINUTES:
          {
             result = 1;
             break;
          }
 
-         case DAYS :
+         case DAYS:
          {
             result = 3;
             break;
          }
 
-         case WEEKS :
+         case WEEKS:
          {
             result = 4;
             break;
          }
 
-         case MONTHS :
+         case MONTHS:
          {
             result = 5;
             break;
          }
 
-         case YEARS :
+         case YEARS:
          {
             result = 7;
             break;
          }
 
-         default :
-         case HOURS :
+         default:
+         case HOURS:
          {
             result = 2;
             break;
@@ -807,7 +815,7 @@ public final class DatatypeConverter
 
          switch (units)
          {
-            case YEARS :
+            case YEARS:
             {
                //
                // Calculate the number of years
@@ -821,7 +829,7 @@ public final class DatatypeConverter
                break;
             }
 
-            case ELAPSED_YEARS :
+            case ELAPSED_YEARS:
             {
                //
                // Calculate the number of years
@@ -835,7 +843,7 @@ public final class DatatypeConverter
                break;
             }
 
-            case MONTHS :
+            case MONTHS:
             {
                //
                // Calculate the number of months
@@ -849,7 +857,7 @@ public final class DatatypeConverter
                break;
             }
 
-            case ELAPSED_MONTHS :
+            case ELAPSED_MONTHS:
             {
                //
                // Calculate the number of months
@@ -863,7 +871,7 @@ public final class DatatypeConverter
                break;
             }
 
-            case WEEKS :
+            case WEEKS:
             {
                //
                // Calculate the number of weeks
@@ -877,7 +885,7 @@ public final class DatatypeConverter
                break;
             }
 
-            case ELAPSED_WEEKS :
+            case ELAPSED_WEEKS:
             {
                //
                // Calculate the number of weeks
@@ -891,7 +899,7 @@ public final class DatatypeConverter
                break;
             }
 
-            case DAYS :
+            case DAYS:
             {
                //
                // Calculate the number of days
@@ -905,7 +913,7 @@ public final class DatatypeConverter
                break;
             }
 
-            case ELAPSED_DAYS :
+            case ELAPSED_DAYS:
             {
                //
                // Calculate the number of days
@@ -919,8 +927,8 @@ public final class DatatypeConverter
                break;
             }
 
-            case HOURS :
-            case ELAPSED_HOURS :
+            case HOURS:
+            case ELAPSED_HOURS:
             {
                //
                // Calculate the number of hours
@@ -934,8 +942,8 @@ public final class DatatypeConverter
                break;
             }
 
-            case MINUTES :
-            case ELAPSED_MINUTES :
+            case MINUTES:
+            case ELAPSED_MINUTES:
             {
                //
                // Calculate the number of minutes
@@ -949,7 +957,7 @@ public final class DatatypeConverter
                break;
             }
 
-            default :
+            default:
             {
                break;
             }
@@ -987,11 +995,31 @@ public final class DatatypeConverter
    {
       String result = null;
 
-      if (duration == null)
+      if (duration != null && duration.getDuration() != 0)
       {
-         result = DatatypeConverter.ZERO_DURATION;
+         result = printDurationMandatory(writer, duration);
       }
-      else
+
+      return (result);
+   }
+
+   /**
+    * Print duration.
+    *
+    * Note that Microsoft's xsd:duration parser implementation does not
+    * appear to recognise durations other than those expressed in hours.
+    * We use the compatibility flag to determine whether the output
+    * is adjusted for the benefit of Microsoft Project.
+    *
+    * @param writer parent MSPDIWriter instance
+    * @param duration Duration value
+    * @return xsd:duration value
+    */
+   public static final String printDurationMandatory(MSPDIWriter writer, Duration duration)
+   {
+      String result = null;
+
+      if (duration != null)
       {
          TimeUnit durationType = duration.getUnits();
 
@@ -1013,15 +1041,16 @@ public final class DatatypeConverter
     * Print duration time units.
     *
     * @param duration Duration value
-    * @return time units value
+    * @param estimated is this an estimated duration
+    * @return time units value 
     */
-   public static final BigInteger printDurationTimeUnits(Duration duration)
+   public static final BigInteger printDurationTimeUnits(Duration duration, boolean estimated)
    {
       BigInteger result = null;
 
       if (duration != null)
       {
-         result = printDurationTimeUnits(duration.getUnits());
+         result = printDurationTimeUnits(duration.getUnits(), estimated);
       }
 
       return (result);
@@ -1046,7 +1075,7 @@ public final class DatatypeConverter
     */
    public static final BigDecimal printCurrency(Number value)
    {
-      return (value == null ? BIGDECIMAL_ZERO : new BigDecimal(value.doubleValue() * 100));
+      return (value == null || value.doubleValue() == 0 ? null : new BigDecimal(value.doubleValue() * 100));
    }
 
    /**
@@ -1066,85 +1095,86 @@ public final class DatatypeConverter
       {
          switch (value.intValue())
          {
-            case 3 :
-            case 35 :
+            case 3:
+            case 35:
             {
                result = TimeUnit.MINUTES;
                break;
             }
 
-            case 4 :
-            case 36 :
+            case 4:
+            case 36:
             {
                result = TimeUnit.ELAPSED_MINUTES;
                break;
             }
 
-            case 5 :
-            case 37 :
+            case 5:
+            case 37:
             {
                result = TimeUnit.HOURS;
                break;
             }
 
-            case 6 :
-            case 38 :
+            case 6:
+            case 38:
             {
                result = TimeUnit.ELAPSED_HOURS;
                break;
             }
 
-            case 7 :
-            case 39 :
+            case 7:
+            case 39:
+            case 53:
             {
                result = TimeUnit.DAYS;
                break;
             }
 
-            case 8 :
-            case 40 :
+            case 8:
+            case 40:
             {
                result = TimeUnit.ELAPSED_DAYS;
                break;
             }
 
-            case 9 :
-            case 41 :
+            case 9:
+            case 41:
             {
                result = TimeUnit.WEEKS;
                break;
             }
 
-            case 10 :
-            case 42 :
+            case 10:
+            case 42:
             {
                result = TimeUnit.ELAPSED_WEEKS;
                break;
             }
 
-            case 11 :
-            case 43 :
+            case 11:
+            case 43:
             {
                result = TimeUnit.MONTHS;
                break;
             }
 
-            case 12 :
-            case 44 :
+            case 12:
+            case 44:
             {
                result = TimeUnit.ELAPSED_MONTHS;
                break;
             }
 
-            case 19 :
-            case 51 :
+            case 19:
+            case 51:
             {
                result = TimeUnit.PERCENT;
                break;
             }
 
-            case 20 :
-            case 52 :
+            case 20:
+            case 52:
             {
                result = TimeUnit.ELAPSED_PERCENT;
                break;
@@ -1162,9 +1192,10 @@ public final class DatatypeConverter
     * durations. Unrecognised duration types are default to hours.
     *
     * @param value Duration units
+    * @param estimated is this an estimated duration
     * @return BigInteger value
     */
-   public static final BigInteger printDurationTimeUnits(TimeUnit value)
+   public static final BigInteger printDurationTimeUnits(TimeUnit value, boolean estimated)
    {
       int result;
 
@@ -1175,76 +1206,76 @@ public final class DatatypeConverter
 
       switch (value)
       {
-         case MINUTES :
+         case MINUTES:
          {
-            result = 3;
+            result = (estimated ? 35 : 3);
             break;
          }
 
-         case ELAPSED_MINUTES :
+         case ELAPSED_MINUTES:
          {
-            result = 4;
+            result = (estimated ? 36 : 4);
             break;
          }
 
-         case ELAPSED_HOURS :
+         case ELAPSED_HOURS:
          {
-            result = 6;
+            result = (estimated ? 38 : 6);
             break;
          }
 
-         case DAYS :
+         case DAYS:
          {
-            result = 7;
+            result = (estimated ? 39 : 7);
             break;
          }
 
-         case ELAPSED_DAYS :
+         case ELAPSED_DAYS:
          {
-            result = 8;
+            result = (estimated ? 40 : 8);
             break;
          }
 
-         case WEEKS :
+         case WEEKS:
          {
-            result = 9;
+            result = (estimated ? 41 : 9);
             break;
          }
 
-         case ELAPSED_WEEKS :
+         case ELAPSED_WEEKS:
          {
-            result = 10;
+            result = (estimated ? 42 : 10);
             break;
          }
 
-         case MONTHS :
+         case MONTHS:
          {
-            result = 11;
+            result = (estimated ? 43 : 11);
             break;
          }
 
-         case ELAPSED_MONTHS :
+         case ELAPSED_MONTHS:
          {
-            result = 12;
+            result = (estimated ? 44 : 12);
             break;
          }
 
-         case PERCENT :
+         case PERCENT:
          {
-            result = 19;
+            result = (estimated ? 51 : 19);
             break;
          }
 
-         case ELAPSED_PERCENT :
+         case ELAPSED_PERCENT:
          {
-            result = 20;
+            result = (estimated ? 52 : 20);
             break;
          }
 
-         default :
-         case HOURS :
+         default:
+         case HOURS:
          {
-            result = 5;
+            result = (estimated ? 37 : 5);
             break;
          }
       }
@@ -1283,30 +1314,136 @@ public final class DatatypeConverter
    }
 
    /**
-    * Parse duration in minutes.
+    * Parse duration represented in thousandths of minutes.
     *
     * @param value duration value
     * @return Duration instance
     */
-   public static final Duration parseDurationInMinutes(Number value)
+   public static final Duration parseDurationInThousanthsOfMinutes(Number value)
+   {
+      return parseDurationInFractionsOfMinutes(null, value, TimeUnit.MINUTES, 1000);
+   }
+
+   /**
+    * Parse duration represented in tenths of minutes.
+    *
+    * @param value duration value
+    * @return Duration instance
+    */
+   public static final Duration parseDurationInTenthsOfMinutes(Number value)
+   {
+      return parseDurationInFractionsOfMinutes(null, value, TimeUnit.MINUTES, 10);
+   }
+
+   /**
+    * Parse duration represented in thousandths of minutes. 
+    * 
+    * @param header project header
+    * @param value duration value
+    * @param targetTimeUnit required output time units
+    * @return Duration instance
+    */
+   public static final Duration parseDurationInThousanthsOfMinutes(ProjectHeader header, Number value, TimeUnit targetTimeUnit)
+   {
+      return parseDurationInFractionsOfMinutes(header, value, targetTimeUnit, 1000);
+   }
+
+   /**
+    * Parse duration represented as tenths of minutes.
+    * 
+    * @param header project header
+    * @param value duration value
+    * @param targetTimeUnit required output time units
+    * @return Duration instance
+    */
+   public static final Duration parseDurationInTenthsOfMinutes(ProjectHeader header, Number value, TimeUnit targetTimeUnit)
+   {
+      return parseDurationInFractionsOfMinutes(header, value, targetTimeUnit, 10);
+   }
+
+   /**
+    * Print duration in thousandths of minutes.
+    *
+    * @param duration Duration instance
+    * @return duration in thousandths of minutes
+    */
+   public static final BigInteger printDurationInIntegerThousandthsOfMinutes(Duration duration)
+   {
+      BigInteger result = null;
+      if (duration != null && duration.getDuration() != 0)
+      {
+         result = BigInteger.valueOf((long) printDurationFractionsOfMinutes(duration, 1000));
+      }
+      return result;
+   }
+
+   /**
+    * Print duration in thousandths of minutes.
+    *
+    * @param duration Duration instance
+    * @return duration in thousandths of minutes
+    */
+   public static final BigDecimal printDurationInDecimalThousandthsOfMinutes(Duration duration)
+   {
+      BigDecimal result = null;
+      if (duration != null && duration.getDuration() != 0)
+      {
+         result = BigDecimal.valueOf(printDurationFractionsOfMinutes(duration, 1000));
+      }
+      return result;
+   }
+
+   /**
+    * Print duration in tenths of minutes.
+    *
+    * @param duration Duration instance
+    * @return duration in tenths of minutes
+    */
+   public static final BigInteger printDurationInIntegerTenthsOfMinutes(Duration duration)
+   {
+      BigInteger result = null;
+
+      if (duration != null && duration.getDuration() != 0)
+      {
+         result = BigInteger.valueOf((long) printDurationFractionsOfMinutes(duration, 10));
+      }
+
+      return result;
+   }
+
+   /**
+    * Parse duration represented as an arbitrary fraction of minutes.
+    * 
+    * @param header project header
+    * @param value duration value
+    * @param targetTimeUnit required output time units
+    * @param factor required fraction of a minute
+    * @return Duration instance
+    */
+   private static final Duration parseDurationInFractionsOfMinutes(ProjectHeader header, Number value, TimeUnit targetTimeUnit, int factor)
    {
       Duration result = null;
 
       if (value != null)
       {
-         result = Duration.getInstance(value.intValue() / 1000, TimeUnit.MINUTES);
+         result = Duration.getInstance(value.intValue() / factor, TimeUnit.MINUTES);
+         if (targetTimeUnit != result.getUnits())
+         {
+            result = result.convertUnits(targetTimeUnit, header);
+         }
       }
 
       return (result);
    }
 
    /**
-    * Print duration in minutes.
-    *
+    * Print a duration represented by an arbitrary fraction of minutes.
+    * 
     * @param duration Duration instance
-    * @return duration in minutes
+    * @param factor required factor
+    * @return duration represented as an arbitrary fraction of minutes
     */
-   public static final double printDurationInMinutes(Duration duration)
+   private static final double printDurationFractionsOfMinutes(Duration duration, int factor)
    {
       double result = 0;
 
@@ -1316,67 +1453,69 @@ public final class DatatypeConverter
 
          switch (duration.getUnits())
          {
-            case HOURS :
-            case ELAPSED_HOURS :
+            case HOURS:
+            case ELAPSED_HOURS:
             {
                result *= 60;
                break;
             }
 
-            case DAYS :
+            case DAYS:
             {
                result *= (60 * 8);
                break;
             }
 
-            case ELAPSED_DAYS :
+            case ELAPSED_DAYS:
             {
                result *= (60 * 24);
                break;
             }
 
-            case WEEKS :
+            case WEEKS:
             {
                result *= (60 * 8 * 5);
                break;
             }
 
-            case ELAPSED_WEEKS :
+            case ELAPSED_WEEKS:
             {
                result *= (60 * 24 * 7);
                break;
             }
 
-            case MONTHS :
+            case MONTHS:
             {
                result *= (60 * 8 * 5 * 4);
                break;
             }
 
-            case ELAPSED_MONTHS :
+            case ELAPSED_MONTHS:
             {
                result *= (60 * 24 * 30);
                break;
             }
 
-            case YEARS :
+            case YEARS:
             {
                result *= (60 * 8 * 5 * 52);
                break;
             }
 
-            case ELAPSED_YEARS :
+            case ELAPSED_YEARS:
             {
                result *= (60 * 24 * 365);
                break;
             }
 
-            default :
+            default:
             {
                break;
             }
          }
       }
+
+      result *= factor;
 
       return (result);
    }
@@ -1389,7 +1528,12 @@ public final class DatatypeConverter
     */
    public static final BigDecimal printRate(Rate rate)
    {
-      return (rate == null ? null : new BigDecimal(rate.getAmount()));
+      BigDecimal result = null;
+      if (rate != null && rate.getAmount() != 0)
+      {
+         result = new BigDecimal(rate.getAmount());
+      }
+      return result;
    }
 
    /**
@@ -1463,7 +1607,10 @@ public final class DatatypeConverter
    public static final String printTaskUID(Integer value)
    {
       ProjectFile file = PARENT_FILE.get();
-      file.fireTaskWrittenEvent(file.getTaskByUniqueID(value));
+      if (file != null)
+      {
+         file.fireTaskWrittenEvent(file.getTaskByUniqueID(value));
+      }
       return (value.toString());
    }
 
@@ -1487,7 +1634,10 @@ public final class DatatypeConverter
    public static final String printResourceUID(Integer value)
    {
       ProjectFile file = PARENT_FILE.get();
-      file.fireResourceWrittenEvent(file.getResourceByUniqueID(value));
+      if (file != null)
+      {
+         file.fireResourceWrittenEvent(file.getResourceByUniqueID(value));
+      }
       return (value.toString());
    }
 
@@ -1646,7 +1796,9 @@ public final class DatatypeConverter
       NumberFormat format = NUMBER_FORMAT.get();
       if (format == null)
       {
-         format = new DecimalFormat("#.##");
+         // XML numbers should use . as decimal separator and no grouping. 
+         format = new DecimalFormat("#.##", new DecimalFormatSymbols(Locale.US));
+         format.setGroupingUsed(false);
          NUMBER_FORMAT.set(format);
       }
       return (format);
@@ -1689,8 +1841,6 @@ public final class DatatypeConverter
    private static final ThreadLocal<DateFormat> DATE_FORMAT = new ThreadLocal<DateFormat>();
    private static final ThreadLocal<DateFormat> TIME_FORMAT = new ThreadLocal<DateFormat>();
    private static final ThreadLocal<NumberFormat> NUMBER_FORMAT = new ThreadLocal<NumberFormat>();
-   private static final String ZERO_DURATION = "PT0H0M0S";
-   private static final BigDecimal BIGDECIMAL_ZERO = BigDecimal.valueOf(0);
    private static final BigDecimal BIGDECIMAL_ONE = BigDecimal.valueOf(1);
    private static final ThreadLocal<ProjectFile> PARENT_FILE = new ThreadLocal<ProjectFile>();
 }
