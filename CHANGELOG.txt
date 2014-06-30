@@ -4,6 +4,8 @@ Bug Fixes
 ---------
 * Normalisations made by the Ogg Audio normaliser now correctly add in the exported checksum (bug-#383)
 * A correct error message is now shown when trying to normalise or convert files when the output directory does not exist (normally because it has been deleted) (bug-#385)
+* Normalisations of pst file now correctly handle non-english characters (bug-#386)
+* Normalisations of email messages with further embedded messages are now correctly handled (bug-#389)
 
 
 

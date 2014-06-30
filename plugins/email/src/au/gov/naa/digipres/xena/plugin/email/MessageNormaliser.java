@@ -18,6 +18,7 @@
 
 package au.gov.naa.digipres.xena.plugin.email;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -223,7 +224,13 @@ public class MessageNormaliser extends AbstractNormaliser {
 
 		// There is a requirement for the meta-data to contain the real source location of the attachment,
 		// thus this hack specially for Trim where attachments are separate files.
-		if (bp.getContent() instanceof Message) {
+		// We check for the existence of the file to avoid trying to use a separate file in cases such as
+		// embedded emails where there is no separate email.
+		//TODO The protection against using a separate file for the attachment should be based on more than just the existence of 
+		//     a file with the correct name as this could result in some sort of false positive.  We really should still be trying
+		//     to read from the getInputStream and only using a separate file if we cannot use the stream or the stream and the file
+		//     contents match up (possibly only testing a small part at the start).
+		if (bp.getContent() instanceof Message && new File(nuri).exists()) {
 			xis = lastInputSource = new XenaInputSource(nuri, localType);
 		} else if (bp instanceof au.gov.naa.digipres.xena.plugin.email.trim.TrimAttachment) {
 			xis = lastInputSource = new XenaInputSource(((au.gov.naa.digipres.xena.plugin.email.trim.TrimPart) bp).getFile(), null);
