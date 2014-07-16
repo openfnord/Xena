@@ -262,17 +262,54 @@ public class EmailToXenaEmailNormaliser extends AbstractNormaliser {
 		for (Message msg : message) {
 			String msgurl = null;
 			XenaInputSource xis = null;
+			MessageNormaliser messageNormaliser = new MessageNormaliser(msg, normaliserManager);
 			if (doMany) {
+				
+				String folderNames;
+				Folder rootFolder = gofolder.getStore().getDefaultFolder();
+				if (rootFolder != null && gofolder != null &&  gofolder.getFullName().startsWith(rootFolder.getFullName())) {
+					// get the folder names minus those of the root folder (to remove the file name part)
+					folderNames = gofolder.getFullName().substring(rootFolder.getFullName().length());
+				} else {
+					// just use the name of the folder itself rather the full path of folder names as it is difficult for us
+					// to tell what the root folder name is in this case
+					folderNames = gofolder.getName();
+				}
+				
+				// create a URI for the file, including folder names and message number
 				URLName url = new URLName(input.getSystemId());
 				String fileName = url.getFile();
 				if (fileName == null) {
 					fileName = "";
-				} else if (fileName.length() == 0) {
-					// nothing
-				} else if (fileName.charAt(fileName.length() - 1) != '/' && !gofolder.getFullName().equals("")) {
+				}
+				String folderUriPart = folderNames;
+				if ( ! folderUriPart.isEmpty()) {
+					folderUriPart = UrlEncoder.encode(folderUriPart) + "/";
+					if ( ! folderUriPart.startsWith("/")) {
+						folderUriPart = "/" + folderUriPart;
+					}
+				} else if ( ! fileName.isEmpty()) {
 					fileName += "/";
 				}
-				fileName += UrlEncoder.encode(gofolder.getName()) + "/" + msg.getMessageNumber();
+				fileName += folderUriPart + msg.getMessageNumber();
+				
+				// record the folder path in the email:folder tag if such a path exists after removing unimportant prefixes
+				// and suffixes
+				final String[] FOLDER_PREFIXES_TO_REMOVE = {"/Outlook Data File/", "/No Folders/", "/Personal Folders/"};
+				final String[] FOLDER_SUFFIXES_TO_REMOVE = {"/mbox", "mbox"};
+				for (String prefix : FOLDER_PREFIXES_TO_REMOVE) {
+					if (folderNames.startsWith(prefix)) {
+						folderNames = folderNames.substring(prefix.length());
+						break;
+					}
+				}
+				for (String suffix : FOLDER_SUFFIXES_TO_REMOVE) {
+					if (folderNames.endsWith(suffix)) {
+						folderNames = folderNames.substring(0, folderNames.length() - suffix.length());
+						break;
+					}
+				}
+				messageNormaliser.setProperty("http://xena/mail/folder", folderNames);
 
 				// Create a temp file for the message so we can use it to find metadata in the default plugin. 
 				File tmpMessage = File.createTempFile("message-", ".msg");
@@ -292,7 +329,6 @@ public class EmailToXenaEmailNormaliser extends AbstractNormaliser {
 			} else {
 				xis = (XenaInputSource) input;
 			}
-			MessageNormaliser messageNormaliser = new MessageNormaliser(msg, normaliserManager);
 
 			OutputStream outputStream = null;
 

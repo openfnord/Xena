@@ -104,6 +104,12 @@ public class MessageNormaliser extends AbstractNormaliser {
 			ContentHandler ch = getContentHandler();
 			LexicalHandler lexicalHandler = getLexicalHandler();
 			ch.startElement(EMAIL_URI, EMAIL_PREFIX, EMAIL_PREFIX + ":email", empty);
+			String folderNames = (String) getProperty("http://xena/mail/folder");
+			if (folderNames != null && ! folderNames.isEmpty()) {
+				ch.startElement(EMAIL_URI, EMAIL_PREFIX, EMAIL_PREFIX + ":folder", empty);
+				ch.characters(folderNames.toCharArray(), 0, folderNames.length());
+				ch.endElement(EMAIL_URI, EMAIL_PREFIX, EMAIL_PREFIX + ":folder");
+			}
 			ch.startElement(EMAIL_URI, "headers", EMAIL_PREFIX + ":headers", empty);
 			Enumeration<Header> en = msg.getAllHeaders();
 			SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_STRING);

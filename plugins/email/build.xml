@@ -54,7 +54,7 @@
 		withViewer="true" 
 		buildNumFile="${basedir}/etc/buildnum.properties"
 		buildNumProperty="buildnum"
-		version="3.3.3">
+		version="3.3.4">
 		<parameter name="Release" type="Boolean" value="${is_release}" />
 	</jreleaseinfo>
 	</target>	

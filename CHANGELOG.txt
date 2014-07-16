@@ -7,6 +7,10 @@ Bug Fixes
 * Normalisations of pst file now correctly handle non-english characters (bug-#386)
 * Normalisations of email messages with further embedded messages are now correctly handled (bug-#389)
 
+Feature Enhancements
+--------------------
+* The folder an email was stored in is now recorded in the email:folder tag where such information is present (rfe-#343)
+
 
 
 Xena 6.1.0
