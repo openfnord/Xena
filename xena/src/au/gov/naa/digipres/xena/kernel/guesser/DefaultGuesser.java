@@ -21,20 +21,13 @@ import au.gov.naa.digipres.xena.kernel.XenaInputSource;
 
 /**
  * @author Justin Waddell
- *
  */
 public abstract class DefaultGuesser extends Guesser {
 
-	/**
-	 * @param guesserManager
-	 */
 	public DefaultGuesser(GuesserManager guesserManager) {
 		super(guesserManager);
 	}
 
-	/**
-	 * 
-	 */
 	public DefaultGuesser() {
 		super();
 	}

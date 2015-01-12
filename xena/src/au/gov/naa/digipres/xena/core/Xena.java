@@ -220,7 +220,6 @@ public class Xena {
 	 * @throws IOException
 	 * @see #GuesserManager.getGuesses(XenaInputSource xis) 
 	 */
-	@SuppressWarnings("unused")
 	public List<Guess> getGuesses(XenaInputSource xis) throws XenaException, IOException {
 		// TODO: Remove the unused XenaException and IOException declarations. 
 		// Removing them now would cause errors in calling methods which catch these exceptions
@@ -280,7 +279,6 @@ public class Xena {
 	 * @throws XenaException
 	 * @throws IOException
 	 */
-	@SuppressWarnings("unused")
 	public Type getMostLikelyType(XenaInputSource xis, List<String> disabledTypeList) throws XenaException, IOException {
 		// TODO: Remove the unused IOException declaration. 
 		// Removing it now would cause errors in calling methods which catch this exception
@@ -506,7 +504,6 @@ public class Xena {
 	 * @return a normaliser with the name specified.
 	 * @throws XenaException
 	 */
-	@SuppressWarnings("unused")
 	public AbstractNormaliser getNormaliser(String name) throws XenaException {
 		// TODO: Remove the unused XenaException declaration. 
 		// Removing it now would cause errors in calling methods which catch this exception

@@ -85,60 +85,49 @@ import au.gov.naa.digipres.xena.kernel.type.UnknownType;
  * of another XenaInputSource when it is normalised, then this will be reflected
  * in the results object, by setting the <code>isChild</code> flag to true,
  * and setting the <code>parentSystemId</code>.
- * 
- * 
- * 
  */
 
 public class NormaliserResults {
 
+	private String id;
 	private String xenaVersion = Xena.getVersion();
 
-	private boolean normalised = false;
-
-	private String normaliserName;
-
 	private String inputSystemId;
-
-	private Date inputLastModified;
-
 	private Type inputType;
-
-	private String outputFileName;
-
-	private String destinationDirString;
-
-	private AbstractFileNamer fileNamer;
-
-	private String wrapperName;
-
-	private String id;
-
-	private String normaliserClassName = null;
-
-	private String normaliserVersion;
-
-	private boolean isChild = false;
-
-	private boolean sourceIsOpenFormat = false;
-
-	private String parentSystemId;
-
-	private List<String> errorList = new ArrayList<String>();
-
-	private List<Exception> exceptionList = new ArrayList<Exception>();
+	private Date inputLastModified;
 	
-	private List<String> warningList = new ArrayList<String>();
-
-	private List<NormaliserResults> childAIPResults = new ArrayList<NormaliserResults>();
-
-	private List<NormaliserResults> dataObjectComponentResults = new ArrayList<NormaliserResults>();
-
+	private long inputSizeInBytes;
+	private long outputPackagedSizeInBytes;
+	private long outputSizeInBytes;
+	
+	private boolean sourceIsOpenFormat = false;
 	private boolean isConvertOnly = false;
+	
+	private boolean normalised = false;
+	private String normaliserName;
+	private String normaliserClassName = null;
+	private String normaliserVersion;
+	
+	//TODO perhaps these should be a Path instead?
+	private String outputFileName;
+	private String destinationDirString;
+	
+	private AbstractFileNamer fileNamer;
+	private String wrapperName;
+	
+	private boolean isChild = false;
+	private String parentSystemId;
+	
+	//TODO should this include actual log-type output from whatever the converter uses to do the conversion?
+	private List<String> errorList = new ArrayList<String>();
+	private List<Exception> exceptionList = new ArrayList<Exception>();
+	private List<String> warningList = new ArrayList<String>();
+	
+	private List<NormaliserResults> childAIPResults = new ArrayList<NormaliserResults>();
+	private List<NormaliserResults> dataObjectComponentResults = new ArrayList<NormaliserResults>();
 
 	/**
 	 * Default Constructor - initialise values to null, unknown, or false.
-	 * 
 	 */
 	public NormaliserResults() {
 		normalised = false;
