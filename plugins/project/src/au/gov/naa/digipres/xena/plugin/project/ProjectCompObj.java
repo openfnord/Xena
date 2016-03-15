@@ -28,10 +28,13 @@ import java.io.InputStream;
 
 /**
  * This class handles reading the data found in the CompObj block
- * of an MPP file. The bits we can decypher allow us to determine
+ * of an MPP file. The bits we can decipher allow us to determine
  * the file format.
  */
 public class ProjectCompObj {
+	
+	private static int MAX_FIELD_LENGTH = 1024;
+	
 	/**
 	* Constructor. Reads and processes the block data.
 	*
@@ -39,31 +42,41 @@ public class ProjectCompObj {
 	* @throws IOException on read failure
 	*/
 	public ProjectCompObj(InputStream is) throws IOException {
-		int length;
-
 		is.skip(28);
-
-		length = readInt(is);
-		m_applicationName = length > 0 ? new String(readByteArray(is, length), 0, length - 1) : "";
-
-		if (m_applicationName != null && m_applicationName.equals("Microsoft Project 4.0") == true) {
-			m_fileFormat = "MSProject.MPP4";
-			m_applicationID = "MSProject.Project.4";
-		} else {
-			length = readInt(is);
-			m_fileFormat = length > 0 ? new String(readByteArray(is, length), 0, length - 1) : "";
-			length = readInt(is);
-			m_applicationID = length > 0 ? new String(readByteArray(is, length), 0, length - 1) : "";
+		try {
+			m_applicationName = readField(is);
+			if (m_applicationName != null && m_applicationName.equals("Microsoft Project 4.0") == true) {
+				m_fileFormat = "MSProject.MPP4";
+				m_applicationID = "MSProject.Project.4";
+			} else {
+				m_fileFormat = readField(is);
+				m_applicationID = readField(is);
+			}
+		} catch (ExceedsMaxLength e) {
+			// just drop out and stop reading
 		}
+	}
+	
+	private class ExceedsMaxLength extends Exception {}
+	 
+	private String readField(InputStream is) throws IOException, ExceedsMaxLength {
+		int length = readInt(is);
+		String result;
+		if (length > 0) {
+			if (length <= MAX_FIELD_LENGTH) {
+				result = new String(readByteArray(is, length), 0, length - 1);
+			} else {
+				throw new ExceedsMaxLength();
+			}
+		} else {
+			result = "";
+		}
+		return result;
 	}
 
 	public boolean isProjectFile() {
 		String format = getFileFormat();
-		if (format.equals("MSProject.MPP9") || format.equals("MSProject.MPP8")) {
-			return true;
-		} else {
-			return false;
-		}
+		return format.equals("MSProject.MPP9") || format.equals("MSProject.MPP8");
 	}
 
 	/**
