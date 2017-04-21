@@ -29,9 +29,9 @@
     </plugins>
   </build>
   <modules>
-    <module>core</module>
-<!--    <module>plugins</module>
-    <module>ext</module>-->
+    <module>core</module> 
+    <module>ext</module>
+    <!--    <module>plugins</module>-->
   </modules>
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
