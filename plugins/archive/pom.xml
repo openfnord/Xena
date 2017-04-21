@@ -11,8 +11,8 @@
   <dependencies>
     <dependency>
       <groupId>au.gov.naa.digipres.xena</groupId>
-      <artifactId>xena</artifactId>
-      <version>6.1.0</version>
+      <artifactId>core</artifactId>
+      <version>6.1.0</version>      
       <type>jar</type>
     </dependency>
     <dependency>
