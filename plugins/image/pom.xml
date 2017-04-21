@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>au.gov.naa.digipres.xena</groupId>
+    <artifactId>plugins</artifactId>
+    <version>6.1.0</version>
+  </parent>
+  <artifactId>image</artifactId>
+  <packaging>jar</packaging>
+  <dependencies>
+    <dependency>
+      <groupId>au.gov.naa.digipres.xena</groupId>
+      <artifactId>core</artifactId>
+      <version>6.1.0</version>
+      <type>jar</type>
+    </dependency>
+   
+<dependency>
+    <groupId>org.apache.sanselan</groupId>
+    <artifactId>sanselan</artifactId>
+    <version>0.97-incubator</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.im4java/im4java -->
+<dependency>
+    <groupId>org.im4java</groupId>
+    <artifactId>im4java</artifactId>
+    <version>1.4.0</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-svggen -->
+<dependency>
+    <groupId>org.apache.xmlgraphics</groupId>
+    <artifactId>batik-svggen</artifactId>
+    <version>1.7</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-svggen -->
+<dependency>
+    <groupId>org.apache.xmlgraphics</groupId>
+    <artifactId>batik-swing</artifactId>
+    <version>1.7</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-svggen -->
+<dependency>
+    <groupId>org.apache.xmlgraphics</groupId>
+    <artifactId>batik-codec</artifactId>
+    <version>1.7</version>
+</dependency>
+
+
+  </dependencies>
+</project>
