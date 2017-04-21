@@ -10,10 +10,10 @@
   <packaging>pom</packaging>
   <modules>
     <module>archive</module>
-   <module>audio</module>
- <module>csv</module>
- <!--        <module>email</module>
-    
+    <module>audio</module>
+    <module>csv</module>
+    <module>email</module>
+    <!--     
     <module>xml</module>-->    
     <module>office</module>
   </modules>
