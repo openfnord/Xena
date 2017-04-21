@@ -13,7 +13,7 @@
     <module>audio</module>
     <module>csv</module>
     <module>email</module>
-         
+    <module>html</module>
     <module>xml</module>    
     <module>office</module>
   </modules>
