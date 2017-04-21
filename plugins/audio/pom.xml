@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>au.gov.naa.digipres.xena</groupId>
+    <artifactId>plugins</artifactId>
+    <version>6.1.0</version>
+  </parent>
+  <artifactId>audio</artifactId>
+  <packaging>jar</packaging>
+  <dependencies>
+   <dependency>
+      <groupId>au.gov.naa.digipres.xena</groupId>
+      <artifactId>core</artifactId>
+      <version>6.1.0</version>
+      <type>jar</type>
+    </dependency>
+    
+    <dependency>    
+      <groupId>jflac</groupId>
+      <artifactId>jflac</artifactId>
+      <version>1.3</version>
+    </dependency> 
+    <dependency>
+      <groupId>javazoom</groupId>
+      <artifactId>jlayer</artifactId>
+      <version>1.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.googlecode.soundlibs</groupId>
+      <artifactId>tritonus-share</artifactId>
+      <version>0.3.7.4</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.googlecode.soundlibs</groupId>
+      <artifactId>tritonus-all</artifactId>
+      <version>0.3.7.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.googlecode.soundlibs</groupId>
+      <artifactId>jlayer</artifactId>
+      <version>1.0.1.4</version>
+    </dependency>
+
+<!--    <dependency>
+      <groupId>com.googlecode.soundlibs</groupId>
+      <artifactId>mp3spi</artifactId>
+      <version>1.9.5.3</version>
+    </dependency>-->
+
+    <dependency>
+      <groupId>com.googlecode.soundlibs</groupId>
+      <artifactId>jorbis</artifactId>
+      <version>0.0.17.4</version>
+    </dependency>
+<dependency>
+    <groupId>org.mobicents.external.jspeex</groupId>
+    <artifactId>jspeex</artifactId>
+    <version>0.9.7</version>
+</dependency>
+    <dependency>
+      <groupId>com.googlecode.soundlibs</groupId>
+      <artifactId>vorbisspi</artifactId>
+      <version>1.0.3.3</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.googlecode.soundlibs</groupId>
+      <artifactId>basicplayer</artifactId>
+      <version>3.0.0.0</version>
+    </dependency> 
+    <dependency>
+      <groupId>org.mobicents.external.fmj</groupId>
+      <artifactId>mp3spi</artifactId>
+      <version>1.9.4</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tika</groupId>
+      <artifactId>tika-core</artifactId>
+      <version>1.3</version>
+      <type>jar</type>
+    </dependency>
+  </dependencies>
+  <repositories>
+    <repository>
+      <id>jboss nexus</id>
+      <name>jboss nexus</name>
+      <url>https://repository.jboss.org/nexus/content/repositories/releases/</url>
+    </repository>
+  </repositories>
+
+</project>
