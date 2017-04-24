@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>au.gov.naa.digipres.xena</groupId>
+    <artifactId>plugins</artifactId>
+    <version>6.1.0</version>
+  </parent>
+  <artifactId>website</artifactId>
+  <packaging>jar</packaging>
+  <dependencies>
+    <dependency>
+      <groupId>au.gov.naa.digipres.xena</groupId>
+      <artifactId>core</artifactId>
+      <version>6.1.0</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>edu.stanford.ejalbert</groupId>
+      <artifactId>BrowserLauncher2</artifactId>
+      <version>1.3</version>
+      <type>jar</type>
+    </dependency>
+  </dependencies>
+</project>

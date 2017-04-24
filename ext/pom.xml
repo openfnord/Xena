@@ -12,6 +12,7 @@
   <modules>
     <module>jflac</module>
     <module>tar</module>
+    <!--<module>jpedal_lgpl</module>-->
     <module>jspeex</module>
     <module>xt</module>
   </modules>

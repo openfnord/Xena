@@ -17,8 +17,14 @@
     <module>image</module>
     <module>metadata</module>
     <module>multipage</module>
-    <module>xml</module>    
+    <!--<module>naa</module>-->
+    <!--<module>pdf</module>-->
+    <module>plaintext</module>
+    <module>project</module>
     <module>office</module>
+    <module>website</module>     
+    <module>xml</module>    
+
   </modules>
   
   <dependencyManagement>
