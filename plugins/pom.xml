@@ -15,6 +15,8 @@
     <module>email</module>
     <module>html</module>
     <module>image</module>
+    <module>metadata</module>
+    <module>multipage</module>
     <module>xml</module>    
     <module>office</module>
   </modules>
