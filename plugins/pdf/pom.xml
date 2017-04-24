@@ -19,7 +19,7 @@
   <dependency>
     <groupId>org.jpedal</groupId>
     <artifactId>jpedal-lgpl</artifactId>
-    <version>4.74b27</version>
+    <version>3.83b38</version>
 </dependency>
 
 
