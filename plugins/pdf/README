@@ -1,0 +1,1 @@
+mvn install:install-file -DgroupId=org.jpedal -DartifactId=jpedal-lgpl -Dversion=3.83b38  -Dfile=./ext/jar/jpedal_lgpl.jar -Dpackaging=jar -DgeneratePom=true
