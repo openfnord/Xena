@@ -18,7 +18,7 @@
     <module>metadata</module>
     <module>multipage</module>
     <!--<module>naa</module>-->
-    <!--<module>pdf</module>-->
+    <module>pdf</module>
     <module>plaintext</module>
     <module>project</module>
     <module>office</module>
