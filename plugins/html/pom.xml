@@ -7,18 +7,14 @@
     <version>6.1.0</version>
   </parent>
   <artifactId>html</artifactId>
-  <packaging>jar</packaging>
+  
+  <packaging>bundle</packaging>
+  
   <dependencies>
-    <dependency>
-      <groupId>au.gov.naa.digipres.xena</groupId>
-      <artifactId>core</artifactId>
-      <version>6.1.0</version>
-      <type>jar</type>
-    </dependency>
+
     <dependency>
       <groupId>edu.stanford.ejalbert</groupId>
       <artifactId>BrowserLauncher2</artifactId>
-      <version>1.3</version>
     </dependency>
 
   </dependencies>

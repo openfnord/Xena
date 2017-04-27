@@ -7,39 +7,13 @@
   <packaging>pom</packaging>
   <name>Xena Management Pom</name>
   <description>Xena's top level management pom</description>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.6.1</version>
-        <configuration>
-          <encoding>${project.build.sourceEncoding}</encoding>
-          <showDeprecation>true</showDeprecation>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>3.0.2</version>
-        <configuration>
-          <encoding>${project.build.sourceEncoding}</encoding>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+ 
   <modules>
     <module>core</module> 
     <module>ext</module>
     <module>plugins</module>
   </modules>
-  <properties>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-  
-  
+ 
   <dependencyManagement>    
     <dependencies>
       <dependency>
@@ -55,8 +29,7 @@
       <dependency>
         <groupId>xerces</groupId>
         <artifactId>xercesImpl</artifactId>
-        <version>2.9.1</version>
-        <type>jar</type>
+        <version>2.9.1</version>      
       </dependency>
       <dependency>
         <groupId>javax.help</groupId>
@@ -89,7 +62,259 @@
         <artifactId>jspeex</artifactId>
         <version>0.9.7</version>
       </dependency>
+    
+      <dependency>
+        <groupId>org.apache.poi</groupId>
+        <artifactId>poi</artifactId>
+        <version>${poi.version}</version>      
+      </dependency>
+      <dependency>
+        <groupId>org.apache.poi</groupId>
+        <artifactId>poi-ooxml</artifactId>
+        <version>${project.version}</version>      
+      </dependency>    
+      <dependency>
+        <groupId>com.ice</groupId>
+        <artifactId>tar</artifactId>
+        <version>2.3</version>      
+      </dependency>
+      <dependency>    
+        <groupId>jflac</groupId>
+        <artifactId>jflac</artifactId>
+        <version>1.3</version>
+      </dependency> 
+      <dependency>
+        <groupId>javazoom</groupId>
+        <artifactId>jlayer</artifactId>
+        <version>1.0.1</version>
+      </dependency>
+      <dependency>
+        <groupId>com.googlecode.soundlibs</groupId>
+        <artifactId>tritonus-share</artifactId>
+        <version>0.3.7.4</version>
+      </dependency>
+      <dependency>
+        <groupId>com.googlecode.soundlibs</groupId>
+        <artifactId>tritonus-all</artifactId>
+        <version>0.3.7.2</version>
+      </dependency>
+      <dependency>
+        <groupId>com.googlecode.soundlibs</groupId>
+        <artifactId>jlayer</artifactId>
+        <version>1.0.1.4</version>
+      </dependency>
+      <!--    
+     <dependency>
+        <groupId>com.googlecode.soundlibs</groupId>
+        <artifactId>mp3spi</artifactId>
+        <version>1.9.5.3</version>
+      </dependency>
+      -->
+      <dependency>
+        <groupId>com.googlecode.soundlibs</groupId>
+        <artifactId>jorbis</artifactId>
+        <version>0.0.17.4</version>
+      </dependency>   
+      <dependency>
+        <groupId>com.googlecode.soundlibs</groupId>
+        <artifactId>vorbisspi</artifactId>
+        <version>1.0.3.3</version>
+      </dependency>
+      <dependency>
+        <groupId>com.googlecode.soundlibs</groupId>
+        <artifactId>basicplayer</artifactId>
+        <version>3.0.0.0</version>
+      </dependency> 
+      <dependency>
+        <groupId>org.mobicents.external.fmj</groupId>
+        <artifactId>mp3spi</artifactId>
+        <version>1.9.4</version>      
+      </dependency>
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-core</artifactId>
+        <version>1.3</version>      
+      </dependency> 
+      <dependency>
+        <groupId>org.apache.ant</groupId>
+        <artifactId>ant</artifactId>
+        <version>1.7.1</version>      
+      </dependency>
+      <dependency>
+        <groupId>javax.mail</groupId>
+        <artifactId>mail</artifactId>
+        <version>1.4.7</version>      
+      </dependency> 
+      <dependency>
+        <groupId>edu.stanford.ejalbert</groupId>
+        <artifactId>BrowserLauncher2</artifactId>
+        <version>1.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.sanselan</groupId>
+        <artifactId>sanselan</artifactId>
+        <version>0.97-incubator</version>
+      </dependency> 
+      <dependency>
+        <groupId>org.im4java</groupId>
+        <artifactId>im4java</artifactId>
+        <version>1.4.0</version>
+      </dependency>      
+      <dependency>
+        <groupId>org.apache.xmlgraphics</groupId>
+        <artifactId>batik-svggen</artifactId>
+        <version>1.7</version>
+      </dependency>      
+      <dependency>
+        <groupId>org.apache.xmlgraphics</groupId>
+        <artifactId>batik-swing</artifactId>
+        <version>1.7</version>
+      </dependency>      
+      <dependency>
+        <groupId>org.apache.xmlgraphics</groupId>
+        <artifactId>batik-codec</artifactId>
+        <version>1.7</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openoffice</groupId>
+        <artifactId>juh</artifactId>
+        <version>3.0.0</version>
+      </dependency>  
+      <dependency>
+        <groupId>org.openoffice</groupId>
+        <artifactId>unoil</artifactId>
+        <version>3.0.0</version>
+      </dependency>   
+      <dependency>
+        <groupId>xt</groupId>
+        <artifactId>xt</artifactId>
+        <version>20051206</version>      
+      </dependency> 
+      <dependency>
+        <groupId>org.jpedal</groupId>
+        <artifactId>jpedal-lgpl</artifactId>
+        <version>3.83b38</version>    
+      </dependency>
+      <dependency>
+        <groupId>net.sourceforge</groupId>
+        <artifactId>mpxj</artifactId>
+        <version>4.0.0.1</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.mail</groupId>
+        <artifactId>mail</artifactId>
+        <version>1.4.7</version>          
+      </dependency>
+      <dependency>
+        <groupId>au.gov.naa.digipres.xena</groupId>
+        <artifactId>core</artifactId>
+        <version>6.1.0</version>
+      </dependency>    
+    
+      <!-- osgi compile/runtime libs -->
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.core</artifactId>
+        <scope>runtime</scope>
+        <version>${osgi.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <!--<artifactId>org.osgi.compendium</artifactId>-->
+        <artifactId>osgi.cmpn</artifactId>
+        <scope>compile</scope>
+        <version>${osgi.version}</version>
+      </dependency> 
     </dependencies>
   </dependencyManagement>
 
+ 
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  
+    <osgi.version>6.0.0</osgi.version>
+    <poi.version>3.9</poi.version>
+    
+    <!--  These properties are used to add osgi bundle properties in sub-modules as needed -->
+    <xena.plugin.prefix></xena.plugin.prefix>
+    <export.packages></export.packages>
+    <import.packages></import.packages> 
+    <require.capabilities></require.capabilities>
+  </properties>
+    
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+      </plugin>
+    </plugins>
+    
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.6.1</version>
+          <configuration>
+            <encoding>${project.build.sourceEncoding}</encoding>
+            <showDeprecation>true</showDeprecation>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>3.0.2</version>
+          <configuration>
+            <encoding>${project.build.sourceEncoding}</encoding>
+          </configuration>
+        </plugin>
+      
+        <!-- This plugin is used to convert  jars to bundles, Meaning it populates the 
+               jar manifest with the details required by an OSGI environment.
+        -->
+        <plugin>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>maven-bundle-plugin</artifactId>
+          <version>3.3.0</version>
+          <extensions>true</extensions>
+          <configuration>
+            <instructions>
+              <Bundle-SymbolicName>XENA${xena.plugin.prefix}-${project.artifactId}</Bundle-SymbolicName>
+              <Bundle-Name>XENA${xena.plugin.prefix}-${project.artifactId}</Bundle-Name>
+              <Import-Package>${import.packages},*</Import-Package>
+              <Export-Package>${export.packages}</Export-Package>          
+              <Require-Capability>${require.capabilities}</Require-Capability>      
+              <Bundle-Version>${project.version}</Bundle-Version>
+            </instructions>         
+          </configuration>
+        </plugin>   
+      </plugins>
+    </pluginManagement>
+  </build> 
+  
+  <repositories>
+    <repository>
+      <id>jboss nexus</id>
+      <name>jboss nexus</name>
+      <url>https://repository.jboss.org/nexus/content/repositories/releases/</url>
+    </repository>
+    
+    <!--    <repository>
+      <id>pdf.repo</id>
+      <name>ProjectRepo</name>
+      <url>file:///${basedir}</url>
+    </repository>-->
+  </repositories>
 </project>

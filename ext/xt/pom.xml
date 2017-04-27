@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <!--  <parent>
+    <parent>
     <groupId>au.gov.naa.digipres.xena</groupId>
-    <artifactId>digipres</artifactId>
-    <version>6.1.0</version>
-    <relativePath>../../pom.xml</relativePath>
-  </parent>-->
+    <artifactId>ext</artifactId>
+    <version>6.1.0</version>  
+  </parent>
+  
   <groupId>xt</groupId>
   <artifactId>xt</artifactId>
   <version>20051206</version> 
@@ -16,8 +16,7 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
-            <type>jar</type>
+            <version>2.5</version>         
         </dependency>
     </dependencies>
 </project>

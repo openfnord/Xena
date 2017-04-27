@@ -7,17 +7,7 @@
     <version>6.1.0</version>
   </parent>
   <artifactId>plaintext</artifactId>
-  <packaging>jar</packaging>
-  <dependencies>
-    <dependency>
-      <groupId>au.gov.naa.digipres.xena</groupId>
-      <artifactId>core</artifactId>
-      <version>6.1.0</version>
-      <type>jar</type>
-    </dependency>
    
-
-
-
-  </dependencies>
+  <packaging>bundle</packaging>
+  
 </project>
