@@ -1,33 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>au.gov.naa.digipres.xena</groupId>
-        <artifactId>plugins</artifactId>
-        <version>6.1.0</version>
-    </parent>
-    <artifactId>email</artifactId>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>au.gov.naa.digipres.xena</groupId>
+    <artifactId>plugins</artifactId>
+    <version>6.1.0</version>
+  </parent>
+  <artifactId>email</artifactId>
   
   <packaging>bundle</packaging>
   
-    <dependencies>   
-        <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>      
-            <version>1.4.7</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi</artifactId>
-            <version>3.8</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml</artifactId>
-            <version>3.8</version>
-            <type>jar</type>
-        </dependency>
-    </dependencies>
+  <dependencies>   
+    <dependency>
+      <groupId>javax.mail</groupId>
+      <artifactId>mail</artifactId>            
+    </dependency>
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi</artifactId>      
+    </dependency>
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi-ooxml</artifactId>
+    </dependency>
+  </dependencies>
 </project>

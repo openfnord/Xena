@@ -71,7 +71,7 @@
       <dependency>
         <groupId>org.apache.poi</groupId>
         <artifactId>poi-ooxml</artifactId>
-        <version>${project.version}</version>      
+        <version>${poi.version}</version>      
       </dependency>    
       <dependency>
         <groupId>com.ice</groupId>
@@ -199,12 +199,7 @@
         <groupId>net.sourceforge</groupId>
         <artifactId>mpxj</artifactId>
         <version>4.0.0.1</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.mail</groupId>
-        <artifactId>mail</artifactId>
-        <version>1.4.7</version>          
-      </dependency>
+      </dependency>    
       <dependency>
         <groupId>au.gov.naa.digipres.xena</groupId>
         <artifactId>core</artifactId>
