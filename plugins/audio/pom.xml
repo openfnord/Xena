@@ -30,8 +30,7 @@
     </dependency>
     <dependency>
       <groupId>com.googlecode.soundlibs</groupId>
-      <artifactId>jlayer</artifactId>
-      <version>1.0.1.4</version>
+      <artifactId>jlayer</artifactId> 
     </dependency>
     <!--    <dependency>
       <groupId>com.googlecode.soundlibs</groupId>

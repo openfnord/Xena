@@ -6,12 +6,13 @@
     <artifactId>xena</artifactId>
     <version>6.1.0</version>
   </parent>
-  <artifactId>core</artifactId>
+  <artifactId>xena-core</artifactId>
   <name>Xena Core</name>
   <description>Xena's core functionality</description>
   
   <packaging>bundle</packaging> 
-  
+ 
+ 
   <dependencies>
     <dependency>
       <groupId>commons-cli</groupId>
@@ -44,6 +45,7 @@
   </dependencies>
   
   <build>
+   
     <plugins>
             <plugin>
         <groupId>org.apache.maven.plugins</groupId>
