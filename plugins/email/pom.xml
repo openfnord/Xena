@@ -7,7 +7,7 @@
     <version>6.1.0</version>
   </parent>
   <artifactId>email</artifactId>
-  
+  <version>3.3.4</version>
   <packaging>bundle</packaging>
   
   <dependencies>   
