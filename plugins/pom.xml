@@ -29,7 +29,8 @@
   <dependencies>
     <dependency>
       <groupId>au.gov.naa.digipres.xena</groupId>
-      <artifactId>core</artifactId>
+      <artifactId>xena-core</artifactId>
+      <version>6.1.0</version>
     </dependency>
   </dependencies>
   <properties>   
